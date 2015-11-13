@@ -1,0 +1,29 @@
+
+import weka.core.Instances;
+import weka.core.SerializationHelper;
+import weka.core.converters.ArffLoader;
+import java.io.File;
+
+import weka.classifiers.Classifier;
+
+
+public class ExampleClassifier {
+
+    public static void main(String[] args) throws Exception {
+    	
+    	ArffLoader m_Loader = new ArffLoader();
+    	m_Loader.setFile(new File("examples/200hz-3class-gyro.arff"));
+        Instances data = m_Loader.getDataSet();
+
+        if (data.classIndex() == -1)
+            data.setClassIndex(data.numAttributes() - 1);
+
+        Classifier rbf; 
+        rbf = (Classifier)SerializationHelper.read("models/2p1-gyro-mlp.model");
+
+        for(int i = 0; i < data.numInstances(); i++) {
+            System.out.println(rbf.classifyInstance(data.instance(i)));
+        }
+    }
+}
+
