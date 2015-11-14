@@ -452,6 +452,7 @@ public class ArffLoader
           if (m_Tokenizer.ttype != StreamTokenizer.TT_WORD) {
             errorMessage("not a valid value");
           }
+                    
           switch (m_Data.attribute(i).type()) {
           case Attribute.NOMINAL:
             // Check if value appears in header.
@@ -468,16 +469,6 @@ public class ArffLoader
                 doubleValue();
             } catch (NumberFormatException e) {
               errorMessage("number expected");
-            }
-            break;
-          case Attribute.STRING:
-            instance[i] = m_Data.attribute(i).addStringValue(m_Tokenizer.sval);
-            break;
-          case Attribute.DATE:
-            try {
-              instance[i] = m_Data.attribute(i).parseDate(m_Tokenizer.sval);
-            } catch (ParseException e) {
-              errorMessage("unparseable date: " + m_Tokenizer.sval);
             }
             break;
           default:

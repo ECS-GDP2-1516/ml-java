@@ -269,48 +269,6 @@ public class Instance
     freshAttributeVector();
     m_AttValues[attIndex] = value;
   }
-
-  /** 
-   * Returns the relational value of a relational attribute.
-   *
-   * @param attIndex the attribute's index
-   * @return the corresponding relation as an Instances object
-   * @throws IllegalArgumentException if the attribute is not a
-   * relation-valued attribute
-   * @throws UnassignedDatasetException if the instance doesn't belong
-   * to a dataset.
-   */
-  //@ requires m_Dataset != null;
-  public final /*@pure@*/ Instances relationalValue(int attIndex) {
-
-    if (m_Dataset == null) {
-      throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
-    } 
-    return relationalValue(m_Dataset.attribute(attIndex));
-  }
-
-  /** 
-   * Returns the relational value of a relational attribute.
-   *
-   * @param att the attribute
-   * @return the corresponding relation as an Instances object
-   * @throws IllegalArgumentException if the attribute is not a
-   * relation-valued attribute
-   * @throws UnassignedDatasetException if the instance doesn't belong
-   * to a dataset.
-   */
-  public final /*@pure@*/ Instances relationalValue(Attribute att) {
-
-    int attIndex = att.index();
-    if (att.isRelationValued()) {
-      if (isMissing(attIndex)) {
-        return null;
-      }
-      return att.relation((int) value(attIndex));
-    } else {
-      throw new IllegalArgumentException("Attribute isn't relation-valued!");
-    }
-  }
   
   /**
    * Returns the values of each attribute as an array of doubles.

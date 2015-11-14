@@ -101,15 +101,6 @@ public class Attribute
   /** Constant set for nominal attributes. */
   public static final int NOMINAL = 1;
 
-  /** Constant set for attributes with string values. */
-  public static final int STRING = 2;
-
-  /** Constant set for attributes with date values. */
-  public static final int DATE = 3;
-
-  /** Constant set for relation-valued attributes. */
-  public static final int RELATIONAL = 4;
-
   /** Constant set for symbolic attributes. */
   public static final int ORDERING_SYMBOLIC = 0;
 
@@ -282,16 +273,7 @@ public class Attribute
 
     m_Name = attributeName;
     m_Index = -1;
-    if (attributeValues == null) {
-      m_Values = new FastVector();
-      m_Hashtable = new Hashtable();
-      m_Header = null;
-      m_Type = STRING;
-      
-      // Make sure there is at least one value so that string attribute
-      // values are always represented when output as part of a sparse instance.
-      addStringValue(DUMMY_STRING_VAL);
-    } else {
+    if (attributeValues == null) {} else {
       m_Values = new FastVector(attributeValues.size());
       m_Hashtable = new Hashtable(attributeValues.size());
       m_Header = null;
@@ -347,7 +329,7 @@ public class Attribute
    */
   public final /*@ pure @*/ Enumeration enumerateValues() {
 
-    if (isNominal() || isString()) {
+    if (isNominal()) {
       final Enumeration ee = m_Values.elements();
       return new Enumeration () {
           public boolean hasMoreElements() {
@@ -388,7 +370,7 @@ public class Attribute
    */
   public final int indexOfValue(String value) {
 
-    if (!isNominal() && !isString())
+    if (!isNominal())
       return -1;
     Object store = value;
     if (value.length() > STRING_COMPRESS_THRESHOLD) {
@@ -423,40 +405,7 @@ public class Attribute
   //@ ensures \result <==> ((m_Type == NUMERIC) || (m_Type == DATE));
   public final /*@ pure @*/ boolean isNumeric() {
 
-    return ((m_Type == NUMERIC) || (m_Type == DATE));
-  }
-
-  /**
-   * Tests if the attribute is relation valued.
-   *
-   * @return true if the attribute is relation valued
-   */
-  //@ ensures \result <==> (m_Type == RELATIONAL);
-  public final /*@ pure @*/ boolean isRelationValued() {
-
-    return (m_Type == RELATIONAL);
-  }
-
-  /**
-   * Tests if the attribute is a string.
-   *
-   * @return true if the attribute is a string
-   */
-  //@ ensures \result <==> (m_Type == STRING);
-  public final /*@ pure @*/ boolean isString() {
-
-    return (m_Type == STRING);
-  }
-
-  /**
-   * Tests if the attribute is a date type.
-   *
-   * @return true if the attribute is a date type
-   */
-  //@ ensures \result <==> (m_Type == DATE);
-  public final /*@ pure @*/ boolean isDate() {
-
-    return (m_Type == DATE);
+    return ((m_Type == NUMERIC));
   }
 
   /**
@@ -479,7 +428,7 @@ public class Attribute
    */
   public final /*@ pure @*/ int numValues() {
 
-    if (!isNominal() && !isString() && !isRelationValued()) {
+    if (!isNominal()) {
       return 0;
     } else {
       return m_Values.size();
@@ -496,20 +445,7 @@ public class Attribute
 
     return m_Type;
   }
-  
-  /**
-   * Returns the Date format pattern in case this attribute is of type DATE,
-   * otherwise an empty string.
-   * 
-   * @return the date format pattern
-   * @see SimpleDateFormat
-   */
-  public final String getDateFormat() {
-    if (isDate())
-      return m_DateFormat.toPattern();
-    else
-      return "";
-  }
+ 
 
   /**
    * Returns a value of a nominal or string attribute.  Returns an
@@ -521,7 +457,7 @@ public class Attribute
    */
   public final /*@ non_null pure @*/ String value(int valIndex) {
     
-    if (!isNominal() && !isString()) {
+    if (!isNominal()) {
       return "";
     } else {
       Object val = m_Values.elementAt(valIndex);
@@ -531,37 +467,6 @@ public class Attribute
         val = ((SerializedObject)val).getObject();
       }
       return (String) val;
-    }
-  }
-
-  /**
-   * Returns the header info for a relation-valued attribute,
-   * null if the attribute is not relation-valued.
-   *
-   * @return the attribute's value as an Instances object
-   */
-  public final /*@ non_null pure @*/ Instances relation() {
-    
-    if (!isRelationValued()) {
-      return null;
-    } else {
-      return m_Header;
-    }
-  }
-
-  /**
-   * Returns a value of a relation-valued attribute. Returns
-   * null if the attribute is not relation-valued.
-   *
-   * @param valIndex the value's index
-   * @return the attribute's value as an Instances object
-   */
-  public final /*@ non_null pure @*/ Instances relation(int valIndex) {
-    
-    if (!isRelationValued()) {
-      return null;
-    } else {
-      return (Instances) m_Values.elementAt(valIndex);
     }
   }
 
@@ -604,76 +509,6 @@ public class Attribute
   }
 
   /**
-   * Adds a string value to the list of valid strings for attributes
-   * of type STRING and returns the index of the string.
-   *
-   * @param value The string value to add
-   * @return the index assigned to the string, or -1 if the attribute is not
-   * of type Attribute.STRING 
-   */
-  /*@ requires value != null;
-      ensures  isString() && 0 <= \result && \result < m_Values.size() ||
-             ! isString() && \result == -1;
-  */
-  public int addStringValue(String value) {
-
-    if (!isString()) {
-      return -1;
-    }
-    Object store = value;
-
-    if (value.length() > STRING_COMPRESS_THRESHOLD) {
-      try {
-        store = new SerializedObject(value, true);
-      } catch (Exception ex) {
-        System.err.println("Couldn't compress string attribute value -"
-                           + " storing uncompressed.");
-      }
-    }
-    Integer index = (Integer)m_Hashtable.get(store);
-    if (index != null) {
-      return index.intValue();
-    } else {
-      int intIndex = m_Values.size();
-      m_Values.addElement(store);
-      m_Hashtable.put(store, new Integer(intIndex));
-      return intIndex;
-    }
-  }
-
-  /**
-   * Adds a string value to the list of valid strings for attributes
-   * of type STRING and returns the index of the string. This method is
-   * more efficient than addStringValue(String) for long strings.
-   *
-   * @param src The Attribute containing the string value to add.
-   * @param index the index of the string value in the source attribute.
-   * @return the index assigned to the string, or -1 if the attribute is not
-   * of type Attribute.STRING 
-   */
-  /*@ requires src != null;
-      requires 0 <= index && index < src.m_Values.size();
-      ensures  isString() && 0 <= \result && \result < m_Values.size() ||
-             ! isString() && \result == -1;
-  */
-  public int addStringValue(Attribute src, int index) {
-
-    if (!isString()) {
-      return -1;
-    }
-    Object store = src.m_Values.elementAt(index);
-    Integer oldIndex = (Integer)m_Hashtable.get(store);
-    if (oldIndex != null) {
-      return oldIndex.intValue();
-    } else {
-      int intIndex = m_Values.size();
-      m_Values.addElement(store);
-      m_Hashtable.put(store, new Integer(intIndex));
-      return intIndex;
-    }
-  }
-
-  /**
    * Adds an attribute value. Creates a fresh list of attribute
    * values before adding it.
    *
@@ -709,44 +544,6 @@ public class Attribute
     copy.setMetadata(m_Metadata);
  
     return copy;
-  }
-
-  /**
-   * Removes a value of a nominal, string, or relation-valued
-   * attribute. Creates a fresh list of attribute values before
-   * removing it.
-   *
-   * @param index the value's index
-   * @throws IllegalArgumentException if the attribute is not 
-   * of the correct type
-   */
-  //@ requires isNominal() || isString() || isRelationValued();
-  //@ requires 0 <= index && index < m_Values.size();
-  final void delete(int index) {
-    
-    if (!isNominal() && !isString() && !isRelationValued()) 
-      throw new IllegalArgumentException("Can only remove value of " +
-                                         "nominal, string or relation-" +
-                                         " valued attribute!");
-    else {
-      m_Values = (FastVector)m_Values.copy();
-      m_Values.removeElementAt(index);
-      if (!isRelationValued()) {
-        Hashtable hash = new Hashtable(m_Hashtable.size());
-        Enumeration enu = m_Hashtable.keys();
-        while (enu.hasMoreElements()) {
-          Object string = enu.nextElement();
-          Integer valIndexObject = (Integer)m_Hashtable.get(string);
-          int valIndex = valIndexObject.intValue();
-          if (valIndex > index) {
-            hash.put(string, new Integer(valIndex - 1));
-          } else if (valIndex < index) {
-            hash.put(string, valIndexObject);
-          }
-        }
-        m_Hashtable = hash;
-      }
-    }
   }
 
   /**
@@ -800,7 +597,6 @@ public class Attribute
     
     switch (m_Type) {
     case NOMINAL:
-    case STRING:
       m_Values = (FastVector)m_Values.copy();
       m_Hashtable = (Hashtable)m_Hashtable.clone();
       Object store = string;
@@ -819,47 +615,6 @@ public class Attribute
     default:
       throw new IllegalArgumentException("Can only set values for nominal"
                                          + " or string attributes!");
-    }
-  }
-
-  /**
-   * Returns the given amount of milliseconds formatted according to the
-   * current Date format.
-   * 
-   * @param date 	the date, represented in milliseconds since 
-   * 			January 1, 1970, 00:00:00 GMT, to return as string
-   * @return 		the formatted date
-   */
-  //@ requires isDate();
-  public /*@pure@*/ String formatDate(double date) {
-    switch (m_Type) {
-    case DATE:
-      return m_DateFormat.format(new Date((long)date));
-    default:
-      throw new IllegalArgumentException("Can only format date values for date"
-                                         + " attributes!");
-    }
-  }
-
-  /**
-   * Parses the given String as Date, according to the current format and
-   * returns the corresponding amount of milliseconds.
-   * 
-   * @param string the date to parse
-   * @return the date in milliseconds since January 1, 1970, 00:00:00 GMT
-   * @throws ParseException if parsing fails
-   */
-  //@ requires isDate();
-  //@ requires string != null;
-  public double parseDate(String string) throws ParseException {
-    switch (m_Type) {
-    case DATE:
-      long time = m_DateFormat.parse(string).getTime();
-      // TODO put in a safety check here if we can't store the value in a double.
-      return (double)time;
-    default:
-      throw new IllegalArgumentException("Can only parse date values for date"
-                                         + " attributes!");
     }
   }
 
@@ -1012,12 +767,7 @@ public class Attribute
     
     m_Metadata = metadata;
 
-    if (m_Type == DATE) {
-      m_Ordering = ORDERING_ORDERED;
-      m_IsRegular = true;
-      m_IsAveragable = false;
-      m_HasZeropoint = false;
-    } else {
+    {
 
       // get ordering
       String orderString = m_Metadata.getProperty("ordering","");

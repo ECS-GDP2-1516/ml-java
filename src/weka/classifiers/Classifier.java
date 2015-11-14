@@ -80,7 +80,6 @@ public abstract class Classifier implements Cloneable, Serializable
         return Instance.missingValue();
       }
     case Attribute.NUMERIC:
-    case Attribute.DATE:
       return dist[0];
     default:
       return Instance.missingValue();

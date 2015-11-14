@@ -276,15 +276,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Checks for string attributes in the dataset
-   * 
-   * @return true if string attributes are present, false otherwise
-   */
-  public/* @pure@ */boolean checkForStringAttributes() {
-    return checkForAttributeType(Attribute.STRING);
-  }
-
-  /**
    * Returns the class attribute.
    * 
    * @return the class attribute
