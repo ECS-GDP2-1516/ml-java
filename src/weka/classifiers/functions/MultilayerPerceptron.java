@@ -33,7 +33,6 @@ import weka.core.Instances;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.Randomizable;
-import weka.core.RevisionHandler;
 import weka.core.RevisionUtils;
 import weka.core.Utils;
 import weka.core.WeightedInstancesHandler;
@@ -41,33 +40,13 @@ import weka.core.Capabilities.Capability;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NominalToBinary;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Enumeration;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Vector;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 
 /** 
  <!-- globalinfo-start -->
@@ -237,22 +216,6 @@ public class MultilayerPerceptron
     }
 
 
-    /**
-     * Call this function to draw the node highlighted.
-     * @param g The graphics context.
-     * @param w The width of the drawing area.
-     * @param h The height of the drawing area.
-     */
-    public void drawHighlight(Graphics g, int w, int h) {
-      
-      g.setColor(Color.black);
-      FontMetrics fm = g.getFontMetrics();
-      int l = (int)(m_x * w) - fm.stringWidth(m_id) / 2;
-      int t = (int)(m_y * h) - fm.getHeight() / 2;
-      g.fillRect(l - 2, t - 2, fm.stringWidth(m_id) + 8
-		 , fm.getHeight() + fm.getDescent() + 8); 
-      drawNode(g, w, h);
-    }
     
     /**
      * Call this to get the output value of this unit. 
@@ -429,459 +392,6 @@ public class MultilayerPerceptron
     }
   }
   
-
- 
-  /** Inner class used to draw the nodes onto.(uses the node lists!!) 
-   * This will also handle the user input. */
-  private class NodePanel 
-    extends JPanel
-    implements RevisionHandler {
-    
-    /** for serialization */
-    static final long serialVersionUID = -3067621833388149984L;
-
-    /**
-     * The constructor.
-     */
-    public NodePanel() {
-      
-
-      addMouseListener(new MouseAdapter() {
-	  
-	  public void mousePressed(MouseEvent e) {
-	    
-	    if (!m_stopped) {
-	      return;
-	    }
-	    if ((e.getModifiers() & MouseEvent.BUTTON1_MASK) == MouseEvent.BUTTON1_MASK && 
-		!e.isAltDown()) {
-	      Graphics g = NodePanel.this.getGraphics();
-	      int x = e.getX();
-	      int y = e.getY();
-	      int w = NodePanel.this.getWidth();
-	      int h = NodePanel.this.getHeight();
-	      FastVector tmp = new FastVector(4);
-	      for (int noa = 0; noa < m_numAttributes; noa++) {
-		if (m_inputs[noa].onUnit(g, x, y, w, h)) {
-		  tmp.addElement(m_inputs[noa]);
-		  selection(tmp, 
-			    (e.getModifiers() & MouseEvent.CTRL_MASK) == MouseEvent.CTRL_MASK
-			    , true);
-		  return;
-		}
-	      }
-	      for (int noa = 0; noa < m_numClasses; noa++) {
-		if (m_outputs[noa].onUnit(g, x, y, w, h)) {
-		  tmp.addElement(m_outputs[noa]);
-		  selection(tmp,
-			    (e.getModifiers() & MouseEvent.CTRL_MASK) == MouseEvent.CTRL_MASK
-			    , true);
-		  return;
-		}
-	      }
-	      for (int noa = 0; noa < m_neuralNodes.length; noa++) {
-		if (m_neuralNodes[noa].onUnit(g, x, y, w, h)) {
-		  tmp.addElement(m_neuralNodes[noa]);
-		  selection(tmp,
-			    (e.getModifiers() & MouseEvent.CTRL_MASK) == MouseEvent.CTRL_MASK
-			    , true);
-		  return;
-		}
-
-	      }
-	      NeuralNode temp = new NeuralNode(String.valueOf(m_nextId), 
-					       m_random, m_sigmoidUnit);
-	      m_nextId++;
-	      temp.setX((double)e.getX() / w);
-	      temp.setY((double)e.getY() / h);
-	      tmp.addElement(temp);
-	      addNode(temp);
-	      selection(tmp, (e.getModifiers() & MouseEvent.CTRL_MASK) == MouseEvent.CTRL_MASK
-			, true);
-	    }
-	    else {
-	      //then right click
-	      Graphics g = NodePanel.this.getGraphics();
-	      int x = e.getX();
-	      int y = e.getY();
-	      int w = NodePanel.this.getWidth();
-	      int h = NodePanel.this.getHeight();
-	      FastVector tmp = new FastVector(4);
-	      for (int noa = 0; noa < m_numAttributes; noa++) {
-		if (m_inputs[noa].onUnit(g, x, y, w, h)) {
-		  tmp.addElement(m_inputs[noa]);
-		  selection(tmp, 
-			    (e.getModifiers() & MouseEvent.CTRL_MASK) == MouseEvent.CTRL_MASK
-			    , false);
-		  return;
-		}
-		
-		
-	      }
-	      for (int noa = 0; noa < m_numClasses; noa++) {
-		if (m_outputs[noa].onUnit(g, x, y, w, h)) {
-		  tmp.addElement(m_outputs[noa]);
-		  selection(tmp,
-			    (e.getModifiers() & MouseEvent.CTRL_MASK) == MouseEvent.CTRL_MASK
-			    , false);
-		  return;
-		}
-	      }
-	      for (int noa = 0; noa < m_neuralNodes.length; noa++) {
-		if (m_neuralNodes[noa].onUnit(g, x, y, w, h)) {
-		  tmp.addElement(m_neuralNodes[noa]);
-		  selection(tmp,
-			    (e.getModifiers() & MouseEvent.CTRL_MASK) == MouseEvent.CTRL_MASK
-			    , false);
-		  return;
-		}
-	      }
-	      selection(null, (e.getModifiers() & MouseEvent.CTRL_MASK) == MouseEvent.CTRL_MASK
-			, false);
-	    }
-	  }
-	});
-    }
-    
-    
-    /**
-     * This function gets called when the user has clicked something
-     * It will amend the current selection or connect the current selection
-     * to the new selection.
-     * Or if nothing was selected and the right button was used it will 
-     * delete the node.
-     * @param v The units that were selected.
-     * @param ctrl True if ctrl was held down.
-     * @param left True if it was the left mouse button.
-     */
-    private void selection(FastVector v, boolean ctrl, boolean left) {
-      
-      if (v == null) {
-	//then unselect all.
-	m_selected.removeAllElements();
-	repaint();
-	return;
-      }
-      
-
-      //then exclusive or the new selection with the current one.
-      if ((ctrl || m_selected.size() == 0) && left) {
-	boolean removed = false;
-	for (int noa = 0; noa < v.size(); noa++) {
-	  removed = false;
-	  for (int nob = 0; nob < m_selected.size(); nob++) {
-	    if (v.elementAt(noa) == m_selected.elementAt(nob)) {
-	      //then remove that element
-	      m_selected.removeElementAt(nob);
-	      removed = true;
-	      break;
-	    }
-	  }
-	  if (!removed) {
-	    m_selected.addElement(v.elementAt(noa));
-	  }
-	}
-	repaint();
-	return;
-      }
-
-      
-      if (left) {
-	//then connect the current selection to the new one.
-	for (int noa = 0; noa < m_selected.size(); noa++) {
-	  for (int nob = 0; nob < v.size(); nob++) {
-	    NeuralConnection
-	      .connect((NeuralConnection)m_selected.elementAt(noa)
-		       , (NeuralConnection)v.elementAt(nob));
-	  }
-	}
-      }
-      else if (m_selected.size() > 0) {
-	//then disconnect the current selection from the new one.
-	
-	for (int noa = 0; noa < m_selected.size(); noa++) {
-	  for (int nob = 0; nob < v.size(); nob++) {
-	    NeuralConnection
-	      .disconnect((NeuralConnection)m_selected.elementAt(noa)
-			  , (NeuralConnection)v.elementAt(nob));
-	    
-	    NeuralConnection
-	      .disconnect((NeuralConnection)v.elementAt(nob)
-			  , (NeuralConnection)m_selected.elementAt(noa));
-	    
-	  }
-	}
-      }
-      else {
-	//then remove the selected node. (it was right clicked while 
-	//no other units were selected
-	for (int noa = 0; noa < v.size(); noa++) {
-	  ((NeuralConnection)v.elementAt(noa)).removeAllInputs();
-	  ((NeuralConnection)v.elementAt(noa)).removeAllOutputs();
-	  removeNode((NeuralConnection)v.elementAt(noa));
-	}
-      }
-      repaint();
-    }
-
-    /**
-     * This will paint the nodes ontot the panel.
-     * @param g The graphics context.
-     */
-    public void paintComponent(Graphics g) {
-
-      super.paintComponent(g);
-      int x = getWidth();
-      int y = getHeight();
-      if (25 * m_numAttributes > 25 * m_numClasses && 
-	  25 * m_numAttributes > y) {
-	setSize(x, 25 * m_numAttributes);
-      }
-      else if (25 * m_numClasses > y) {
-	setSize(x, 25 * m_numClasses);
-      }
-      else {
-	setSize(x, y);
-      }
-
-      y = getHeight();
-      for (int noa = 0; noa < m_numAttributes; noa++) {
-	m_inputs[noa].drawInputLines(g, x, y);
-      }
-      for (int noa = 0; noa < m_numClasses; noa++) {
-	m_outputs[noa].drawInputLines(g, x, y);
-	m_outputs[noa].drawOutputLines(g, x, y);
-      }
-      for (int noa = 0; noa < m_neuralNodes.length; noa++) {
-	m_neuralNodes[noa].drawInputLines(g, x, y);
-      }
-      for (int noa = 0; noa < m_numAttributes; noa++) {
-	m_inputs[noa].drawNode(g, x, y);
-      }
-      for (int noa = 0; noa < m_numClasses; noa++) {
-	m_outputs[noa].drawNode(g, x, y);
-      }
-      for (int noa = 0; noa < m_neuralNodes.length; noa++) {
-	m_neuralNodes[noa].drawNode(g, x, y);
-      }
-
-      for (int noa = 0; noa < m_selected.size(); noa++) {
-	((NeuralConnection)m_selected.elementAt(noa)).drawHighlight(g, x, y);
-      }
-    }
-    
-    /**
-     * Returns the revision string.
-     * 
-     * @return		the revision
-     */
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 10073 $");
-    }
-  }
-
-  /** 
-   * This provides the basic controls for working with the neuralnetwork
-   * @author Malcolm Ware (mfw4@cs.waikato.ac.nz)
-   * @version $Revision: 10073 $
-   */
-  class ControlPanel 
-    extends JPanel
-    implements RevisionHandler {
-    
-    /** for serialization */
-    static final long serialVersionUID = 7393543302294142271L;
-    
-    /** The start stop button. */
-    public JButton m_startStop;
-    
-    /** The button to accept the network (even if it hasn't done all epochs. */
-    public JButton m_acceptButton;
-    
-    /** A label to state the number of epochs processed so far. */
-    public JPanel m_epochsLabel;
-    
-    /** A label to state the total number of epochs to be processed. */
-    public JLabel m_totalEpochsLabel;
-    
-    /** A text field to allow the changing of the total number of epochs. */
-    public JTextField m_changeEpochs;
-    
-    /** A label to state the learning rate. */
-    public JLabel m_learningLabel;
-    
-    /** A label to state the momentum. */
-    public JLabel m_momentumLabel;
-    
-    /** A text field to allow the changing of the learning rate. */
-    public JTextField m_changeLearning;
-    
-    /** A text field to allow the changing of the momentum. */
-    public JTextField m_changeMomentum;
-    
-    /** A label to state roughly the accuracy of the network.(because the
-	accuracy is calculated per epoch, but the network is changing 
-	throughout each epoch train).
-    */
-    public JPanel m_errorLabel;
-    
-    /** The constructor. */
-    public ControlPanel() { 
-      setBorder(BorderFactory.createTitledBorder("Controls"));
-      
-      m_totalEpochsLabel = new JLabel("Num Of Epochs  ");
-      m_epochsLabel = new JPanel(){ 
-	  /** for serialization */
-	  private static final long serialVersionUID = 2562773937093221399L;
-
-	  public void paintComponent(Graphics g) {
-	    super.paintComponent(g);
-	    g.setColor(m_controlPanel.m_totalEpochsLabel.getForeground());
-	    g.drawString("Epoch  " + m_epoch, 0, 10);
-	  }
-	};
-      m_epochsLabel.setFont(m_totalEpochsLabel.getFont());
-      
-      m_changeEpochs = new JTextField();
-      m_changeEpochs.setText("" + m_numEpochs);
-      m_errorLabel = new JPanel(){
-	  /** for serialization */
-	  private static final long serialVersionUID = 4390239056336679189L;
-
-	  public void paintComponent(Graphics g) {
-	    super.paintComponent(g);
-	    g.setColor(m_controlPanel.m_totalEpochsLabel.getForeground());
-	    if (m_valSize == 0) {
-	      g.drawString("Error per Epoch = " + 
-			   Utils.doubleToString(m_error, 7), 0, 10);
-	    }
-	    else {
-	      g.drawString("Validation Error per Epoch = "
-			   + Utils.doubleToString(m_error, 7), 0, 10);
-	    }
-	  }
-	};
-      m_errorLabel.setFont(m_epochsLabel.getFont());
-      
-      m_learningLabel = new JLabel("Learning Rate = ");
-      m_momentumLabel = new JLabel("Momentum = ");
-      m_changeLearning = new JTextField();
-      m_changeMomentum = new JTextField();
-      m_changeLearning.setText("" + m_learningRate);
-      m_changeMomentum.setText("" + m_momentum);
-      setLayout(new BorderLayout(15, 10));
-
-      m_stopIt = true;
-      m_accepted = false;
-      m_startStop = new JButton("Start");
-      m_startStop.setActionCommand("Start");
-      
-      m_acceptButton = new JButton("Accept");
-      m_acceptButton.setActionCommand("Accept");
-      
-      JPanel buttons = new JPanel();
-      buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
-      buttons.add(m_startStop);
-      buttons.add(m_acceptButton);
-      add(buttons, BorderLayout.WEST);
-      JPanel data = new JPanel();
-      data.setLayout(new BoxLayout(data, BoxLayout.Y_AXIS));
-      
-      Box ab = new Box(BoxLayout.X_AXIS);
-      ab.add(m_epochsLabel);
-      data.add(ab);
-      
-      ab = new Box(BoxLayout.X_AXIS);
-      Component b = Box.createGlue();
-      ab.add(m_totalEpochsLabel);
-      ab.add(m_changeEpochs);
-      m_changeEpochs.setMaximumSize(new Dimension(200, 20));
-      ab.add(b);
-      data.add(ab);
-      
-      ab = new Box(BoxLayout.X_AXIS);
-      ab.add(m_errorLabel);
-      data.add(ab);
-      
-      add(data, BorderLayout.CENTER);
-      
-      data = new JPanel();
-      data.setLayout(new BoxLayout(data, BoxLayout.Y_AXIS));
-      ab = new Box(BoxLayout.X_AXIS);
-      b = Box.createGlue();
-      ab.add(m_learningLabel);
-      ab.add(m_changeLearning);
-      m_changeLearning.setMaximumSize(new Dimension(200, 20));
-      ab.add(b);
-      data.add(ab);
-      
-      ab = new Box(BoxLayout.X_AXIS);
-      b = Box.createGlue();
-      ab.add(m_momentumLabel);
-      ab.add(m_changeMomentum);
-      m_changeMomentum.setMaximumSize(new Dimension(200, 20));
-      ab.add(b);
-      data.add(ab);
-      
-      add(data, BorderLayout.EAST);
-      
-      m_startStop.addActionListener(new ActionListener() {
-	  public void actionPerformed(ActionEvent e) {
-	    if (e.getActionCommand().equals("Start")) {
-	      m_stopIt = false;
-	      m_startStop.setText("Stop");
-	      m_startStop.setActionCommand("Stop");
-	      int n = Integer.valueOf(m_changeEpochs.getText()).intValue();
-	      
-	      m_numEpochs = n;
-	      m_changeEpochs.setText("" + m_numEpochs);
-	      
-	      double m=Double.valueOf(m_changeLearning.getText()).
-		doubleValue();
-	      setLearningRate(m);
-	      m_changeLearning.setText("" + m_learningRate);
-	      
-	      m = Double.valueOf(m_changeMomentum.getText()).doubleValue();
-	      setMomentum(m);
-	      m_changeMomentum.setText("" + m_momentum);
-	      
-	      blocker(false);
-	    }
-	    else if (e.getActionCommand().equals("Stop")) {
-	      m_stopIt = true;
-	      m_startStop.setText("Start");
-	      m_startStop.setActionCommand("Start");
-	    }
-	  }
-	});
-      
-      m_acceptButton.addActionListener(new ActionListener() {
-	  public void actionPerformed(ActionEvent e) {
-	    m_accepted = true;
-	    blocker(false);
-	  }
-	});
-      
-      m_changeEpochs.addActionListener(new ActionListener() {
-	  public void actionPerformed(ActionEvent e) {
-	    int n = Integer.valueOf(m_changeEpochs.getText()).intValue();
-	    if (n > 0) {
-	      m_numEpochs = n;
-	      blocker(false);
-	    }
-	  }
-	});
-    }
-    
-    /**
-     * Returns the revision string.
-     * 
-     * @return		the revision
-     */
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 10073 $");
-    }
-  }
   
   /** a ZeroR model in case no model can be built from the data 
    * or the network predicts all zeros for the classes */
@@ -920,12 +430,6 @@ public class MultilayerPerceptron
   /** The number of attributes. */
   private int m_numAttributes = 0; //note the number doesn't include the class.
   
-  /** The panel the nodes are displayed on. */
-  private NodePanel m_nodePanel;
-  
-  /** The control panel. */
-  private ControlPanel m_controlPanel;
-
   /** The next id number available for default naming. */
   private int m_nextId;
    
@@ -947,15 +451,10 @@ public class MultilayerPerceptron
   /** a flag to state that the network should be accepted the way it is. */
   private boolean m_accepted;
   /** The window for the network. */
-  private JFrame m_win;
 
   /** A flag to tell the build classifier to automatically build a neural net.
    */
   private boolean m_autoBuild;
-
-  /** A flag to state that the gui for the network should be brought up.
-      To allow interaction while training. */
-  private boolean m_gui;
 
   /** An int to say how big the validation set should be. */
   private int m_valSize;
@@ -1027,8 +526,6 @@ public class MultilayerPerceptron
   public MultilayerPerceptron() {
     m_instances = null;
     m_currentInstance = null;
-    m_controlPanel = null;
-    m_nodePanel = null;
     m_epoch = 0;
     m_error = 0;
     
@@ -1056,7 +553,6 @@ public class MultilayerPerceptron
     m_normalizeClass = true;
     m_normalizeAttributes = true;
     m_autoBuild = true;
-    m_gui = false;
     m_useNomToBin = true;
     m_driftThreshold = 20;
     m_numEpochs = 500;
@@ -1094,9 +590,7 @@ public class MultilayerPerceptron
    * and set the learning rate to half what it currently is.
    */
   public void setReset(boolean r) {
-    if (m_gui) {
-      r = false;
-    }
+
     m_reset = r;
       
   }
@@ -1201,10 +695,6 @@ public class MultilayerPerceptron
   public void setLearningRate(double l) {
     if (l > 0 && l <= 1) {
       m_learningRate = l;
-    
-      if (m_controlPanel != null) {
-	m_controlPanel.m_changeLearning.setText("" + l);
-      }
     }
   }
 
@@ -1223,10 +713,6 @@ public class MultilayerPerceptron
   public void setMomentum(double m) {
     if (m >= 0 && m <= 1) {
       m_momentum = m;
-  
-      if (m_controlPanel != null) {
-	m_controlPanel.m_changeMomentum.setText("" + m);
-      }
     }
   }
   
@@ -1244,9 +730,7 @@ public class MultilayerPerceptron
    * @param a True if the network should be auto built.
    */
   public void setAutoBuild(boolean a) {
-    if (!m_gui) {
       a = true;
-    }
     m_autoBuild = a;
   }
 
@@ -1313,29 +797,6 @@ public class MultilayerPerceptron
    */
   public String getHiddenLayers() {
     return m_hiddenLayers;
-  }
-
-  /**
-   * This will set whether A GUI is brought up to allow interaction by the user
-   * with the neural network during training.
-   * @param a True if gui should be created.
-   */
-  public void setGUI(boolean a) {
-    m_gui = a;
-    if (!a) {
-      setAutoBuild(true);
-      
-    }
-    else {
-      setReset(false);
-    }
-  }
-
-  /**
-   * @return The true if should show gui.
-   */
-  public boolean getGUI() {
-    return m_gui;
   }
 
   /**
@@ -1491,17 +952,6 @@ public class MultilayerPerceptron
     }
     else {
       notifyAll();
-    }
-  }
-
-  /**
-   * Call this function to update the control panel for the gui.
-   */
-  private void updateDisplay() {
-    
-    if (m_gui) {
-      m_controlPanel.m_errorLabel.repaint();
-      m_controlPanel.m_epochsLabel.repaint();
     }
   }
   
@@ -1772,8 +1222,6 @@ public class MultilayerPerceptron
     m_error = 0;
     m_instances = null;
     m_currentInstance = null;
-    m_controlPanel = null;
-    m_nodePanel = null;
     
     
     m_outputs = new NeuralEnd[0];
@@ -1825,64 +1273,6 @@ public class MultilayerPerceptron
       setupHiddenLayer();
     }
     
-    /////////////////////////////
-    //this sets up the gui for usage
-    if (m_gui) {
-      m_win = new JFrame();
-      
-      m_win.addWindowListener(new WindowAdapter() {
-	  public void windowClosing(WindowEvent e) {
-	    boolean k = m_stopIt;
-	    m_stopIt = true;
-	    int well =JOptionPane.showConfirmDialog(m_win, 
-						    "Are You Sure...\n"
-						    + "Click Yes To Accept"
-						    + " The Neural Network" 
-						    + "\n Click No To Return",
-						    "Accept Neural Network", 
-						    JOptionPane.YES_NO_OPTION);
-	    
-	    if (well == 0) {
-	      m_win.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	      m_accepted = true;
-	      blocker(false);
-	    }
-	    else {
-	      m_win.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-	    }
-	    m_stopIt = k;
-	  }
-	});
-      
-      m_win.getContentPane().setLayout(new BorderLayout());
-      m_win.setTitle("Neural Network");
-      m_nodePanel = new NodePanel();
-      // without the following two lines, the NodePanel.paintComponents(Graphics) 
-      // method will go berserk if the network doesn't fit completely: it will
-      // get called on a constant basis, using 100% of the CPU
-      // see the following forum thread:
-      // http://forum.java.sun.com/thread.jspa?threadID=580929&messageID=2945011
-      m_nodePanel.setPreferredSize(new Dimension(640, 480));
-      m_nodePanel.revalidate();
-
-      JScrollPane sp = new JScrollPane(m_nodePanel,
-				       JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, 
-				       JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-      m_controlPanel = new ControlPanel();
-           
-      m_win.getContentPane().add(sp, BorderLayout.CENTER);
-      m_win.getContentPane().add(m_controlPanel, BorderLayout.SOUTH);
-      m_win.setSize(640, 480);
-      m_win.setVisible(true);
-    }
-   
-    //This sets up the initial state of the gui
-    if (m_gui) {
-      blocker(true);
-      m_controlPanel.m_changeEpochs.setEnabled(false);
-      m_controlPanel.m_changeLearning.setEnabled(false);
-      m_controlPanel.m_changeMomentum.setEnabled(false);
-    } 
     
     //For silly situations in which the network gets accepted before training
     //commenses
@@ -1890,9 +1280,6 @@ public class MultilayerPerceptron
       setEndsToLinear();
     }
     if (m_accepted) {
-      m_win.dispose();
-      m_controlPanel = null;
-      m_nodePanel = null;
       m_instances = new Instances(m_instances, 0);
       m_currentInstance = null;
       return;
@@ -2019,58 +1406,15 @@ public class MultilayerPerceptron
       m_epoch = noa;
       m_error = right;
       //shows what the neuralnet is upto if a gui exists. 
-      updateDisplay();
       //This junction controls what state the gui is in at the end of each
       //epoch, Such as if it is paused, if it is resumable etc...
-      if (m_gui) {
-	while ((m_stopIt || (m_epoch >= m_numEpochs && m_valSize == 0)) && 
-		!m_accepted) {
-	  m_stopIt = true;
-	  m_stopped = true;
-	  if (m_epoch >= m_numEpochs && m_valSize == 0) {
-	    
-	    m_controlPanel.m_startStop.setEnabled(false);
-	  }
-	  else {
-	    m_controlPanel.m_startStop.setEnabled(true);
-	  }
-	  m_controlPanel.m_startStop.setText("Start");
-	  m_controlPanel.m_startStop.setActionCommand("Start");
-	  m_controlPanel.m_changeEpochs.setEnabled(true);
-	  m_controlPanel.m_changeLearning.setEnabled(true);
-	  m_controlPanel.m_changeMomentum.setEnabled(true);
-	  
-	  blocker(true);
-	  if (m_numeric) {
-	    setEndsToLinear();
-	  }
-	}
-	m_controlPanel.m_changeEpochs.setEnabled(false);
-	m_controlPanel.m_changeLearning.setEnabled(false);
-	m_controlPanel.m_changeMomentum.setEnabled(false);
-	
-	m_stopped = false;
-	//if the network has been accepted stop the training loop
-	if (m_accepted) {
-	  m_win.dispose();
-	  m_controlPanel = null;
-	  m_nodePanel = null;
-	  m_instances = new Instances(m_instances, 0);
-	  m_currentInstance = null;
-	  return;
-	}
-      }
       if (m_accepted) {
 	m_instances = new Instances(m_instances, 0);
 	m_currentInstance = null;
 	return;
       }
     }
-    if (m_gui) {
-      m_win.dispose();
-      m_controlPanel = null;
-      m_nodePanel = null;
-    }
+
     m_instances = new Instances(m_instances, 0);
     m_currentInstance = null;
   }
@@ -2334,11 +1678,8 @@ public class MultilayerPerceptron
     } else {
       setHiddenLayers("a");
     }
-    if (Utils.getFlag('G', options)) {
-      setGUI(true);
-    } else {
-      setGUI(false);
-    } //small note. since the gui is the only option that can change the other
+    
+    
     //options this should be set first to allow the other options to set 
     //properly
     if (Utils.getFlag('A', options)) {
@@ -2391,9 +1732,7 @@ public class MultilayerPerceptron
     options[current++] = "-S"; options[current++] = "" + getSeed();
     options[current++] = "-E"; options[current++] =""+getValidationThreshold();
     options[current++] = "-H"; options[current++] = getHiddenLayers();
-    if (getGUI()) {
-      options[current++] = "-G";
-    }
+
     if (!getAutoBuild()) {
       options[current++] = "-A";
     }
