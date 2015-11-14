@@ -24,12 +24,10 @@
 package weka.filters.unsupervised.attribute;
 
 import weka.core.Attribute;
-import weka.core.Capabilities;
 import weka.core.Instance;
 import weka.core.Range;
 import weka.core.SparseInstance;
 import weka.core.Utils;
-import weka.core.Capabilities.Capability;
 import weka.filters.Filter;
 
 /** 
@@ -102,28 +100,6 @@ public class NominalToBinary
       + "this filter.";
   }
 
-  /** 
-   * Returns the Capabilities of this filter.
-   *
-   * @return            the capabilities of this object
-   * @see               Capabilities
-   */
-  public Capabilities getCapabilities() {
-    Capabilities result = super.getCapabilities();
-    result.disableAll();
-
-    // attributes
-    result.enableAllAttributes();
-    result.enable(Capability.MISSING_VALUES);
-    
-    // class
-    result.enableAllClasses();
-    result.enable(Capability.MISSING_CLASS_VALUES);
-    result.enable(Capability.NO_CLASS);
-    
-    return result;
-  }
-
   /**
    * Input an instance for filtering. Filter requires all
    * training instances be read before producing output.
@@ -145,91 +121,6 @@ public class NominalToBinary
 
     convertInstance(instance);
     return true;
-  }
-
-  /**
-   * Parses a given list of options. <p/>
-   * 
-   <!-- options-start -->
-   * Valid options are: <p/>
-   * 
-   * <pre> -N
-   *  Sets if binary attributes are to be coded as nominal ones.</pre>
-   * 
-   * <pre> -A
-   *  For each nominal value a new attribute is created, 
-   *  not only if there are more than 2 values.</pre>
-   * 
-   * <pre> -R &lt;col1,col2-col4,...&gt;
-   *  Specifies list of columns to act on. First and last are 
-   *  valid indexes.
-   *  (default: first-last)</pre>
-   * 
-   * <pre> -V
-   *  Invert matching sense of column indexes.</pre>
-   * 
-   <!-- options-end -->
-   *
-   * @param options the list of options as an array of strings
-   * @throws Exception if an option is not supported
-   */
-  public void setOptions(String[] options) throws Exception {
-
-    setBinaryAttributesNominal(Utils.getFlag('N', options));
-
-    setTransformAllValues(Utils.getFlag('A', options));
-
-    String convertList = Utils.getOption('R', options);
-    if (convertList.length() != 0) {
-      setAttributeIndices(convertList);
-    } else {
-      setAttributeIndices("first-last");
-    }
-    setInvertSelection(Utils.getFlag('V', options));
-
-    if (getInputFormat() != null)
-      setInputFormat(getInputFormat());
-  }
-
-  /**
-   * Gets the current settings of the filter.
-   *
-   * @return an array of strings suitable for passing to setOptions
-   */
-  public String [] getOptions() {
-
-    String [] options = new String [4];
-    int current = 0;
-
-    if (getBinaryAttributesNominal()) {
-      options[current++] = "-N";
-    }
-
-    if (getTransformAllValues()) {
-      options[current++] = "-A";
-    }
-
-    if (!getAttributeIndices().equals("")) {
-      options[current++] = "-R"; options[current++] = getAttributeIndices();
-    }
-    if (getInvertSelection()) {
-      options[current++] = "-V";
-    }
-
-    while (current < options.length) {
-      options[current++] = "";
-    }
-    return options;
-  }
-
-  /**
-   * Returns the tip text for this property
-   *
-   * @return tip text for this property suitable for
-   * displaying in the explorer/experimenter gui
-   */
-  public String binaryAttributesNominalTipText() {
-    return "Whether resulting binary attributes will be nominal.";
   }
 
   /**

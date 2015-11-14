@@ -22,17 +22,13 @@
 
 package weka.filters;
 
-import weka.core.Capabilities;
-import weka.core.CapabilitiesHandler;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Queue;
 import weka.core.RelationalLocator;
 import weka.core.SerializedObject;
 import weka.core.StringLocator;
-import weka.core.Capabilities.Capability;
 import java.io.Serializable;
-import java.util.Iterator;
 
 /** 
  * An abstract class for instance filters: objects that take instances
@@ -65,7 +61,7 @@ import java.util.Iterator;
  * @version $Revision: 7880 $
  */
 public abstract class Filter
-  implements Serializable, CapabilitiesHandler {
+  implements Serializable {
 
   /** for serialization */
   private static final long serialVersionUID = -8835063755891851218L;
@@ -120,63 +116,6 @@ public abstract class Filter
    */
   public boolean isFirstBatchDone() {
     return m_FirstBatchDone;
-  }
-
-  /** 
-   * Returns the Capabilities of this filter. Derived filters have to
-   * override this method to enable capabilities.
-   *
-   * @return            the capabilities of this object
-   * @see               Capabilities
-   */
-  public Capabilities getCapabilities() {
-    Capabilities 	result;
-
-    result = new Capabilities(this);
-    result.enableAll();
-    
-    result.setMinimumNumberInstances(0);
-    
-    return result;
-  }
-
-  /** 
-   * Returns the Capabilities of this filter, customized based on the data.
-   * I.e., if removes all class capabilities, in case there's not class
-   * attribute present or removes the NO_CLASS capability, in case that
-   * there's a class present.
-   *
-   * @param data	the data to use for customization
-   * @return            the capabilities of this object, based on the data
-   * @see               #getCapabilities()
-   */
-  public Capabilities getCapabilities(Instances data) {
-    Capabilities 	result;
-    Capabilities 	classes;
-    Iterator		iter;
-    Capability		cap;
-
-    result = getCapabilities();
-
-    // no class? -> remove all class capabilites apart from NO_CLASS
-    if (data.classIndex() == -1) {
-      classes = result.getClassCapabilities();
-      iter    = classes.capabilities();
-      while (iter.hasNext()) {
-	cap = (Capability) iter.next();
-	if (cap != Capability.NO_CLASS) {
-	  result.disable(cap);
-	  result.disableDependency(cap);
-	}
-      }
-    }
-    // class? -> remove NO_CLASS
-    else {
-      result.disable(Capability.NO_CLASS);
-      result.disableDependency(Capability.NO_CLASS);
-    }
-    
-    return result;
   }
 
   /**
@@ -371,42 +310,6 @@ public abstract class Filter
       // This more efficient than new Instances(m_InputFormat, 0);
       m_InputFormat.delete();
     }
-  }
-  
-  /**
-   * tests the data whether the filter can actually handle it
-   * 
-   * @param instanceInfo	the data to test
-   * @throws Exception		if the test fails
-   */
-  protected void testInputFormat(Instances instanceInfo) throws Exception {
-    getCapabilities(instanceInfo).testWithFail(instanceInfo);
-  }
-
-  /**
-   * Sets the format of the input instances. If the filter is able to
-   * determine the output format before seeing any input instances, it
-   * does so here. This default implementation clears the output format
-   * and output queue, and the new batch flag is set. Overriders should
-   * call <code>super.setInputFormat(Instances)</code>
-   *
-   * @param instanceInfo an Instances object containing the input instance
-   * structure (any instances contained in the object are ignored - only the
-   * structure is required).
-   * @return true if the outputFormat may be collected immediately
-   * @throws Exception if the inputFormat can't be set successfully 
-   */
-  public boolean setInputFormat(Instances instanceInfo) throws Exception {
-
-    testInputFormat(instanceInfo);
-    
-    m_InputFormat = instanceInfo.stringFreeStructure();
-    m_OutputFormat = null;
-    m_OutputQueue = new Queue();
-    m_NewBatch = true;
-    m_FirstBatchDone = false;
-    initInputLocators(m_InputFormat, null);
-    return false;
   }
 
   /**
