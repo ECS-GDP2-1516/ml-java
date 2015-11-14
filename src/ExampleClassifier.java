@@ -1,7 +1,7 @@
 
 import weka.core.Instances;
 import weka.core.SerializationHelper;
-import weka.core.converters.ArffLoader;
+
 import java.io.File;
 
 import weka.classifiers.functions.MultilayerPerceptron;
@@ -12,7 +12,7 @@ public class ExampleClassifier {
     public static void main(String[] args) throws Exception {
     	
     	ArffLoader m_Loader = new ArffLoader();
-    	m_Loader.setFile(new File("examples/200hz-3class-gyro.arff"));
+    	m_Loader.setSource(new File("examples/200hz-3class-gyro.arff"));
         Instances data = m_Loader.getDataSet();
 
         if (data.classIndex() == -1)

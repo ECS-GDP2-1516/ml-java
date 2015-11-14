@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.util.HashSet;
-import weka.core.converters.ArffLoader.ArffReader;
 
 /**
  * Class for handling an ordered set of weighted instances.
@@ -109,33 +108,6 @@ public class Instances implements Serializable {
    * @see #readInstance(Reader)
    */
   protected int m_Lines = 0;
-
-  /**
-   * Reads the header of an ARFF file from a reader and reserves space for the
-   * given number of instances. Lets the class index be undefined (negative).
-   * 
-   * @param reader the reader
-   * @param capacity the capacity
-   * @throws IllegalArgumentException if the header is not read successfully or
-   *           the capacity is negative.
-   * @throws IOException if there is a problem with the reader.
-   * @deprecated instead of using this method in conjunction with the
-   *             <code>readInstance(Reader)</code> method, one should use the
-   *             <code>ArffLoader</code> or <code>DataSource</code> class
-   *             instead.
-   * @see weka.core.converters.ArffLoader
-   * @see weka.core.converters.ConverterUtils.DataSource
-   */
-  // @ requires capacity >= 0;
-  // @ ensures classIndex() == -1;
-  @Deprecated
-  public Instances(/* @non_null@ */Reader reader, int capacity) throws IOException {
-
-    ArffReader arff = new ArffReader(reader, 0);
-    Instances header = arff.getStructure();
-    initialize(header, capacity);
-    m_Lines = arff.getLineNo();
-  }
 
   /**
    * Constructor creating an empty set of instances. Copies references to the

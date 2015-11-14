@@ -20,10 +20,11 @@
  *
  */
 
-package weka.core.converters;
+
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +35,7 @@ import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
+import weka.core.Utils;
 
 /**
  * <!-- globalinfo-start --> Reads a source that is in arff (attribute relation
@@ -47,21 +49,55 @@ import weka.core.Instances;
  * @see Loader
  */
 public class ArffLoader
-  extends AbstractFileLoader
-  {
-
-  /** for serialization */
-  static final long serialVersionUID = 2726929550544048587L;
-
+{
   /** the file extension */
   public static String FILE_EXTENSION = Instances.FILE_EXTENSION;
-  public static String FILE_EXTENSION_COMPRESSED = FILE_EXTENSION + ".gz";
 
   /** The reader for the source file. */
   protected transient Reader m_sourceReader = null;
 
   /** The parser for the ARFF file */
   protected transient ArffReader m_ArffReader = null;
+  
+  /** The retrieval modes */
+  public static final int NONE = 0;
+  public static final int BATCH = 1;
+  public static final int INCREMENTAL = 2;
+  
+  /** the file */
+  protected String m_File = (new File(System.getProperty("user.dir"))).getAbsolutePath();
+
+  /** Holds the determined structure (header) of the data set. */
+  protected transient Instances m_structure = null;
+
+  /** Holds the source of the data set. */
+  protected File m_sourceFile = null;
+
+  /** use relative file paths */
+  protected boolean m_useRelativePath = false;
+  
+/** The current retrieval mode */
+protected int m_retrieval;
+
+/**
+* Sets the retrieval mode.
+*
+* @param mode the retrieval mode
+*/
+public void setRetrieval(int mode) {
+
+m_retrieval = mode;
+}
+
+/**
+* Gets the retrieval mode.
+*
+* @return the retrieval mode
+*/
+protected int getRetrieval() {
+
+return m_retrieval;
+}
 
   /**
    * Reads data from an ARFF file, either in incremental or batch mode.
@@ -632,83 +668,49 @@ public class ArffLoader
       return m_Data;
     }
   }
-
+  
   /**
-   * Returns a string describing this Loader
-   * 
-   * @return a description of the Loader suitable for displaying in the
-   *         explorer/experimenter gui
+   * Resets the Loader object and sets the source of the data set to be 
+   * the supplied File object.
+   *
+   * @param file 		the source file.
+   * @throws IOException 	if an error occurs
    */
-  public String globalInfo() {
-    return "Reads a source that is in arff (attribute relation file format) "
-      + "format. ";
-  }
-
-  /**
-   * Get the file extension used for arff files
-   * 
-   * @return the file extension
-   */
-  @Override
-  public String getFileExtension() {
-    return FILE_EXTENSION;
-  }
-
-  /**
-   * Gets all the file extensions used for this type of file
-   * 
-   * @return the file extensions
-   */
-  @Override
-  public String[] getFileExtensions() {
-    return new String[] { FILE_EXTENSION, FILE_EXTENSION_COMPRESSED };
-  }
-
-  /**
-   * Returns a description of the file type.
-   * 
-   * @return a short file description
-   */
-  public String getFileDescription() {
-    return "Arff data files";
-  }
-
-  /**
-   * Resets the Loader ready to read a new data set or the same data set again.
-   * 
-   * @throws IOException if something goes wrong
-   */
-  @Override
-  public void reset() throws IOException {
+  public void setSource(File file) throws IOException {
+    File original = file;
     m_structure = null;
-    m_ArffReader = null;
+    
     setRetrieval(NONE);
 
-    if (m_File != null && !(new File(m_File).isDirectory())) {
-      setFile(new File(m_File));
+    if (file == null)
+      throw new IOException("Source file object is null!");
+
+  //  try {
+      String fName = file.getPath();
+
+      file = new File(fName);
+      // set the source only if the file exists
+      if (file.exists()) {
+          setSource(new FileInputStream(file));
+      }
+   // }
+  /*  catch (FileNotFoundException ex) {
+      throw new IOException("File not found");
+    } */
+
+    if (m_useRelativePath) {
+      try {
+        m_sourceFile = Utils.convertToRelativePath(original);
+        m_File = m_sourceFile.getPath();
+      } catch (Exception ex) {
+        //        System.err.println("[AbstractFileLoader] can't convert path to relative path.");
+        m_sourceFile = original;
+        m_File       = m_sourceFile.getPath();
+      }
+    } else {
+      m_sourceFile = original;
+      m_File       = m_sourceFile.getPath();
     }
-  }
-
-  /**
-   * get the File specified as the source
-   * 
-   * @return the source file
-   */
-  @Override
-  public File retrieveFile() {
-    return new File(m_File);
-  }
-
-  /**
-   * sets the source File
-   * 
-   * @param file the source file
-   * @throws IOException if an error occurs
-   */
-  @Override
-  public void setFile(File file) throws IOException {
-    m_File = file.getPath();
-    setSource(file);
   }
 
   /**
@@ -718,7 +720,7 @@ public class ArffLoader
    * @param in the source InputStream.
    * @throws IOException always thrown.
    */
-  @Override
+  
   public void setSource(InputStream in) throws IOException {
     m_File = (new File(System.getProperty("user.dir"))).getAbsolutePath();
 
@@ -732,7 +734,6 @@ public class ArffLoader
    * @return the structure of the data set as an empty set of Instances
    * @throws IOException if an error occurs
    */
-  @Override
   public Instances getStructure() throws IOException {
 
     if (m_structure == null) {
@@ -759,7 +760,7 @@ public class ArffLoader
    * @return the structure of the data set as an empty set of Instances
    * @throws IOException if there is no source or parsing fails
    */
-  @Override
+  
   public Instances getDataSet() throws IOException {
 
     Instances insts = null;
@@ -793,46 +794,4 @@ public class ArffLoader
 
     return insts;
   }
-
-  /**
-   * Read the data set incrementally---get the next instance in the data set or
-   * returns null if there are no more instances to get. If the structure hasn't
-   * yet been determined by a call to getStructure then method should do so
-   * before returning the next instance in the data set.
-   * 
-   * @param structure the dataset header information, will get updated in case
-   *          of string or relational attributes
-   * @return the next instance in the data set as an Instance object or null if
-   *         there are no more instances to be read
-   * @throws IOException if there is an error during parsing
-   */
-  @Override
-  public Instance getNextInstance(Instances structure) throws IOException {
-
-    m_structure = structure;
-
-    if (getRetrieval() == BATCH) {
-      throw new IOException(
-        "Cannot mix getting Instances in both incremental and batch modes");
-    }
-    setRetrieval(INCREMENTAL);
-
-    Instance current = null;
-    if (m_sourceReader != null) {
-      current = m_ArffReader.readInstance(m_structure);
-    }
-
-    if ((m_sourceReader != null) && (current == null)) {
-      try {
-        // close the stream
-        m_sourceReader.close();
-        m_sourceReader = null;
-        // reset();
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
-    return current;
-  }
-
 }
