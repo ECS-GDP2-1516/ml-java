@@ -32,8 +32,7 @@ package weka.core;
  * @author Eibe Frank (eibe@cs.waikato.ac.nz)
  * @version $Revision: 1.7 $
  */
-public class Option
-  implements RevisionHandler {
+public class Option  {
 
   /** What does this option do? */
   private String m_Description;
@@ -102,14 +101,6 @@ public class Option
   
     return m_Synopsis;
   }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 1.7 $");
-  }
+
 }
 

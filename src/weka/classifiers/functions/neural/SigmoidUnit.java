@@ -21,9 +21,6 @@
 
 package weka.classifiers.functions.neural;
 
-import weka.core.RevisionHandler;
-import weka.core.RevisionUtils;
-
 /**
  * This can be used by the 
  * neuralnode to perform all it's computations (as a sigmoid unit).
@@ -32,7 +29,7 @@ import weka.core.RevisionUtils;
  * @version $Revision: 1.7 $
  */
 public class SigmoidUnit
-  implements NeuralMethod, RevisionHandler {
+  implements NeuralMethod {
 
   /** for serialization */
   private static final long serialVersionUID = -5162958458177475652L;
@@ -115,14 +112,5 @@ public class SigmoidUnit
       weights[noa] += c;
       cWeights[noa] = c; 
     }
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 1.7 $");
   }
 }

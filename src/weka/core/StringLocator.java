@@ -171,13 +171,4 @@ public class StringLocator
       }
     }
   }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 6226 $");
-  }
 }

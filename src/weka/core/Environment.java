@@ -37,7 +37,7 @@ import java.util.TreeMap;
  * @author Mark Hall (mhall{[at]}pentaho{[dot]}com)
  * @version $Revision: 5562 $
  */
-public class Environment implements RevisionHandler {
+public class Environment {
   
   private static Environment m_systemWide = new Environment();
   
@@ -184,14 +184,5 @@ public class Environment implements RevisionHandler {
         ex.printStackTrace();
       }
     }
-  }
-
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 5562 $");
   }
 }

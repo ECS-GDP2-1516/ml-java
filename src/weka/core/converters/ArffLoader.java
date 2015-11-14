@@ -36,8 +36,6 @@ import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.RevisionHandler;
-import weka.core.RevisionUtils;
 import weka.core.SparseInstance;
 
 /**
@@ -102,7 +100,7 @@ public class ArffLoader
    * @version $Revision: 11137 $
    */
   public static class ArffReader
-    implements RevisionHandler {
+     {
 
     /** the tokenizer for reading the stream */
     protected StreamTokenizer m_Tokenizer;
@@ -843,16 +841,6 @@ public class ArffLoader
     public Instances getData() {
       return m_Data;
     }
-
-    /**
-     * Returns the revision string.
-     * 
-     * @return the revision
-     */
-    @Override
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 11137 $");
-    }
   }
 
   /**
@@ -891,7 +879,6 @@ public class ArffLoader
    * 
    * @return a short file description
    */
-  @Override
   public String getFileDescription() {
     return "Arff data files";
   }
@@ -1058,22 +1045,4 @@ public class ArffLoader
     return current;
   }
 
-  /**
-   * Returns the revision string.
-   * 
-   * @return the revision
-   */
-  @Override
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 11137 $");
-  }
-
-  /**
-   * Main method.
-   * 
-   * @param args should contain the name of an input file.
-   */
-  public static void main(String[] args) {
-    runFileLoader(new ArffLoader(), args);
-  }
 }

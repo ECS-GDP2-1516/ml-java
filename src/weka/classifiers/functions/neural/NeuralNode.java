@@ -21,8 +21,6 @@
 
 package weka.classifiers.functions.neural;
 
-import weka.core.RevisionUtils;
-
 import java.util.Random;
 
 /**
@@ -327,13 +325,4 @@ public class NeuralNode
     m_changeInWeights[0] = temp2;
     
   }  
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 5403 $");
-  }
 }

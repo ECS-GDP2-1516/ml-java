@@ -31,7 +31,6 @@ import weka.core.Instances;
 import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.Range;
-import weka.core.RevisionUtils;
 import weka.core.SparseInstance;
 import weka.core.Utils;
 import weka.core.Capabilities.Capability;
@@ -545,24 +544,5 @@ public class NominalToBinary
     copyValues(inst, false, instance.dataset(), getOutputFormat());
     inst.setDataset(getOutputFormat());
     push(inst);
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 9819 $");
-  }
-
-  /**
-   * Main method for testing this class.
-   *
-   * @param argv should contain arguments to the filter: 
-   * use -h for help
-   */
-  public static void main(String [] argv) {
-    runFilter(new NominalToBinary(), argv);
   }
 }

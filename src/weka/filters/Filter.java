@@ -30,20 +30,15 @@ import weka.core.Option;
 import weka.core.OptionHandler;
 import weka.core.Queue;
 import weka.core.RelationalLocator;
-import weka.core.RevisionHandler;
-import weka.core.RevisionUtils;
 import weka.core.SerializedObject;
 import weka.core.StringLocator;
-import weka.core.UnsupportedAttributeTypeException;
 import weka.core.Utils;
-import weka.core.Version;
 import weka.core.Capabilities.Capability;
 import weka.core.converters.ConverterUtils.DataSource;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 
@@ -78,7 +73,7 @@ import java.util.Iterator;
  * @version $Revision: 7880 $
  */
 public abstract class Filter
-  implements Serializable, CapabilitiesHandler, RevisionHandler {
+  implements Serializable, CapabilitiesHandler {
 
   /** for serialization */
   private static final long serialVersionUID = -8835063755891851218L;
@@ -151,15 +146,6 @@ public abstract class Filter
     result.setMinimumNumberInstances(0);
     
     return result;
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return            the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 7880 $");
   }
 
   /** 
@@ -684,264 +670,6 @@ public abstract class Filter
   }
   
   /**
-   * generates source code from the filter
-   * 
-   * @param filter the filter to output as source
-   * @param className the name of the generated class
-   * @param input the input data the header is generated for
-   * @param output the output data the header is generated for
-   * @return the generated source code
-   * @throws Exception if source code cannot be generated
-   */
-  public static String wekaStaticWrapper(
-      Sourcable filter, String className, Instances input, Instances output) 
-    throws Exception {
-    
-    StringBuffer	result;
-    int			i;
-    int			n;
-    
-    result = new StringBuffer();
-    
-    result.append("// Generated with Weka " + Version.VERSION + "\n");
-    result.append("//\n");
-    result.append("// This code is public domain and comes with no warranty.\n");
-    result.append("//\n");
-    result.append("// Timestamp: " + new Date() + "\n");
-    result.append("// Relation: " + input.relationName() + "\n");
-    result.append("\n");
-    
-    result.append("package weka.filters;\n");
-    result.append("\n");
-    result.append("import weka.core.Attribute;\n");
-    result.append("import weka.core.Capabilities;\n");
-    result.append("import weka.core.Capabilities.Capability;\n");
-    result.append("import weka.core.FastVector;\n");
-    result.append("import weka.core.Instance;\n");
-    result.append("import weka.core.Instances;\n");
-    result.append("import weka.filters.Filter;\n");
-    result.append("\n");
-    result.append("public class WekaWrapper\n");
-    result.append("  extends Filter {\n");
-
-    // globalInfo
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * Returns only the toString() method.\n");
-    result.append("   *\n");
-    result.append("   * @return a string describing the filter\n");
-    result.append("   */\n");
-    result.append("  public String globalInfo() {\n");
-    result.append("    return toString();\n");
-    result.append("  }\n");
-    
-    // getCapabilities
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * Returns the capabilities of this filter.\n");
-    result.append("   *\n");
-    result.append("   * @return the capabilities\n");
-    result.append("   */\n");
-    result.append("  public Capabilities getCapabilities() {\n");
-    result.append(((Filter) filter).getCapabilities().toSource("result", 4));
-    result.append("    return result;\n");
-    result.append("  }\n");
-
-    // objectsToInstance
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * turns array of Objects into an Instance object\n");
-    result.append("   *\n");
-    result.append("   * @param obj	the Object array to turn into an Instance\n");
-    result.append("   * @param format	the data format to use\n");
-    result.append("   * @return		the generated Instance object\n");
-    result.append("   */\n");
-    result.append("  protected Instance objectsToInstance(Object[] obj, Instances format) {\n");
-    result.append("    Instance		result;\n");
-    result.append("    double[]		values;\n");
-    result.append("    int		i;\n");
-    result.append("\n");  
-    result.append("    values = new double[obj.length];\n");
-    result.append("\n");
-    result.append("    for (i = 0 ; i < obj.length; i++) {\n");
-    result.append("      if (obj[i] == null)\n");
-    result.append("        values[i] = Instance.missingValue();\n");
-    result.append("      else if (format.attribute(i).isNumeric())\n");
-    result.append("        values[i] = (Double) obj[i];\n");
-    result.append("      else if (format.attribute(i).isNominal())\n");
-    result.append("        values[i] = format.attribute(i).indexOfValue((String) obj[i]);\n");
-    result.append("    }\n");
-    result.append("\n");
-    result.append("    // create new instance\n");
-    result.append("    result = new Instance(1.0, values);\n");
-    result.append("    result.setDataset(format);\n");
-    result.append("\n");
-    result.append("    return result;\n");
-    result.append("  }\n");
-
-    // instanceToObjects
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * turns the Instance object into an array of Objects\n");
-    result.append("   *\n");
-    result.append("   * @param inst	the instance to turn into an array\n");
-    result.append("   * @return		the Object array representing the instance\n");
-    result.append("   */\n");
-    result.append("  protected Object[] instanceToObjects(Instance inst) {\n");
-    result.append("    Object[]	result;\n");
-    result.append("    int		i;\n");
-    result.append("\n");  
-    result.append("    result = new Object[inst.numAttributes()];\n");
-    result.append("\n");
-    result.append("    for (i = 0 ; i < inst.numAttributes(); i++) {\n");
-    result.append("      if (inst.isMissing(i))\n");
-    result.append("  	result[i] = null;\n");
-    result.append("      else if (inst.attribute(i).isNumeric())\n");
-    result.append("  	result[i] = inst.value(i);\n");
-    result.append("      else\n");
-    result.append("  	result[i] = inst.stringValue(i);\n");
-    result.append("    }\n");
-    result.append("\n");
-    result.append("    return result;\n");
-    result.append("  }\n");
-
-    // instancesToObjects
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * turns the Instances object into an array of Objects\n");
-    result.append("   *\n");
-    result.append("   * @param data	the instances to turn into an array\n");
-    result.append("   * @return		the Object array representing the instances\n");
-    result.append("   */\n");
-    result.append("  protected Object[][] instancesToObjects(Instances data) {\n");
-    result.append("    Object[][]	result;\n");
-    result.append("    int		i;\n");
-    result.append("\n");  
-    result.append("    result = new Object[data.numInstances()][];\n");
-    result.append("\n");  
-    result.append("    for (i = 0; i < data.numInstances(); i++)\n");
-    result.append("      result[i] = instanceToObjects(data.instance(i));\n");
-    result.append("\n");  
-    result.append("    return result;\n");
-    result.append("  }\n");
-    
-    // setInputFormat
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * Only tests the input data.\n");
-    result.append("   *\n");
-    result.append("   * @param instanceInfo the format of the data to convert\n");
-    result.append("   * @return always true, to indicate that the output format can \n");
-    result.append("   *         be collected immediately.\n");
-    result.append("   */\n");
-    result.append("  public boolean setInputFormat(Instances instanceInfo) throws Exception {\n");
-    result.append("    super.setInputFormat(instanceInfo);\n");
-    result.append("    \n");
-    result.append("    // generate output format\n");
-    result.append("    FastVector atts = new FastVector();\n");
-    result.append("    FastVector attValues;\n");
-    for (i = 0; i < output.numAttributes(); i++) {
-      result.append("    // " + output.attribute(i).name() + "\n");
-      if (output.attribute(i).isNumeric()) {
-	result.append("    atts.addElement(new Attribute(\"" 
-	    + output.attribute(i).name() + "\"));\n");
-      }
-      else if (output.attribute(i).isNominal()) {
-	result.append("    attValues = new FastVector();\n");
-	for (n = 0; n < output.attribute(i).numValues(); n++) {
-	  result.append("    attValues.addElement(\"" + output.attribute(i).value(n) + "\");\n");
-	}
-	result.append("    atts.addElement(new Attribute(\"" 
-	    + output.attribute(i).name() + "\", attValues));\n");
-      }
-      else {
-	throw new UnsupportedAttributeTypeException(
-	    "Attribute type '" + output.attribute(i).type() + "' (position " 
-	    + (i+1) + ") is not supported!");
-      }
-    }
-    result.append("    \n");
-    result.append("    Instances format = new Instances(\"" + output.relationName() + "\", atts, 0);\n");
-    result.append("    format.setClassIndex(" + output.classIndex() + ");\n");
-    result.append("    setOutputFormat(format);\n");
-    result.append("    \n");
-    result.append("    return true;\n");
-    result.append("  }\n");
-    
-    // input
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * Directly filters the instance.\n");
-    result.append("   *\n");
-    result.append("   * @param instance the instance to convert\n");
-    result.append("   * @return always true, to indicate that the output can \n");
-    result.append("   *         be collected immediately.\n");
-    result.append("   */\n");
-    result.append("  public boolean input(Instance instance) throws Exception {\n");
-    result.append("    Object[] filtered = " + className + ".filter(instanceToObjects(instance));\n");
-    result.append("    push(objectsToInstance(filtered, getOutputFormat()));\n");
-    result.append("    return true;\n");
-    result.append("  }\n");
-    
-    // batchFinished
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * Performs a batch filtering of the buffered data, if any available.\n");
-    result.append("   *\n");
-    result.append("   * @return true if instances were filtered otherwise false\n");
-    result.append("   */\n");
-    result.append("  public boolean batchFinished() throws Exception {\n");
-    result.append("    if (getInputFormat() == null)\n");
-    result.append("      throw new NullPointerException(\"No input instance format defined\");;\n");
-    result.append("\n");
-    result.append("    Instances inst = getInputFormat();\n");
-    result.append("    if (inst.numInstances() > 0) {\n");
-    result.append("      Object[][] filtered = " + className + ".filter(instancesToObjects(inst));\n");
-    result.append("      for (int i = 0; i < filtered.length; i++) {\n");
-    result.append("        push(objectsToInstance(filtered[i], getOutputFormat()));\n");
-    result.append("      }\n");
-    result.append("    }\n");
-    result.append("\n");
-    result.append("    flushInput();\n");
-    result.append("    m_NewBatch = true;\n");
-    result.append("    m_FirstBatchDone = true;\n");
-    result.append("\n");
-    result.append("    return (inst.numInstances() > 0);\n");
-    result.append("  }\n");
-
-    // toString
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * Returns only the classnames and what filter it is based on.\n");
-    result.append("   *\n");
-    result.append("   * @return a short description\n");
-    result.append("   */\n");
-    result.append("  public String toString() {\n");
-    result.append("    return \"Auto-generated filter wrapper, based on " 
-	+ filter.getClass().getName() + " (generated with Weka " + Version.VERSION + ").\\n" 
-	+ "\" + this.getClass().getName() + \"/" + className + "\";\n");
-    result.append("  }\n");
-    
-    // main
-    result.append("\n");
-    result.append("  /**\n");
-    result.append("   * Runs the filter from commandline.\n");
-    result.append("   *\n");
-    result.append("   * @param args the commandline arguments\n");
-    result.append("   */\n");
-    result.append("  public static void main(String args[]) {\n");
-    result.append("    runFilter(new WekaWrapper(), args);\n");
-    result.append("  }\n");
-    result.append("}\n");
-
-    // actual filter code
-    result.append("\n");
-    result.append(filter.toSource(className, input));
-    
-    return result.toString();
-  }
-  
-  /**
    * Method for testing filters.
    *
    * @param filter the filter to use
@@ -973,8 +701,7 @@ public abstract class Filter
       String infileName = Utils.getOption('i', options);
       String outfileName = Utils.getOption('o', options); 
       String classIndex = Utils.getOption('c', options);
-      if (filter instanceof Sourcable)
-	sourceCode = Utils.getOption('z', options);
+     
       
       if (filter instanceof OptionHandler) {
 	((OptionHandler)filter).setOptions(options);
@@ -1033,11 +760,6 @@ public abstract class Filter
 	+ "\t\"first\" and \"last\" are also valid entries.\n"
 	+ "\tIf not supplied then no class is assigned.\n";
 
-      if (filter instanceof Sourcable) {
-	genericOptions +=
-	  "-z <class name>\n"
-	  + "\tOutputs the source code representing the trained filter.\n";
-      }
       
       throw new Exception('\n' + ex.getMessage()
 			  + filterOptions+genericOptions);
@@ -1108,11 +830,7 @@ public abstract class Filter
     if (output != null) {
       output.close();
     }
-    
-    if (sourceCode.length() != 0)
-      System.out.println(
-	  wekaStaticWrapper(
-	      (Sourcable) filter, sourceCode, data, filter.getOutputFormat()));
+
   }
 
   /**
@@ -1173,8 +891,6 @@ public abstract class Filter
 	secondOutput = new PrintWriter(System.out);
       }
       String classIndex = Utils.getOption('c', options);
-      if (filter instanceof Sourcable)
-	sourceCode = Utils.getOption('z', options);
 
       if (filter instanceof OptionHandler) {
 	((OptionHandler)filter).setOptions(options);
@@ -1230,11 +946,6 @@ public abstract class Filter
 	+ "\t\"first\" and \"last\" are also valid entries.\n"
 	+ "\tIf not supplied then no class is assigned.\n";
 
-      if (filter instanceof Sourcable) {
-	genericOptions +=
-	  "-z <class name>\n"
-	  + "\tOutputs the source code representing the trained filter.\n";
-      }
       
       throw new Exception('\n' + ex.getMessage()
 			  + filterOptions+genericOptions);
@@ -1299,54 +1010,6 @@ public abstract class Filter
     }
     if (secondOutput != null) {
       secondOutput.close();
-    }
-
-    if (sourceCode.length() != 0)
-      System.out.println(
-	  wekaStaticWrapper(
-	      (Sourcable) filter, sourceCode, firstData, filter.getOutputFormat()));
-  }
-
-  /**
-   * runs the filter instance with the given options.
-   * 
-   * @param filter	the filter to run
-   * @param options	the commandline options
-   */
-  protected static void runFilter(Filter filter, String[] options) {
-    try {
-      if (Utils.getFlag('b', options)) {
-	Filter.batchFilterFile(filter, options);
-      } else {
-	Filter.filterFile(filter, options);
-      }
-    } catch (Exception e) {
-      if (    (e.toString().indexOf("Help requested") == -1) 
-	   && (e.toString().indexOf("Filter options") == -1) )
-	e.printStackTrace();
-      else
-	System.err.println(e.getMessage());
-    }
-  }
-  
-  /**
-   * Main method for testing this class.
-   *
-   * @param args should contain arguments to the filter: use -h for help
-   */
-  public static void main(String [] args) {
-    
-    try {
-      if (args.length == 0) {
-        throw new Exception("First argument must be the class name of a Filter");
-      }
-      String fname = args[0];
-      Filter f = (Filter)Class.forName(fname).newInstance();
-      args[0] = "";
-      runFilter(f, args);
-    } catch (Exception ex) {
-      ex.printStackTrace();
-      System.err.println(ex.getMessage());
     }
   }
 }

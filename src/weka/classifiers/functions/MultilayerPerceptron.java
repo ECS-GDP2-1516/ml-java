@@ -25,7 +25,6 @@ import weka.classifiers.Classifier;
 import weka.classifiers.functions.neural.NeuralConnection;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.RevisionUtils;
 import weka.filters.unsupervised.attribute.NominalToBinary;
 
 /** 
@@ -310,15 +309,6 @@ public class MultilayerPerceptron
     public int getLink() {
       return m_link;
     }
-    
-    /**
-     * Returns the revision string.
-     * 
-     * @return		the revision
-     */
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 10073 $");
-    }
   }
   
   
@@ -403,7 +393,7 @@ public class MultilayerPerceptron
    * @throws Exception if can't classify instance.
    */
   public double[] distributionForInstance(Instance i) throws Exception {
-
+	  
     // default model?
     if (m_useDefaultModel) {
       return m_ZeroR.distributionForInstance(i);

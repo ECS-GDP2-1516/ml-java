@@ -42,7 +42,7 @@ import java.util.Vector;
  * @version $Revision: 1.18 $
  */
 public class Range
-  implements Serializable, RevisionHandler {
+  implements Serializable {
   
   /** for serialization */
   static final long serialVersionUID = 3667337062176835900L;
@@ -416,41 +416,6 @@ public class Range
       return false;
     } catch (NumberFormatException ex) {
       return false;
-    }
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 1.18 $");
-  }
-
-  /**
-   * Main method for testing this class.
-   *
-   * @param argv one parameter: a test range specification
-   */
-  public static void main(String [] argv) {
-
-    try {
-      if (argv.length == 0) {
-	throw new Exception("Usage: Range <rangespec>");
-      }
-      Range range = new Range();
-      range.setRanges(argv[0]);
-      range.setUpper(9);
-      range.setInvert(false);
-      System.out.println("Input: " + argv[0] + "\n"
-			 + range.toString());
-      int [] rangeIndices = range.getSelection();
-      for (int i = 0; i < rangeIndices.length; i++)
-	System.out.print(" " + (rangeIndices[i] + 1));
-      System.out.println("");
-    } catch (Exception ex) {
-      System.out.println(ex.getMessage());
     }
   }
 }

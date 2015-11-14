@@ -67,7 +67,7 @@ import java.util.Vector;
  * @version $Revision: 9140 $
  */
 public class Capabilities 
-  implements Cloneable, Serializable, RevisionHandler {
+  implements Cloneable, Serializable {
   
   /** serialversion UID */
   static final long serialVersionUID = -5478590032325567849L;  
@@ -1574,84 +1574,5 @@ public class Capabilities
     }
     
     return result;
-  }
-  
-  /**
-   * loads the given dataset and prints the Capabilities necessary to 
-   * process it. <p/>
-   * 
-   * Valid parameters: <p/>
-   * 
-   * -file filename <br/>
-   *  the file to load
-   *  
-   * -c index
-   *  the explicit index of the class attribute (default: none)
-   * 
-   * @param args	the commandline arguments
-   * @throws Exception	if something goes wrong
-   */
-  public static void main(String[] args) throws Exception {
-    String 		tmpStr;
-    String		filename;
-    DataSource 		source;
-    Instances 		data;
-    int 		classIndex;
-    Capabilities 	cap;
-    Iterator		iter;
-
-    if (args.length == 0) {
-      System.out.println(
-	  "\nUsage: " + Capabilities.class.getName() 
-	  + " -file <dataset> [-c <class index>]\n");
-      return;
-    }
-    
-    // get parameters
-    tmpStr = Utils.getOption("file", args);
-    if (tmpStr.length() == 0)
-      throw new Exception("No file provided with option '-file'!");
-    else
-      filename = tmpStr;
-
-    tmpStr = Utils.getOption("c", args);
-    if (tmpStr.length() != 0) {
-      if (tmpStr.equals("first"))
-	classIndex = 0;
-      else if (tmpStr.equals("last"))
-	classIndex = -2;  // last
-      else
-	classIndex = Integer.parseInt(tmpStr) - 1;
-    }
-    else {
-      classIndex = -3;  // not set
-    }
-    
-    // load data
-    source = new DataSource(filename);
-    if (classIndex == -3)
-      data = source.getDataSet();
-    else if (classIndex == -2)
-      data = source.getDataSet(source.getStructure().numAttributes() - 1);
-    else
-      data = source.getDataSet(classIndex);
-
-    // determine and print capabilities
-    cap = forInstances(data);
-    System.out.println("File: " + filename);
-    System.out.println("Class index: " + ((data.classIndex() == -1) ? "not set" : "" + (data.classIndex() + 1)));
-    System.out.println("Capabilities:");
-    iter = cap.capabilities();
-    while (iter.hasNext())
-      System.out.println("- " + iter.next());
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 9140 $");
   }
 }

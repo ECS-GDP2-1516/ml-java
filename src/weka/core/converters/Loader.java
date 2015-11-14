@@ -24,7 +24,6 @@ package weka.core.converters;
 
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.RevisionHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ import java.io.Serializable;
  * @version $Revision: 7454 $
  */
 public interface Loader
-  extends Serializable, RevisionHandler {
+  extends Serializable {
   
   /** The retrieval modes */
   public static final int NONE = 0;

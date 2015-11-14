@@ -42,7 +42,7 @@ import java.util.zip.GZIPOutputStream;
  * @version $Revision: 1.12 $ 
  */
 public class SerializedObject
-  implements Serializable, RevisionHandler {
+  implements Serializable {
 
   /** for serialization */
   private static final long serialVersionUID = 6635502953928860434L;
@@ -147,14 +147,5 @@ public class SerializedObject
       e.printStackTrace();
       return null;
     }
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 1.12 $");
   }
 }

@@ -33,7 +33,7 @@ import java.util.BitSet;
  * @see Attribute#RELATIONAL
  */
 public class AttributeLocator 
-  implements Serializable, Comparable<AttributeLocator>, RevisionHandler {
+  implements Serializable, Comparable<AttributeLocator> {
   
   /** for serialization */
   private static final long serialVersionUID = -2932848827681070345L;
@@ -346,14 +346,5 @@ public class AttributeLocator
     }
     
     m_Attributes = null;
-  }
-
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 8034 $");
   }
 }

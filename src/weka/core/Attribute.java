@@ -90,7 +90,7 @@ import java.util.Properties;
  * @version $Revision: 9518 $
  */
 public class Attribute
-  implements Copyable, Serializable, RevisionHandler {
+  implements Copyable, Serializable {
 
   /** for serialization */
   static final long serialVersionUID = -742180568732916383L;
@@ -1484,15 +1484,6 @@ public class Attribute
 					 + ") on numeric range is"
 					 + " less than lower bound ("
 					 + m_LowerBound + ")!");
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 9518 $");
   }
 
   /**

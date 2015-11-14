@@ -62,6 +62,7 @@ public abstract class Classifier implements Cloneable, Serializable
     if (dist == null) {
       throw new Exception("Null distribution predicted");
     }
+        
     switch (instance.classAttribute().type()) {
     case Attribute.NOMINAL:
       double max = 0;

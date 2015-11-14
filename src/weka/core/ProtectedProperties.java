@@ -36,7 +36,7 @@ import java.util.Properties;
  */
 public class ProtectedProperties
   extends Properties
-  implements RevisionHandler {
+   {
 
   /** for serialization */
   private static final long serialVersionUID = 3876658672657323985L;
@@ -134,15 +134,6 @@ public class ProtectedProperties
 
     throw new
       UnsupportedOperationException("ProtectedProperties cannot be modified!");
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 1.6 $");
   }
 }
 

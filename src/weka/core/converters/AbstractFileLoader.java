@@ -43,7 +43,7 @@ import java.util.zip.GZIPInputStream;
  */
 public abstract class AbstractFileLoader
   extends AbstractLoader
-  implements FileSourcedConverter, EnvironmentHandler {
+  implements EnvironmentHandler {
 
   /** the file */
   protected String m_File = (new File(System.getProperty("user.dir"))).getAbsolutePath();
@@ -113,6 +113,8 @@ public abstract class AbstractFileLoader
     m_structure = null;
     setRetrieval(NONE);
   }
+  
+  abstract public String getFileExtension();
 
   /**
    * Resets the Loader object and sets the source of the data set to be 
@@ -225,6 +227,8 @@ public abstract class AbstractFileLoader
   public boolean getUseRelativePath() {
     return m_useRelativePath;
   }
+  
+  abstract public String[] getFileExtensions();
 
   /**
    * generates a string suitable for output on the command line displaying

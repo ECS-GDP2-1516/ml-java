@@ -32,7 +32,7 @@ import java.io.Serializable;
  * @version $Revision: 1.10 $
  */
 public class AttributeStats
-  implements Serializable, RevisionHandler {
+  implements Serializable {
 
   /** for serialization */
   private static final long serialVersionUID = 4434688832743939380L;
@@ -134,14 +134,5 @@ public class AttributeStats
     }
     sb.append('\n');
     return sb.toString();
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 1.10 $");
   }
 }

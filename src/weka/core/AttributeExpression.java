@@ -42,7 +42,7 @@ import java.util.Vector;
  * @version $Revision: 5989 $
  */
 public class AttributeExpression
-  implements Serializable, RevisionHandler {
+  implements Serializable {
 
   /** for serialization */
   static final long serialVersionUID = 402130123261736245L;
@@ -51,7 +51,7 @@ public class AttributeExpression
    * Inner class handling an attribute index as an operand
    */
   private class AttributeOperand 
-    implements Serializable, RevisionHandler {
+    implements Serializable {
     
     /** for serialization */
     static final long serialVersionUID = -7674280127286031105L;
@@ -86,22 +86,13 @@ public class AttributeExpression
       }
       return result+"a"+(m_attributeIndex+1);
     }
-    
-    /**
-     * Returns the revision string.
-     * 
-     * @return		the revision
-     */
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 5989 $");
-    }
   }
 
   /**
    * Inner class for storing numeric constant opperands
    */
   private class NumericOperand 
-    implements Serializable, RevisionHandler {
+    implements Serializable {
     
     /** for serialization */
     static final long serialVersionUID = 9037007836243662859L;
@@ -130,22 +121,13 @@ public class AttributeExpression
     public String toString() {
       return ""+m_numericConst;
     }
-    
-    /**
-     * Returns the revision string.
-     * 
-     * @return		the revision
-     */
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 5989 $");
-    }
   }
 
   /**
    * Inner class for storing operators
    */
   private class Operator 
-    implements Serializable, RevisionHandler {
+    implements Serializable {
     
     /** for serialization */
     static final long serialVersionUID = -2760353522666004638L;
@@ -224,15 +206,6 @@ public class AttributeExpression
      */
     public String toString() {
       return ""+m_operator;
-    }
-    
-    /**
-     * Returns the revision string.
-     * 
-     * @return		the revision
-     */
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 5989 $");
     }
   }
 
@@ -570,14 +543,5 @@ public class AttributeExpression
 
   public String toString() {
     return m_originalInfix;
-  }
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 5989 $");
   }
 }

@@ -24,7 +24,6 @@ package weka.classifiers.rules;
 
 import weka.classifiers.Classifier;
 import weka.core.Instance;
-import weka.core.WeightedInstancesHandler;
 
 /**
  <!-- globalinfo-start -->
@@ -46,7 +45,7 @@ import weka.core.WeightedInstancesHandler;
  */
 public class ZeroR 
   extends Classifier 
-  implements WeightedInstancesHandler {
+   {
 
   /** for serialization */
   static final long serialVersionUID = 48055541465867954L;
@@ -66,6 +65,8 @@ public class ZeroR
    */
   public double [] distributionForInstance(Instance instance) 
        throws Exception {
+	  
+	  System.out.println(m_Counts);
 	 
     if (m_Counts == null) {
       double[] result = new double[1];

@@ -24,21 +24,15 @@ package weka.core.converters;
 
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.RevisionHandler;
-import weka.core.RevisionUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.Vector;
 
 /**
@@ -50,7 +44,7 @@ import java.util.Vector;
  * @see Serializable
  */
 public class ConverterUtils
-  implements Serializable, RevisionHandler {
+  implements Serializable {
 
   /** for serialization. */
   static final long serialVersionUID = -2460855349276148760L;
@@ -74,7 +68,7 @@ public class ConverterUtils
    * @see DataSink
    */
   public static class DataSource
-    implements Serializable, RevisionHandler {
+    implements Serializable {
     
     /** for serialization. */
     private static final long serialVersionUID = -613122395928757332L;
@@ -499,15 +493,6 @@ public class ConverterUtils
       while (loader.hasMoreElements(structure))
 	System.out.println(loader.nextElement(inst));
     }
-    
-    /**
-     * Returns the revision string.
-     * 
-     * @return		the revision
-     */
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 6416 $");
-    }
   }
   
   /** all available loaders (extension &lt;-&gt; classname). */
@@ -752,15 +737,5 @@ public class ConverterUtils
    */
   public static Vector<String> getFileSavers() {
     return getConverters(m_FileSavers);
-  }
-
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 6416 $");
   }
 }

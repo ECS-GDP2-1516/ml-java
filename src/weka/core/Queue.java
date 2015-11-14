@@ -37,7 +37,7 @@ import java.io.Serializable;
  */
 public class Queue
   extends Object
-  implements Serializable, RevisionHandler {
+  implements Serializable {
 
   /** for serialization */
   private static final long serialVersionUID = -1141282001146389780L;
@@ -46,7 +46,7 @@ public class Queue
    * Represents one node in the queue.
    */
   protected class QueueNode
-    implements Serializable, RevisionHandler {
+    implements Serializable {
 
     /** for serialization */
     private static final long serialVersionUID = -5119358279412097455L;
@@ -104,15 +104,6 @@ public class Queue
       //@ ensures \result == m_Contents;
     public /*@ pure @*/ Object contents() {
       return m_Contents;
-    }
-    
-    /**
-     * Returns the revision string.
-     * 
-     * @return		the revision
-     */
-    public String getRevision() {
-      return RevisionUtils.extract("$Revision: 1.10 $");
     }
   }
 
@@ -267,48 +258,4 @@ public class Queue
     }
     return retval;
   } //@ nowarn Post;
-  
-  /**
-   * Returns the revision string.
-   * 
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 1.10 $");
-  }
-
-  /**
-   * Main method for testing this class.
-   *
-   * @param argv a set of strings that are pushed on a test queue
-   */
-  //@ requires argv.length >= 0;
-  //@ requires argv != null;
-  //@ requires (\forall int i; 0 <= i && i < argv.length; argv[i] != null);
-  public static void main(String [] argv) {
-
-    try {
-      Queue queue = new Queue();
-      for(int i = 0; i < argv.length; i++) {
-	queue.push(argv[i]);
-      }
-      System.out.println("After pushing command line arguments");
-      System.out.println(queue.toString());
-      while (!queue.empty()) {
-	System.out.println("Pop: " + queue.pop().toString());
-      }
-      // try one more pop, to make sure we get an exception
-      try 
-	{
-	  queue.pop();
-	  System.out.println("ERROR: pop did not throw exception!");
-	}
-      catch (RuntimeException ex)
-        {
-	  System.out.println("Pop on empty queue correctly gave exception.");
-	}
-    } catch (Exception ex) {
-      System.out.println(ex.getMessage());
-    }
-  }
 }

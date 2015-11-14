@@ -42,7 +42,7 @@ import java.util.Comparator;
  * @see     java.util.Collections
  */
 public class InstanceComparator
-  implements Comparator, Serializable, RevisionHandler {
+  implements Comparator, Serializable {
 
   /** for serialization */
   private static final long serialVersionUID = -6589278678230949683L;
@@ -165,44 +165,5 @@ public class InstanceComparator
     }
 
     return result;
-  }
-
-  /**
-   * Returns the revision string.
-   *
-   * @return		the revision
-   */
-  public String getRevision() {
-    return RevisionUtils.extract("$Revision: 7988 $");
-  }
-
-  /**
-   * for testing only. takes an ARFF-filename as first argument to perform
-   * some tests.
-   */
-  public static void main(String[] args) throws Exception {
-    Instances       inst;
-    Comparator      comp;
-
-    if (args.length == 0)
-      return;
-
-    // read instances
-    inst = new Instances(new BufferedReader(new FileReader(args[0])));
-    inst.setClassIndex(inst.numAttributes() - 1);
-
-    // compare incl. class
-    comp = new InstanceComparator();
-    System.out.println("\nIncluding the class");
-    System.out.println("comparing 1. instance with 1.: " + comp.compare(inst.instance(0), inst.instance(0)));
-    System.out.println("comparing 1. instance with 2.: " + comp.compare(inst.instance(0), inst.instance(1)));
-    System.out.println("comparing 2. instance with 1.: " + comp.compare(inst.instance(1), inst.instance(0)));
-
-    // compare excl. class
-    comp = new InstanceComparator(false);
-    System.out.println("\nExcluding the class");
-    System.out.println("comparing 1. instance with 1.: " + comp.compare(inst.instance(0), inst.instance(0)));
-    System.out.println("comparing 1. instance with 2.: " + comp.compare(inst.instance(0), inst.instance(1)));
-    System.out.println("comparing 2. instance with 1.: " + comp.compare(inst.instance(1), inst.instance(0)));
   }
 }
