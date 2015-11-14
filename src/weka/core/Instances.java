@@ -338,34 +338,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Checks if the given instance is compatible with this dataset. Only looks at
-   * the size of the instance and the ranges of the values for nominal and
-   * string attributes.
-   * 
-   * @param instance the instance to check
-   * @return true if the instance is compatible with the dataset
-   */
-  public/* @pure@ */boolean checkInstance(Instance instance) {
-
-    if (instance.numAttributes() != numAttributes()) {
-      return false;
-    }
-    for (int i = 0; i < numAttributes(); i++) {
-      if (instance.isMissing(i)) {
-        continue;
-      } else if (attribute(i).isNominal() || attribute(i).isString()) {
-        if (!(Utils.eq(instance.value(i), (int) instance.value(i)))) {
-          return false;
-        } else if (Utils.sm(instance.value(i), 0)
-          || Utils.gr(instance.value(i), attribute(i).numValues())) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  /**
    * Returns the class attribute.
    * 
    * @return the class attribute
@@ -1115,43 +1087,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Stratifies a set of instances according to its class values if the class
-   * attribute is nominal (so that afterwards a stratified cross-validation can
-   * be performed).
-   * 
-   * @param numFolds the number of folds in the cross-validation
-   * @throws UnassignedClassException if the class is not set
-   */
-  public void stratify(int numFolds) {
-
-    if (numFolds <= 1) {
-      throw new IllegalArgumentException(
-        "Number of folds must be greater than 1");
-    }
-    if (m_ClassIndex < 0) {
-      throw new UnassignedClassException("Class index is negative (not set)!");
-    }
-    if (classAttribute().isNominal()) {
-
-      // sort by class
-      int index = 1;
-      while (index < numInstances()) {
-        Instance instance1 = instance(index - 1);
-        for (int j = index; j < numInstances(); j++) {
-          Instance instance2 = instance(j);
-          if ((instance1.classValue() == instance2.classValue())
-            || (instance1.classIsMissing() && instance2.classIsMissing())) {
-            swap(index, j);
-            index++;
-          }
-        }
-        index++;
-      }
-      stratStep(numFolds);
-    }
-  }
-
-  /**
    * Computes the sum of all the instances' weights.
    * 
    * @return the sum of all the instances' weights as a double
@@ -1572,41 +1507,5 @@ public class Instances implements Serializable {
   public void swap(int i, int j) {
 
     m_Instances.swap(i, j);
-  }
-
-  /**
-   * Merges two sets of Instances together. The resulting set will have all the
-   * attributes of the first set plus all the attributes of the second set. The
-   * number of instances in both sets must be the same.
-   * 
-   * @param first the first set of Instances
-   * @param second the second set of Instances
-   * @return the merged set of Instances
-   * @throws IllegalArgumentException if the datasets are not the same size
-   */
-  public static Instances mergeInstances(Instances first, Instances second) {
-
-    if (first.numInstances() != second.numInstances()) {
-      throw new IllegalArgumentException(
-        "Instance sets must be of the same size");
-    }
-
-    // Create the vector of merged attributes
-    FastVector newAttributes = new FastVector();
-    for (int i = 0; i < first.numAttributes(); i++) {
-      newAttributes.addElement(first.attribute(i));
-    }
-    for (int i = 0; i < second.numAttributes(); i++) {
-      newAttributes.addElement(second.attribute(i));
-    }
-
-    // Create the set of Instances
-    Instances merged = new Instances(first.relationName() + '_'
-      + second.relationName(), newAttributes, first.numInstances());
-    // Merge each instance
-    for (int i = 0; i < first.numInstances(); i++) {
-      merged.add(first.instance(i).mergeInstance(second.instance(i)));
-    }
-    return merged;
   }
 }

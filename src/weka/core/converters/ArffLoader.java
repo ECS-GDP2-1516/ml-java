@@ -36,7 +36,7 @@ import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.SparseInstance;
+//import weka.core.SparseInstance;
 
 /**
  * <!-- globalinfo-start --> Reads a source that is in arff (attribute relation
@@ -421,134 +421,10 @@ public class ArffLoader
 
       // Parse instance
       if (m_Tokenizer.ttype == '{') {
-        return getInstanceSparse(flag);
+    	  throw new Error("Sparse Instances have been deleted!");
       } else {
         return getInstanceFull(flag);
       }
-    }
-
-    /**
-     * Reads a single instance using the tokenizer and returns it.
-     * 
-     * @param flag if method should test for carriage return after each instance
-     * @return null if end of file has been reached
-     * @throws IOException if the information is not read successfully
-     */
-    protected Instance getInstanceSparse(boolean flag) throws IOException {
-      int valIndex, numValues = 0, maxIndex = -1;
-
-      // Get values
-      do {
-        // Get index
-        getIndex();
-        if (m_Tokenizer.ttype == '}') {
-          break;
-        }
-
-        // Is index valid?
-        try {
-          m_IndicesBuffer[numValues] =
-            Integer.valueOf(m_Tokenizer.sval).intValue();
-        } catch (NumberFormatException e) {
-          errorMessage("index number expected");
-        }
-        if (m_IndicesBuffer[numValues] <= maxIndex) {
-          errorMessage("indices have to be ordered");
-        }
-        if ((m_IndicesBuffer[numValues] < 0) ||
-          (m_IndicesBuffer[numValues] >= m_Data.numAttributes())) {
-          errorMessage("index out of bounds");
-        }
-        maxIndex = m_IndicesBuffer[numValues];
-
-        // Get value;
-        getNextToken();
-
-        // Check if value is missing.
-        if (m_Tokenizer.ttype == '?') {
-          m_ValueBuffer[numValues] = Instance.missingValue();
-        } else {
-
-          // Check if token is valid.
-          if (m_Tokenizer.ttype != StreamTokenizer.TT_WORD) {
-            errorMessage("not a valid value");
-          }
-          switch (m_Data.attribute(m_IndicesBuffer[numValues]).type()) {
-          case Attribute.NOMINAL:
-            // Check if value appears in header.
-            valIndex =
-              m_Data.attribute(m_IndicesBuffer[numValues]).indexOfValue(
-                m_Tokenizer.sval);
-            if (valIndex == -1) {
-              errorMessage("nominal value not declared in header");
-            }
-            m_ValueBuffer[numValues] = valIndex;
-            break;
-          case Attribute.NUMERIC:
-            // Check if value is really a number.
-            try {
-              m_ValueBuffer[numValues] = Double.valueOf(m_Tokenizer.sval).
-                doubleValue();
-            } catch (NumberFormatException e) {
-              errorMessage("number expected");
-            }
-            break;
-          case Attribute.STRING:
-            m_ValueBuffer[numValues] =
-              m_Data.attribute(m_IndicesBuffer[numValues]).addStringValue(
-                m_Tokenizer.sval);
-            break;
-          case Attribute.DATE:
-            try {
-              m_ValueBuffer[numValues] =
-                m_Data.attribute(m_IndicesBuffer[numValues]).parseDate(
-                  m_Tokenizer.sval);
-            } catch (ParseException e) {
-              errorMessage("unparseable date: " + m_Tokenizer.sval);
-            }
-            break;
-          case Attribute.RELATIONAL:
-            try {
-              ArffReader arff =
-                new ArffReader(new StringReader(m_Tokenizer.sval), m_Data
-                  .attribute(m_IndicesBuffer[numValues]).relation(), 0);
-              Instances data = arff.getData();
-              m_ValueBuffer[numValues] =
-                m_Data.attribute(m_IndicesBuffer[numValues]).addRelation(data);
-            } catch (Exception e) {
-              throw new IOException(e.toString() + " of line " + getLineNo());
-            }
-            break;
-          default:
-            errorMessage("unknown attribute type in column "
-              + m_IndicesBuffer[numValues]);
-          }
-        }
-        numValues++;
-      } while (true);
-
-      double weight = 1.0;
-      if (flag) {
-        // check for an instance weight
-        weight = getInstanceWeight();
-        if (!Double.isNaN(weight)) {
-          getLastToken(true);
-        } else {
-          weight = 1.0;
-        }
-      }
-
-      // Add instance to dataset
-      double[] tempValues = new double[numValues];
-      int[] tempIndices = new int[numValues];
-      System.arraycopy(m_ValueBuffer, 0, tempValues, 0, numValues);
-      System.arraycopy(m_IndicesBuffer, 0, tempIndices, 0, numValues);
-      Instance inst =
-        new SparseInstance(weight, tempValues, tempIndices,
-          m_Data.numAttributes());
-      inst.setDataset(m_Data);
-
-      return inst;
     }
 
     /**

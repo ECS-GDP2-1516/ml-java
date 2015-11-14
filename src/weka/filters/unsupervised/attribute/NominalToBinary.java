@@ -26,7 +26,7 @@ package weka.filters.unsupervised.attribute;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Range;
-import weka.core.SparseInstance;
+//import weka.core.SparseInstance;
 import weka.filters.Filter;
 
 /** 
@@ -114,7 +114,8 @@ public class NominalToBinary
       push(instance);
       return;
     }
-
+    
+    /*
     double [] vals = new double [m_OutputFormat.numAttributes()];
     int attSoFar = 0;
 
@@ -156,5 +157,6 @@ public class NominalToBinary
     copyValues(inst, false, instance.dataset(), getOutputFormat());
     inst.setDataset(getOutputFormat());
     push(inst);
+    */
   }
 }

@@ -156,24 +156,6 @@ public class Instance
   }
 
   /**
-   * Returns the attribute with the given index. Does the same
-   * thing as attribute().
-   *
-   * @param indexOfIndex the index of the attribute's index 
-   * @return the attribute at the given position
-   * @throws UnassignedDatasetException if instance doesn't have access to a
-   * dataset
-   */ 
-  //@ requires m_Dataset != null;
-  public /*@pure@*/ Attribute attributeSparse(int indexOfIndex) {
-   
-    if (m_Dataset == null) {
-      throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
-    }
-    return m_Dataset.attribute(indexOfIndex);
-  }
-
-  /**
    * Returns class attribute.
    *
    * @return the class attribute
@@ -203,41 +185,6 @@ public class Instance
       throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
     }
     return m_Dataset.classIndex();
-  }
-
-  /**
-   * Tests if an instance's class is missing.
-   *
-   * @return true if the instance's class is missing
-   * @throws UnassignedClassException if the class is not set or the instance doesn't
-   * have access to a dataset
-   */
-  //@ requires classIndex() >= 0;
-  public /*@pure@*/ boolean classIsMissing() {
-
-    if (classIndex() < 0) {
-      throw new UnassignedClassException("Class is not set!");
-    }
-    return isMissing(classIndex());
-  }
-
-  /**
-   * Returns an instance's class value in internal format. (ie. as a
-   * floating-point number)
-   *
-   * @return the corresponding value as a double (If the 
-   * corresponding attribute is nominal (or a string) then it returns the 
-   * value's index as a double).
-   * @throws UnassignedClassException if the class is not set or the instance doesn't
-   * have access to a dataset 
-   */
-  //@ requires classIndex() >= 0;
-  public /*@pure@*/ double classValue() {
-    
-    if (classIndex() < 0) {
-      throw new UnassignedClassException("Class is not set!");
-    }
-    return value(classIndex());
   }
 
   /**
@@ -271,80 +218,7 @@ public class Instance
     return m_Dataset;
   }
 
-  /**
-   * Deletes an attribute at the given position (0 to 
-   * numAttributes() - 1). Only succeeds if the instance does not
-   * have access to any dataset because otherwise inconsistencies
-   * could be introduced.
-   *
-   * @param position the attribute's position
-   * @throws RuntimeException if the instance has access to a
-   * dataset 
-   */
-  //@ requires m_Dataset != null;
-  public void deleteAttributeAt(int position) {
 
-    if (m_Dataset != null) {
-      throw new RuntimeException("Instance has access to a dataset!");
-    }
-    forceDeleteAttributeAt(position);
-  }
-
-  /**
-   * Returns an enumeration of all the attributes.
-   *
-   * @return enumeration of all the attributes
-   * @throws UnassignedDatasetException if the instance doesn't
-   * have access to a dataset 
-   */
-  //@ requires m_Dataset != null;
-  public /*@pure@*/ Enumeration enumerateAttributes() {
-
-    if (m_Dataset == null) {
-      throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
-    }
-    return m_Dataset.enumerateAttributes();
-  }
-
-  /**
-   * Tests if the headers of two instances are equivalent.
-   *
-   * @param inst another instance
-   * @return true if the header of the given instance is 
-   * equivalent to this instance's header
-   * @throws UnassignedDatasetException if instance doesn't have access to any
-   * dataset
-   */
-  //@ requires m_Dataset != null;
-  public /*@pure@*/ boolean equalHeaders(Instance inst) {
-
-    if (m_Dataset == null) {
-      throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
-    }
-    return m_Dataset.equalHeaders(inst.m_Dataset);
-  }
-
-  /**
-   * Tests whether an instance has a missing value. Skips the class attribute if set.
-   * @return true if instance has a missing value.
-   * @throws UnassignedDatasetException if instance doesn't have access to any
-   * dataset
-   */
-  //@ requires m_Dataset != null;
-  public /*@pure@*/ boolean hasMissingValue() {
-    
-    if (m_Dataset == null) {
-      throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
-    }
-    for (int i = 0; i < numAttributes(); i++) {
-      if (i != classIndex()) {
-	if (isMissing(i)) {
-	  return true;
-	}
-      }
-    }
-    return false;
-  }
 
   /**
    * Returns the index of the attribute stored at the given position.
@@ -356,32 +230,6 @@ public class Instance
   public /*@pure@*/ int index(int position) {
 
     return position;
-  }
-
-  /**
-   * Inserts an attribute at the given position (0 to 
-   * numAttributes()). Only succeeds if the instance does not
-   * have access to any dataset because otherwise inconsistencies
-   * could be introduced.
-   *
-   * @param position the attribute's position
-   * @throws RuntimeException if the instance has accesss to a
-   * dataset
-   * @throws IllegalArgumentException if the position is out of range
-   */
-  //@ requires m_Dataset == null;
-  //@ requires 0 <= position && position <= numAttributes();
-  public void insertAttributeAt(int position) {
-
-    if (m_Dataset != null) {
-      throw new RuntimeException("Instance has accesss to a dataset!");
-    }
-    if ((position < 0) ||
-	(position > numAttributes())) {
-      throw new IllegalArgumentException("Can't insert attribute: index out "+
-                                         "of range");
-    }
-    forceInsertAttributeAt(position);
   }
 
   /**
@@ -399,33 +247,6 @@ public class Instance
   }
 
   /**
-   * Tests if a specific value is "missing". Does
-   * the same thing as isMissing() if applied to an Instance.
-   *
-   * @param indexOfIndex the index of the attribute's index 
-   * @return true if the value is "missing"
-   */
-  public /*@pure@*/ boolean isMissingSparse(int indexOfIndex) {
-
-    if (Double.isNaN(m_AttValues[indexOfIndex])) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Tests if a specific value is "missing".
-   * The given attribute has to belong to a dataset.
-   *
-   * @param att the attribute
-   * @return true if the value is "missing"
-   */
-  public /*@pure@*/ boolean isMissing(Attribute att) {
-
-    return isMissing(att.index());
-  }
-
-  /**
    * Tests if the given value codes "missing".
    *
    * @param val the value to be tested
@@ -436,25 +257,7 @@ public class Instance
     return Double.isNaN(val);
   }
 
-  /**
-   * Merges this instance with the given instance and returns
-   * the result. Dataset is set to null.
-   *
-   * @param inst the instance to be merged with this one
-   * @return the merged instances
-   */
-  public Instance mergeInstance(Instance inst) {
-
-    int m = 0;
-    double [] newVals = new double[numAttributes() + inst.numAttributes()];
-    for (int j = 0; j < numAttributes(); j++, m++) {
-      newVals[m] = value(j);
-    }
-    for (int j = 0; j < inst.numAttributes(); j++, m++) {
-      newVals[m] = inst.value(j);
-    }
-    return new Instance(1.0, newVals);
-  }
+  
 
   /**
    * Returns the double that codes "missing".
@@ -464,86 +267,6 @@ public class Instance
   public /*@pure@*/ static double missingValue() {
 
     return MISSING_VALUE;
-  }
-
-  /**
-   * Returns the number of attributes.
-   *
-   * @return the number of attributes as an integer
-   */
-  //@ ensures \result == m_AttValues.length;
-  public /*@pure@*/ int numAttributes() {
-
-    return m_AttValues.length;
-  }
-
-  /**
-   * Returns the number of class labels.
-   *
-   * @return the number of class labels as an integer if the 
-   * class attribute is nominal, 1 otherwise.
-   * @throws UnassignedDatasetException if instance doesn't have access to any
-   * dataset
-   */
-  //@ requires m_Dataset != null;
-  public /*@pure@*/ int numClasses() {
-    
-    if (m_Dataset == null) {
-      throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
-    }
-    return m_Dataset.numClasses();
-  }
-
-  /**
-   * Returns the number of values present. Always the same as numAttributes().
-   *
-   * @return the number of values
-   */
-  //@ ensures \result == m_AttValues.length;
-  public /*@pure@*/ int numValues() {
-
-    return m_AttValues.length;
-  }
-
-  /** 
-   * Replaces all missing values in the instance with the
-   * values contained in the given array. A deep copy of
-   * the vector of attribute values is performed before the
-   * values are replaced.
-   *
-   * @param array containing the means and modes
-   * @throws IllegalArgumentException if numbers of attributes are unequal
-   */
-  public void replaceMissingValues(double[] array) {
-	 
-    if ((array == null) || 
-	(array.length != m_AttValues.length)) {
-      throw new IllegalArgumentException("Unequal number of attributes!");
-    }
-    freshAttributeVector();
-    for (int i = 0; i < m_AttValues.length; i++) {
-      if (isMissing(i)) {
-	m_AttValues[i] = array[i];
-      }
-    }
-  }
-
-  /**
-   * Sets the class value of an instance to be "missing". A deep copy of
-   * the vector of attribute values is performed before the
-   * value is set to be missing.
-   *
-   * @throws UnassignedClassException if the class is not set
-   * @throws UnassignedDatasetException if the instance doesn't
-   * have access to a dataset
-   */
-  //@ requires classIndex() >= 0;
-  public void setClassMissing() {
-
-    if (classIndex() < 0) {
-      throw new UnassignedClassException("Class is not set!");
-    }
-    setMissing(classIndex());
   }
 
   /**
@@ -641,23 +364,6 @@ public class Instance
     
     freshAttributeVector();
     m_AttValues[attIndex] = value;
-  }
-
-  /**
-   * Sets a specific value in the instance to the given value 
-   * (internal floating-point format). Performs a deep copy
-   * of the vector of attribute values before the value is set.
-   * Does exactly the same thing as setValue().
-   *
-   * @param indexOfIndex the index of the attribute's index 
-   * @param value the new attribute value (If the corresponding
-   * attribute is nominal (or a string) then this is the new value's
-   * index as a double).  
-   */
-  public void setValueSparse(int indexOfIndex, double value) {
-    
-    freshAttributeVector();
-    m_AttValues[indexOfIndex] = value;
   }
 
   /**
@@ -1017,42 +723,6 @@ public class Instance
   public final /*@pure@*/ double weight() {
 
     return m_Weight;
-  }
-
-  /**
-   * Deletes an attribute at the given position (0 to 
-   * numAttributes() - 1).
-   *
-   * @param position the attribute's position
-   */
-  void forceDeleteAttributeAt(int position) {
-
-    double[] newValues = new double[m_AttValues.length - 1];
-
-    System.arraycopy(m_AttValues, 0, newValues, 0, position);
-    if (position < m_AttValues.length - 1) {
-      System.arraycopy(m_AttValues, position + 1, 
-		       newValues, position, 
-		       m_AttValues.length - (position + 1));
-    }
-    m_AttValues = newValues;
-  }
-
-  /**
-   * Inserts an attribute at the given position
-   * (0 to numAttributes()) and sets its value to be missing. 
-   *
-   * @param position the attribute's position
-   */
-  void forceInsertAttributeAt(int position)  {
-
-    double[] newValues = new double[m_AttValues.length + 1];
-
-    System.arraycopy(m_AttValues, 0, newValues, 0, position);
-    newValues[position] = MISSING_VALUE;
-    System.arraycopy(m_AttValues, position, newValues, 
-		     position + 1, m_AttValues.length - position);
-    m_AttValues = newValues;
   }
 
   /**
