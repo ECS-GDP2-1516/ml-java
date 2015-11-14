@@ -709,57 +709,11 @@ public class ArffLoader
 
       // Check if attribute is nominal.
       if (m_Tokenizer.ttype == StreamTokenizer.TT_WORD) {
-
         // Attribute is real, integer, or string.
-        if (m_Tokenizer.sval.equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_REAL) ||
-          m_Tokenizer.sval.equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_INTEGER) ||
-          m_Tokenizer.sval.equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_NUMERIC)) {
+        if (m_Tokenizer.sval.equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_NUMERIC)) {
           attributes
             .addElement(new Attribute(attributeName, attributes.size()));
           readTillEOL();
-        } else if (m_Tokenizer.sval
-          .equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_STRING)) {
-          attributes.
-            addElement(new Attribute(attributeName, (FastVector) null,
-              attributes.size()));
-          readTillEOL();
-        } else if (m_Tokenizer.sval
-          .equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_RELATIONAL)) {
-          readTillEOL();
-
-          // Read attributes for subrelation
-          // First, save current set of attributes
-          FastVector atts = attributes;
-          attributes = new FastVector();
-
-          // Now, read attributes until we hit end of declaration of relational
-          // value
-          getFirstToken();
-          if (m_Tokenizer.ttype == StreamTokenizer.TT_EOF) {
-            errorMessage("premature end of file");
-          }
-          do {
-            if (Attribute.ARFF_ATTRIBUTE.equalsIgnoreCase(m_Tokenizer.sval)) {
-              attributes = parseAttribute(attributes);
-            } else if (Attribute.ARFF_END_SUBRELATION
-              .equalsIgnoreCase(m_Tokenizer.sval)) {
-              getNextToken();
-              if (!attributeName.equalsIgnoreCase(m_Tokenizer.sval)) {
-                errorMessage("declaration of subrelation " + attributeName +
-                  " must be terminated by " + "@end " + attributeName);
-              }
-              break;
-            } else {
-              errorMessage("declaration of subrelation " + attributeName +
-                " must be terminated by " + "@end " + attributeName);
-            }
-          } while (true);
-
-          // Make relation and restore original set of attributes
-          Instances relation = new Instances(attributeName, attributes, 0);
-          attributes = atts;
-          attributes.addElement(new Attribute(attributeName, relation,
-            attributes.size()));
         } else {
           errorMessage("no valid attribute type or invalid " +
             "enumeration");

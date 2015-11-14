@@ -319,43 +319,6 @@ public class Attribute
   }
 
   /**
-   * Constructor for relation-valued attributes.
-   *
-   * @param attributeName the name for the attribute
-   * @param header an Instances object specifying the header of the relation.
-   */
-  public Attribute(String attributeName, Instances header) {
-
-    this(attributeName, header,
-	 new ProtectedProperties(new Properties()));
-  }
-
-  /**
-   * Constructor for relation-valued attributes.
-   *
-   * @param attributeName the name for the attribute
-   * @param header an Instances object specifying the header of the relation.
-   * @param metadata the attribute's properties
-   */
-  public Attribute(String attributeName, 
-		   Instances header,
-		   ProtectedProperties metadata) {
-
-    if (header.numInstances() > 0) {
-      throw new IllegalArgumentException("Header for relation-valued " +
-                                         "attribute should not contain " +
-                                         "any instances");
-    }
-    m_Name = attributeName;
-    m_Index = -1;
-    m_Values = new FastVector();
-    m_Hashtable = new Hashtable();
-    m_Header = header;
-    m_Type = RELATIONAL;
-    setMetadata(metadata);
-  }
-
-  /**
    * Produces a shallow copy of this attribute.
    *
    * @return a copy of this attribute with the same index
@@ -719,24 +682,6 @@ public class Attribute
 	    int index) {
 
     this(attributeName, attributeValues);
-    m_Index = index;
-  }
-
-  /**
-   * Constructor for a relation-valued attribute with a particular index.
-   *
-   * @param attributeName the name for the attribute
-   * @param header the header information for this attribute
-   * @param index the attribute's index
-   */
-  //@ requires attributeName != null;
-  //@ requires index >= 0;
-  //@ ensures  m_Name == attributeName;
-  //@ ensures  m_Index == index;
-  public Attribute(String attributeName, Instances header,
-	    int index) {
-
-    this(attributeName, header);
     m_Index = index;
   }
 

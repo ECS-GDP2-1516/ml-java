@@ -262,38 +262,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Create a copy of the structure if the data has string or relational
-   * attributes, "cleanses" string types (i.e. doesn't contain references to the
-   * strings seen in the past) and all relational attributes.
-   * 
-   * @return a copy of the instance structure.
-   */
-  public Instances stringFreeStructure() {
-
-    FastVector newAtts = new FastVector();
-    for (int i = 0; i < m_Attributes.size(); i++) {
-      Attribute att = (Attribute) m_Attributes.elementAt(i);
-      if (att.type() == Attribute.STRING) {
-        newAtts.addElement(new Attribute(att.name(), (FastVector) null, i));
-      } else if (att.type() == Attribute.RELATIONAL) {
-        newAtts.addElement(new Attribute(att.name(), new Instances(att
-          .relation(), 0), i));
-      }
-    }
-    if (newAtts.size() == 0) {
-      return new Instances(this, 0);
-    }
-    FastVector atts = (FastVector) m_Attributes.copy();
-    for (int i = 0; i < newAtts.size(); i++) {
-      atts.setElementAt(newAtts.elementAt(i),
-        ((Attribute) newAtts.elementAt(i)).index());
-    }
-    Instances result = new Instances(this, 0);
-    result.m_Attributes = atts;
-    return result;
-  }
-
-  /**
    * Adds one instance to the end of the set. Shallow copies instance before it
    * is added. Increases the size of the dataset if it is not large enough. Does
    * not check if the instance is compatible with the dataset. Note: String or
