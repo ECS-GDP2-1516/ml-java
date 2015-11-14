@@ -68,9 +68,6 @@ public class NominalToBinary
   /** Stores which columns to act on */
   protected Range m_Columns = new Range();
 
-  /** Are the new attributes going to be nominal or numeric ones? */
-  private boolean m_Numeric = true;
-
   /** Are all values transformed into new attributes? */
   private boolean m_TransformAll = false;
   
@@ -80,23 +77,6 @@ public class NominalToBinary
   /** Constructor - initialises the filter */
   public NominalToBinary() {
 
-    setAttributeIndices("first-last");
-  }
-
-  /**
-   * Returns a string describing this filter
-   *
-   * @return a description of the filter suitable for
-   * displaying in the explorer/experimenter gui
-   */
-  public String globalInfo() {
-
-    return "Converts all nominal attributes into binary numeric attributes. An "
-      + "attribute with k values is transformed into k binary attributes if "
-      + "the class is nominal (using the one-attribute-per-value approach). "
-      + "Binary attributes are left binary, if option '-A' is not given."
-      + "If the class is numeric, you might want to use the supervised version of "
-      + "this filter.";
   }
 
   /**
@@ -120,130 +100,6 @@ public class NominalToBinary
 
     convertInstance(instance);
     return true;
-  }
-
-  /**
-   * Gets if binary attributes are to be treated as nominal ones.
-   *
-   * @return true if binary attributes are to be treated as nominal ones
-   */
-  public boolean getBinaryAttributesNominal() {
-
-    return !m_Numeric;
-  }
-
-  /**
-   * Sets if binary attributes are to be treates as nominal ones.
-   *
-   * @param bool true if binary attributes are to be treated as nominal ones
-   */
-  public void setBinaryAttributesNominal(boolean bool) {
-
-    m_Numeric = !bool;
-  }
-
-  /**
-   * Returns the tip text for this property
-   *
-   * @return tip text for this property suitable for
-   * displaying in the explorer/experimenter gui
-   */
-  public String transformAllValuesTipText() {
-    return "Whether all nominal values are turned into new attributes, not only if there are more than 2.";
-  }
-
-  /**
-   * Gets if all nominal values are turned into new attributes, not only if
-   * there are more than 2.
-   *
-   * @return true all nominal values are transformed into new attributes
-   */
-  public boolean getTransformAllValues() {
-
-    return m_TransformAll;
-  }
-
-  /**
-   * Sets whether all nominal values are transformed into new attributes, not
-   * just if there are more than 2.
-   *
-   * @param bool true if all nominal value are transformed into new attributes
-   */
-  public void setTransformAllValues(boolean bool) {
-
-    m_TransformAll = bool;
-  }
-
-  /**
-   * Returns the tip text for this property
-   *
-   * @return tip text for this property suitable for
-   * displaying in the explorer/experimenter gui
-   */
-  public String invertSelectionTipText() {
-
-    return "Set attribute selection mode. If false, only selected"
-      + " (numeric) attributes in the range will be discretized; if"
-      + " true, only non-selected attributes will be discretized.";
-  }
-
-  /**
-   * Gets whether the supplied columns are to be removed or kept
-   *
-   * @return true if the supplied columns will be kept
-   */
-  public boolean getInvertSelection() {
-
-    return m_Columns.getInvert();
-  }
-
-  /**
-   * Sets whether selected columns should be removed or kept. If true the 
-   * selected columns are kept and unselected columns are deleted. If false
-   * selected columns are deleted and unselected columns are kept.
-   *
-   * @param invert the new invert setting
-   */
-  public void setInvertSelection(boolean invert) {
-
-    m_Columns.setInvert(invert);
-  }
-
-  /**
-   * Returns the tip text for this property
-   *
-   * @return tip text for this property suitable for
-   * displaying in the explorer/experimenter gui
-   */
-  public String attributeIndicesTipText() {
-    return "Specify range of attributes to act on."
-      + " This is a comma separated list of attribute indices, with"
-      + " \"first\" and \"last\" valid values. Specify an inclusive"
-      + " range with \"-\". E.g: \"first-3,5,6-10,last\".";
-  }
-
-  /**
-   * Gets the current range selection
-   *
-   * @return a string containing a comma separated list of ranges
-   */
-  public String getAttributeIndices() {
-
-    return m_Columns.getRanges();
-  }
-
-  /**
-   * Sets which attributes are to be acted on.
-   *
-   * @param rangeList a string representing the list of attributes. Since
-   * the string will typically come from a user, attributes are indexed from
-   * 1. <br>
-   * eg: first-3,5,6-last
-   * @throws IllegalArgumentException if an invalid range list is supplied 
-   */
-  public void setAttributeIndices(String rangeList) {
-
-    m_Columns.setRanges(rangeList);
   }
 
   /**
