@@ -22,7 +22,6 @@
 
 package weka.core;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
@@ -31,7 +30,6 @@ import java.util.HashSet;
 import java.util.Random;
 
 import weka.core.converters.ArffLoader.ArffReader;
-import weka.core.converters.ConverterUtils.DataSource;
 
 /**
  * Class for handling an ordered set of weighted instances.

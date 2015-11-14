@@ -22,8 +22,6 @@
 
 package weka.core;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.Serializable;
 import java.util.Comparator;
 

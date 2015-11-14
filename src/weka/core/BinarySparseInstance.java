@@ -22,8 +22,6 @@
 
 package weka.core;
 
-import java.util.Enumeration;
-
 /**
  * Class for storing a binary-data-only instance as a sparse vector. A
  * sparse instance only requires storage for those attribute values
