@@ -80,7 +80,7 @@ public class ConverterUtils
     protected URL m_URL;
     
     /** the loader.*/
-    protected Loader m_Loader;
+    protected AbstractLoader m_Loader;
     
     /** whether the loader is incremental. */
     protected boolean m_Incremental;
@@ -153,7 +153,7 @@ public class ConverterUtils
      * 
      * @param loader		the Loader to use
      */
-    public DataSource(Loader loader) {
+    public DataSource(AbstractLoader loader) {
       super();
 
       m_BatchBuffer = null;
@@ -233,7 +233,7 @@ public class ConverterUtils
      * 
      * @return		the loader used for retrieving the data
      */
-    public Loader getLoader() {
+    public AbstractLoader getLoader() {
       return m_Loader;
     }
     
@@ -454,7 +454,7 @@ public class ConverterUtils
      * @return			the dataset
      * @throws Exception	if loading fails
      */
-    public static Instances read(Loader loader) throws Exception {
+    public static Instances read(AbstractLoader loader) throws Exception {
       DataSource	source;
       Instances		result;
       

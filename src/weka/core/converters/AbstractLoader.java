@@ -33,8 +33,13 @@ import java.io.*;
  * @author Richard Kirkby (rkirkby@cs.waikato.ac.nz)
  * @version $Revision: 7454 $
  */
-public abstract class AbstractLoader implements Loader {
+public abstract class AbstractLoader implements Serializable {
 
+	/** The retrieval modes */
+	  public static final int NONE = 0;
+	  public static final int BATCH = 1;
+	  public static final int INCREMENTAL = 2;
+	  
   /** The current retrieval mode */
   protected int m_retrieval;
 
