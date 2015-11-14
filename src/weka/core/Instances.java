@@ -492,22 +492,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Returns a random number generator. The initial seed of the random number
-   * generator depends on the given seed and the hash code of a string
-   * representation of a instances chosen based on the given seed.
-   * 
-   * @param seed the given seed
-   * @return the random number generator
-   */
-  public Random getRandomNumberGenerator(long seed) {
-
-    Random r = new Random(seed);
-    r.setSeed(instance(r.nextInt(numInstances())).toStringNoWeight().hashCode()
-      + seed);
-    return r;
-  }
-
-  /**
    * Returns the instance at the given position.
    * 
    * @param index the instance's index (index starts with 0)
@@ -529,58 +513,6 @@ public class Instances implements Serializable {
   public/* @non_null pure@ */Instance lastInstance() {
 
     return (Instance) m_Instances.lastElement();
-  }
-
-  /**
-   * Returns the mean (mode) for a numeric (nominal) attribute as a
-   * floating-point value. Returns 0 if the attribute is neither nominal nor
-   * numeric. If all values are missing it returns zero.
-   * 
-   * @param attIndex the attribute's index (index starts with 0)
-   * @return the mean or the mode
-   */
-  public/* @pure@ */double meanOrMode(int attIndex) {
-
-    double result, found;
-    int[] counts;
-
-    if (attribute(attIndex).isNumeric()) {
-      result = found = 0;
-      for (int j = 0; j < numInstances(); j++) {
-        if (!instance(j).isMissing(attIndex)) {
-          found += instance(j).weight();
-          result += instance(j).weight() * instance(j).value(attIndex);
-        }
-      }
-      if (found <= 0) {
-        return 0;
-      } else {
-        return result / found;
-      }
-    } else if (attribute(attIndex).isNominal()) {
-      counts = new int[attribute(attIndex).numValues()];
-      for (int j = 0; j < numInstances(); j++) {
-        if (!instance(j).isMissing(attIndex)) {
-          counts[(int) instance(j).value(attIndex)] += instance(j).weight();
-        }
-      }
-      return Utils.maxIndex(counts);
-    } else {
-      return 0;
-    }
-  }
-
-  /**
-   * Returns the mean (mode) for a numeric (nominal) attribute as a
-   * floating-point value. Returns 0 if the attribute is neither nominal nor
-   * numeric. If all values are missing it returns zero.
-   * 
-   * @param att the attribute
-   * @return the mean or the mode
-   */
-  public/* @pure@ */double meanOrMode(Attribute att) {
-
-    return meanOrMode(att.index());
   }
 
   /**
@@ -776,144 +708,6 @@ public class Instances implements Serializable {
     return newData;
   }
 
-  /**
-   * Creates a new dataset of the same size using random sampling with
-   * replacement according to the current instance weights. The weights of the
-   * instances in the new dataset are set to one.
-   * 
-   * @param random a random number generator
-   * @return the new dataset
-   */
-  public Instances resampleWithWeights(Random random) {
-
-    double[] weights = new double[numInstances()];
-    for (int i = 0; i < weights.length; i++) {
-      weights[i] = instance(i).weight();
-    }
-    return resampleWithWeights(random, weights);
-  }
-
-  /**
-   * Creates a new dataset of the same size using random sampling with
-   * replacement according to the current instance weights. The weights of the
-   * instances in the new dataset are set to one. See also
-   * resampleWithWeights(Random, double[], boolean[]).
-   * 
-   * @param random a random number generator
-   * @param sampled an array indicating what has been sampled
-   * @return the new dataset
-   */
-  public Instances resampleWithWeights(Random random, boolean[] sampled) {
-
-    double[] weights = new double[numInstances()];
-    for (int i = 0; i < weights.length; i++) {
-      weights[i] = instance(i).weight();
-    }
-    return resampleWithWeights(random, weights, sampled);
-  }
-
-  /**
-   * Creates a new dataset of the same size using random sampling with
-   * replacement according to the given weight vector. See also
-   * resampleWithWeights(Random, double[], boolean[]).
-   * 
-   * @param random a random number generator
-   * @param weights the weight vector
-   * @return the new dataset
-   * @throws IllegalArgumentException if the weights array is of the wrong
-   *           length or contains negative weights.
-   */
-  public Instances resampleWithWeights(Random random, double[] weights) {
-
-    return resampleWithWeights(random, weights, null);
-  }
-
-  /**
-   * Creates a new dataset of the same size using random sampling with
-   * replacement according to the given weight vector. The weights of the
-   * instances in the new dataset are set to one. The length of the weight
-   * vector has to be the same as the number of instances in the dataset, and
-   * all weights have to be positive. Uses Walker's method, see pp. 232 of
-   * "Stochastic Simulation" by B.D. Ripley (1987).
-   * 
-   * @param random a random number generator
-   * @param weights the weight vector
-   * @param sampled an array indicating what has been sampled, can be null
-   * @return the new dataset
-   * @throws IllegalArgumentException if the weights array is of the wrong
-   *           length or contains negative weights.
-   */
-  public Instances resampleWithWeights(Random random, double[] weights,
-    boolean[] sampled) {
-
-    if (weights.length != numInstances()) {
-      throw new IllegalArgumentException("weights.length != numInstances.");
-    }
-
-    Instances newData = new Instances(this, numInstances());
-    if (numInstances() == 0) {
-      return newData;
-    }
-
-    // Walker's method, see pp. 232 of "Stochastic Simulation" by B.D. Ripley
-    double[] P = new double[weights.length];
-    System.arraycopy(weights, 0, P, 0, weights.length);
-    Utils.normalize(P);
-    double[] Q = new double[weights.length];
-    int[] A = new int[weights.length];
-    int[] W = new int[weights.length];
-    int M = weights.length;
-    int NN = -1;
-    int NP = M;
-    for (int I = 0; I < M; I++) {
-      if (P[I] < 0) {
-        throw new IllegalArgumentException("Weights have to be positive.");
-      }
-      Q[I] = M * P[I];
-      if (Q[I] < 1.0) {
-        W[++NN] = I;
-      } else {
-        W[--NP] = I;
-      }
-    }
-    if (NN > -1 && NP < M) {
-      for (int S = 0; S < M - 1; S++) {
-        int I = W[S];
-        int J = W[NP];
-        A[I] = J;
-        Q[J] += Q[I] - 1.0;
-        if (Q[J] < 1.0) {
-          NP++;
-        }
-        if (NP >= M) {
-          break;
-        }
-      }
-      // A[W[M]] = W[M];
-    }
-
-    for (int I = 0; I < M; I++) {
-      Q[I] += I;
-    }
-
-    for (int i = 0; i < numInstances(); i++) {
-      int ALRV;
-      double U = M * random.nextDouble();
-      int I = (int) U;
-      if (U < Q[I]) {
-        ALRV = I;
-      } else {
-        ALRV = A[I];
-      }
-      newData.add(instance(ALRV));
-      if (sampled != null) {
-        sampled[ALRV] = true;
-      }
-      newData.instance(newData.numInstances() - 1).setWeight(1);
-    }
-
-    return newData;
-  }
 
   /**
    * Sets the class attribute.
@@ -948,21 +742,6 @@ public class Instances implements Serializable {
   public void setRelationName(/* @non_null@ */String newName) {
 
     m_RelationName = newName;
-  }
-
-  /**
-   * Computes the sum of all the instances' weights.
-   * 
-   * @return the sum of all the instances' weights as a double
-   */
-  public/* @pure@ */double sumOfWeights() {
-
-    double sum = 0;
-
-    for (int i = 0; i < numInstances(); i++) {
-      sum += instance(i).weight();
-    }
-    return sum;
   }
 
   /**
@@ -1044,116 +823,6 @@ public class Instances implements Serializable {
     return text.toString();
   }
 
-  /**
-   * Creates the training set for one fold of a cross-validation on the dataset.
-   * 
-   * @param numFolds the number of folds in the cross-validation. Must be
-   *          greater than 1.
-   * @param numFold 0 for the first fold, 1 for the second, ...
-   * @return the training set
-   * @throws IllegalArgumentException if the number of folds is less than 2 or
-   *           greater than the number of instances.
-   */
-  // @ requires 2 <= numFolds && numFolds < numInstances();
-  // @ requires 0 <= numFold && numFold < numFolds;
-  public Instances trainCV(int numFolds, int numFold) {
-
-    int numInstForFold, first, offset;
-    Instances train;
-
-    if (numFolds < 2) {
-      throw new IllegalArgumentException("Number of folds must be at least 2!");
-    }
-    if (numFolds > numInstances()) {
-      throw new IllegalArgumentException(
-        "Can't have more folds than instances!");
-    }
-    numInstForFold = numInstances() / numFolds;
-    if (numFold < numInstances() % numFolds) {
-      numInstForFold++;
-      offset = numFold;
-    } else {
-      offset = numInstances() % numFolds;
-    }
-    train = new Instances(this, numInstances() - numInstForFold);
-    first = numFold * (numInstances() / numFolds) + offset;
-    copyInstances(0, train, first);
-    copyInstances(first + numInstForFold, train, numInstances() - first
-      - numInstForFold);
-
-    return train;
-  }
-
-  /**
-   * Creates the training set for one fold of a cross-validation on the dataset.
-   * The data is subsequently randomized based on the given random number
-   * generator.
-   * 
-   * @param numFolds the number of folds in the cross-validation. Must be
-   *          greater than 1.
-   * @param numFold 0 for the first fold, 1 for the second, ...
-   * @param random the random number generator
-   * @return the training set
-   * @throws IllegalArgumentException if the number of folds is less than 2 or
-   *           greater than the number of instances.
-   */
-  // @ requires 2 <= numFolds && numFolds < numInstances();
-  // @ requires 0 <= numFold && numFold < numFolds;
-  public Instances trainCV(int numFolds, int numFold, Random random) {
-
-    Instances train = trainCV(numFolds, numFold);
-    train.randomize(random);
-    return train;
-  }
-
-  /**
-   * Computes the variance for a numeric attribute.
-   * 
-   * @param attIndex the numeric attribute (index starts with 0)
-   * @return the variance if the attribute is numeric
-   * @throws IllegalArgumentException if the attribute is not numeric
-   */
-  public/* @pure@ */double variance(int attIndex) {
-
-    double sum = 0, sumSquared = 0, sumOfWeights = 0;
-
-    if (!attribute(attIndex).isNumeric()) {
-      throw new IllegalArgumentException(
-        "Can't compute variance because attribute is " + "not numeric!");
-    }
-    for (int i = 0; i < numInstances(); i++) {
-      if (!instance(i).isMissing(attIndex)) {
-        sum += instance(i).weight() * instance(i).value(attIndex);
-        sumSquared += instance(i).weight() * instance(i).value(attIndex)
-          * instance(i).value(attIndex);
-        sumOfWeights += instance(i).weight();
-      }
-    }
-    if (sumOfWeights <= 1) {
-      return 0;
-    }
-    double result = (sumSquared - (sum * sum / sumOfWeights))
-      / (sumOfWeights - 1);
-
-    // We don't like negative variance
-    if (result < 0) {
-      return 0;
-    } else {
-      return result;
-    }
-  }
-
-  /**
-   * Computes the variance for a numeric attribute.
-   * 
-   * @param att the numeric attribute
-   * @return the variance if the attribute is numeric
-   * @throws IllegalArgumentException if the attribute is not numeric
-   */
-  public/* @pure@ */double variance(Attribute att) {
-
-    return variance(att.index());
-  }
 
   /**
    * Gets the value of all instances in this dataset for a particular attribute.
@@ -1188,25 +857,6 @@ public class Instances implements Serializable {
     for (int i = 0; i < num; i++) {
       dest.add(instance(from + i));
     }
-  }
-
-  /**
-   * Returns string including all instances, their weights and their indices in
-   * the original dataset.
-   * 
-   * @return description of instance and its weight as a string
-   */
-  protected/* @pure@ */String instancesAndWeights() {
-
-    StringBuffer text = new StringBuffer();
-
-    for (int i = 0; i < numInstances(); i++) {
-      text.append(instance(i) + " " + instance(i).weight());
-      if (i < numInstances() - 1) {
-        text.append("\n");
-      }
-    }
-    return text.toString();
   }
 
   /**

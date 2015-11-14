@@ -241,53 +241,6 @@ public class Instance
     return MISSING_VALUE;
   }
   
-  
-  
-
-  /**
-   * Sets the class value of an instance to the given value (internal
-   * floating-point format).  A deep copy of the vector of attribute
-   * values is performed before the value is set.
-   *
-   * @param value the new attribute value (If the corresponding
-   * attribute is nominal (or a string) then this is the new value's
-   * index as a double).  
-   * @throws UnassignedClassException if the class is not set
-   * @throws UnaddignedDatasetException if the instance doesn't
-   * have access to a dataset 
-   */
-  //@ requires classIndex() >= 0;
-  public void setClassValue(double value) {
-
-    if (classIndex() < 0) {
-      throw new UnassignedClassException("Class is not set!");
-    }
-    setValue(classIndex(), value);
-  }
-
-  /**
-   * Sets the class value of an instance to the given value. A deep
-   * copy of the vector of attribute values is performed before the
-   * value is set.
-   *
-   * @param value the new class value (If the class
-   * is a string attribute and the value can't be found,
-   * the value is added to the attribute).
-   * @throws UnassignedClassException if the class is not set
-   * @throws UnassignedDatasetException if the dataset is not set
-   * @throws IllegalArgumentException if the attribute is not
-   * nominal or a string, or the value couldn't be found for a nominal
-   * attribute 
-   */
-  //@ requires classIndex() >= 0;
-  public final void setClassValue(String value) {
-
-    if (classIndex() < 0) {
-      throw new UnassignedClassException("Class is not set!");
-    }
-    setValue(classIndex(), value);
-  }
-
   /**
    * Sets the reference to the dataset. Does not check if the instance
    * is compatible with the dataset. Note: the dataset does not know
@@ -300,31 +253,7 @@ public class Instance
     
     m_Dataset = instances;
   }
-
-  /**
-   * Sets a specific value to be "missing". Performs a deep copy
-   * of the vector of attribute values before the value is set to
-   * be missing.
-   *
-   * @param attIndex the attribute's index
-   */
-  public final void setMissing(int attIndex) {
-
-    setValue(attIndex, MISSING_VALUE);
-  }
-
-  /**
-   * Sets a specific value to be "missing". Performs a deep copy
-   * of the vector of attribute values before the value is set to
-   * be missing. The given attribute has to belong to a dataset.
-   *
-   * @param att the attribute
-   */
-  public final void setMissing(Attribute att) {
-
-    setMissing(att.index());
-  }
-
+  
   /**
    * Sets a specific value in the instance to the given value 
    * (internal floating-point format). Performs a deep copy
@@ -339,105 +268,6 @@ public class Instance
     
     freshAttributeVector();
     m_AttValues[attIndex] = value;
-  }
-
-  /**
-   * Sets a value of a nominal or string attribute to the given
-   * value. Performs a deep copy of the vector of attribute values
-   * before the value is set.
-   *
-   * @param attIndex the attribute's index
-   * @param value the new attribute value (If the attribute
-   * is a string attribute and the value can't be found,
-   * the value is added to the attribute).
-   * @throws UnassignedDatasetException if the dataset is not set
-   * @throws IllegalArgumentException if the selected
-   * attribute is not nominal or a string, or the supplied value couldn't 
-   * be found for a nominal attribute 
-   */
-  //@ requires m_Dataset != null;
-  public final void setValue(int attIndex, String value) {
-    
-    int valIndex;
-
-    if (m_Dataset == null) {
-      throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
-    }
-    if (!attribute(attIndex).isNominal() &&
-	!attribute(attIndex).isString()) {
-      throw new IllegalArgumentException("Attribute neither nominal nor string!");
-    }
-    valIndex = attribute(attIndex).indexOfValue(value);
-    if (valIndex == -1) {
-      if (attribute(attIndex).isNominal()) {
-	throw new IllegalArgumentException("Value not defined for given nominal attribute!");
-      } else {
-	attribute(attIndex).forceAddValue(value);
-	valIndex = attribute(attIndex).indexOfValue(value);
-      }
-    }
-    setValue(attIndex, (double)valIndex); 
-  }
-
-  /**
-   * Sets a specific value in the instance to the given value
-   * (internal floating-point format). Performs a deep copy of the
-   * vector of attribute values before the value is set, so if you are
-   * planning on calling setValue many times it may be faster to
-   * create a new instance using toDoubleArray.  The given attribute
-   * has to belong to a dataset.
-   *
-   * @param att the attribute 
-   * @param value the new attribute value (If the corresponding
-   * attribute is nominal (or a string) then this is the new value's
-   * index as a double).  
-   */
-  public final void setValue(Attribute att, double value) {
-
-    setValue(att.index(), value);
-  }
-
-  /**
-   * Sets a value of an nominal or string attribute to the given
-   * value. Performs a deep copy of the vector of attribute values
-   * before the value is set, so if you are planning on calling setValue many
-   * times it may be faster to create a new instance using toDoubleArray.
-   * The given attribute has to belong to a dataset.
-   *
-   * @param att the attribute
-   * @param value the new attribute value (If the attribute
-   * is a string attribute and the value can't be found,
-   * the value is added to the attribute).
-   * @throws IllegalArgumentException if the the attribute is not
-   * nominal or a string, or the value couldn't be found for a nominal
-   * attribute 
-   */
-  public final void setValue(Attribute att, String value) {
-
-    if (!att.isNominal() &&
-	!att.isString()) {
-      throw new IllegalArgumentException("Attribute neither nominal nor string!");
-    }
-    int valIndex = att.indexOfValue(value);
-    if (valIndex == -1) {
-      if (att.isNominal()) {
-	throw new IllegalArgumentException("Value not defined for given nominal attribute!");
-      } else {
-	att.forceAddValue(value);
-	valIndex = att.indexOfValue(value);
-      }
-    }
-    setValue(att.index(), (double)valIndex);
-  }
-  
-  /**
-   * Sets the weight of an instance.
-   *
-   * @param weight the weight
-   */
-  public final void setWeight(double weight) {
-
-    m_Weight = weight;
   }
 
   /** 
@@ -458,7 +288,6 @@ public class Instance
     } 
     return relationalValue(m_Dataset.attribute(attIndex));
   }
-
 
   /** 
    * Returns the relational value of a relational attribute.
@@ -482,58 +311,7 @@ public class Instance
       throw new IllegalArgumentException("Attribute isn't relation-valued!");
     }
   }
-
-  /** 
-   * Returns the value of a nominal, string, date, or relational attribute
-   * for the instance as a string.
-   *
-   * @param attIndex the attribute's index
-   * @return the value as a string
-   * @throws IllegalArgumentException if the attribute is not a nominal,
-   * string, date, or relation-valued attribute.
-   * @throws UnassignedDatasetException if the instance doesn't belong
-   * to a dataset.
-   */
-  //@ requires m_Dataset != null;
-  public final /*@pure@*/ String stringValue(int attIndex) {
-
-    if (m_Dataset == null) {
-      throw new UnassignedDatasetException("Instance doesn't have access to a dataset!");
-    } 
-    return stringValue(m_Dataset.attribute(attIndex));
-  }
-
-
-  /** 
-   * Returns the value of a nominal, string, date, or relational attribute
-   * for the instance as a string.
-   *
-   * @param att the attribute
-   * @return the value as a string
-   * @throws IllegalArgumentException if the attribute is not a nominal,
-   * string, date, or relation-valued attribute.
-   * @throws UnassignedDatasetException if the instance doesn't belong
-   * to a dataset.
-   */
-  public final /*@pure@*/ String stringValue(Attribute att) {
-
-    int attIndex = att.index();
-    if (isMissing(attIndex)) {
-      return "?";
-    }
-    switch (att.type()) {
-    case Attribute.NOMINAL:
-    case Attribute.STRING:
-      return att.value((int) value(attIndex));
-    case Attribute.DATE:
-      return att.formatDate(value(attIndex));
-    case Attribute.RELATIONAL:
-      return att.relation((int) value(attIndex)).stringWithoutHeader();
-    default:
-      throw new IllegalArgumentException("Attribute isn't nominal, string or date!");
-    }
-  }
-
+  
   /**
    * Returns the values of each attribute as an array of doubles.
    *
@@ -546,109 +324,7 @@ public class Instance
 		     m_AttValues.length);
     return newValues;
   }
-
-  /**
-   * Returns the description of one instance. If the instance
-   * doesn't have access to a dataset, it returns the internal
-   * floating-point values. Quotes string
-   * values that contain whitespace characters.
-   *
-   * @return the instance's description as a string
-   */
-  public String toString() {
-
-    StringBuffer text = new StringBuffer();
-    
-    for (int i = 0; i < m_AttValues.length; i++) {
-      if (i > 0) text.append(",");
-      text.append(toString(i));
-    }
-
-    if (m_Weight != 1.0) {
-      text.append(",{" + Utils.doubleToString(m_Weight, 6) + "}");
-    }
-
-    return text.toString();
-  }
-
-  /**
-   * Returns the description of one instance (without weight
-   * appended). If the instance
-   * doesn't have access to a dataset, it returns the internal
-   * floating-point values. Quotes string
-   * values that contain whitespace characters.
-   *
-   * This method is used by getRandomNumberGenerator() in
-   * Instances.java in order to maintain backwards compatibility
-   * with weka 3.4.
-   *
-   * @return the instance's description as a string
-   */
-  protected String toStringNoWeight() {
-    StringBuffer text = new StringBuffer();
-    
-    for (int i = 0; i < m_AttValues.length; i++) {
-      if (i > 0) text.append(",");
-      text.append(toString(i));
-    }
-
-    return text.toString();
-  }
-
-  /**
-   * Returns the description of one value of the instance as a 
-   * string. If the instance doesn't have access to a dataset, it 
-   * returns the internal floating-point value. Quotes string
-   * values that contain whitespace characters, or if they
-   * are a question mark.
-   *
-   * @param attIndex the attribute's index
-   * @return the value's description as a string
-   */
-  public final /*@pure@*/ String toString(int attIndex) {
-
-   StringBuffer text = new StringBuffer();
-   
-   if (isMissing(attIndex)) {
-     text.append("?");
-   } else {
-     if (m_Dataset == null) {
-       text.append(Utils.doubleToString(m_AttValues[attIndex],6));
-     } else {
-       switch (m_Dataset.attribute(attIndex).type()) {
-       case Attribute.NOMINAL:
-       case Attribute.STRING:
-       case Attribute.DATE:
-       case Attribute.RELATIONAL:
-         text.append(Utils.quote(stringValue(attIndex)));
-         break;
-       case Attribute.NUMERIC:
-	 text.append(Utils.doubleToString(value(attIndex),6));
-         break;
-       default:
-         throw new IllegalStateException("Unknown attribute type");
-       }
-     }
-   }
-   return text.toString();
-  }
-
-  /**
-   * Returns the description of one value of the instance as a 
-   * string. If the instance doesn't have access to a dataset it 
-   * returns the internal floating-point value. Quotes string
-   * values that contain whitespace characters, or if they
-   * are a question mark.
-   * The given attribute has to belong to a dataset.
-   *
-   * @param att the attribute
-   * @return the value's description as a string
-   */
-  public final String toString(Attribute att) {
-   
-   return toString(att.index());
-  }
-
+  
   /**
    * Returns an instance's attribute value in internal format.
    *
@@ -661,45 +337,8 @@ public class Instance
 
     return m_AttValues[attIndex];
   }
-
-  /**
-   * Returns an instance's attribute value in internal format.
-   * Does exactly the same thing as value() if applied to an Instance.
-   *
-   * @param indexOfIndex the index of the attribute's index
-   * @return the specified value as a double (If the corresponding
-   * attribute is nominal (or a string) then it returns the value's index as a 
-   * double).
-   */
-  public /*@pure@*/ double valueSparse(int indexOfIndex) {
-
-    return m_AttValues[indexOfIndex];
-  }  
-
-  /**
-   * Returns an instance's attribute value in internal format.
-   * The given attribute has to belong to a dataset.
-   *
-   * @param att the attribute
-   * @return the specified value as a double (If the corresponding
-   * attribute is nominal (or a string) then it returns the value's index as a
-   * double).
-   */
-  public /*@pure@*/ double value(Attribute att) {
-
-    return value(att.index());
-  }
-
-  /**
-   * Returns the instance's weight.
-   *
-   * @return the instance's weight as a double
-   */
-  public final /*@pure@*/ double weight() {
-
-    return m_Weight;
-  }
-
+  
+ 
   /**
    * Private constructor for subclasses. Does nothing.
    */
