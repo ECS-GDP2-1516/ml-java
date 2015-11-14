@@ -367,41 +367,6 @@ public class Attribute
   }
 
   /**
-   * Tests if given attribute is equal to this attribute.
-   *
-   * @param other the Object to be compared to this attribute
-   * @return true if the given attribute is equal to this attribute
-   */
-  public final /*@ pure @*/ boolean equals(Object other) {
-
-    if ((other == null) || !(other.getClass().equals(this.getClass()))) {
-      return false;
-    }
-    Attribute att = (Attribute) other;
-    if (!m_Name.equals(att.m_Name)) {
-      return false;
-    }
-    if (isNominal() && att.isNominal()) {
-      if (m_Values.size() != att.m_Values.size()) {
-        return false;
-      }
-      for (int i = 0; i < m_Values.size(); i++) {
-        if (!m_Values.elementAt(i).equals(att.m_Values.elementAt(i))) {
-          return false;
-        }
-      }
-      return true;
-    } 
-    if (isRelationValued() && att.isRelationValued()) {
-      if (!m_Header.equalHeaders(att.m_Header)) {
-        return false;
-      }
-      return true;
-    } 
-    return (type() == att.type());
-  }
-
-  /**
    * Returns the index of this attribute.
    *
    * @return the index of this attribute
@@ -519,53 +484,6 @@ public class Attribute
     } else {
       return m_Values.size();
     }
-  }
-
-  /**
-   * Returns a description of this attribute in ARFF format. Quotes
-   * strings if they contain whitespace characters, or if they
-   * are a question mark.
-   *
-   * @return a description of this attribute as a string
-   */
-  public final String toString() {
-    
-    StringBuffer text = new StringBuffer();
-    
-    text.append(ARFF_ATTRIBUTE).append(" ").append(Utils.quote(m_Name)).append(" ");
-    switch (m_Type) {
-    case NOMINAL:
-      text.append('{');
-      Enumeration enu = enumerateValues();
-      while (enu.hasMoreElements()) {
-	text.append(Utils.quote((String) enu.nextElement()));
-	if (enu.hasMoreElements())
-	  text.append(',');
-      }
-      text.append('}');
-      break;
-    case NUMERIC:
-      text.append(ARFF_ATTRIBUTE_NUMERIC);
-      break;
-    case STRING:
-      text.append(ARFF_ATTRIBUTE_STRING);
-      break;
-    case DATE:
-      text.append(ARFF_ATTRIBUTE_DATE).append(" ").append(Utils.quote(m_DateFormat.toPattern()));
-      break;
-    case RELATIONAL:
-      text.append(ARFF_ATTRIBUTE_RELATIONAL).append("\n");
-      Enumeration enm = m_Header.enumerateAttributes();
-      while (enm.hasMoreElements()) {
-        text.append(enm.nextElement()).append("\n");
-      }
-      text.append(ARFF_END_SUBRELATION).append(" ").append(Utils.quote(m_Name));
-      break;
-    default:
-      text.append("UNKNOWN");
-      break;
-    }
-    return text.toString();
   }
 
   /**
@@ -756,33 +674,6 @@ public class Attribute
   }
 
   /**
-   * Adds a relation to a relation-valued attribute.
-   *
-   * @param value The value to add
-   * @return the index assigned to the value, or -1 if the attribute is not
-   * of type Attribute.RELATIONAL 
-   */
-  public int addRelation(Instances value) {
-
-    if (!isRelationValued()) {
-      return -1;
-    }
-    if (!m_Header.equalHeaders(value)) {
-      throw new IllegalArgumentException("Incompatible value for " +
-                                         "relation-valued attribute.");
-    }
-    Integer index = (Integer)m_Hashtable.get(value);
-    if (index != null) {
-      return index.intValue();
-    } else {
-      int intIndex = m_Values.size();
-      m_Values.addElement(value);
-      m_Hashtable.put(value, new Integer(intIndex));
-      return intIndex;
-    }
-  }
-
-  /**
    * Adds an attribute value. Creates a fresh list of attribute
    * values before adding it.
    *
@@ -928,30 +819,6 @@ public class Attribute
     default:
       throw new IllegalArgumentException("Can only set values for nominal"
                                          + " or string attributes!");
-    }
-  }
-
-  /**
-   * Sets a value of a relation-valued attribute.
-   * Creates a fresh list of attribute values before it is set.
-   *
-   * @param index the value's index
-   * @param data the value
-   * @throws IllegalArgumentException if the attribute is not 
-   * relation-valued.
-   */
-  final void setValue(int index, Instances data) {
-    
-    if (isRelationValued()) { 
-      if (!data.equalHeaders(m_Header)) {
-        throw new IllegalArgumentException("Can't set relational value. " +
-                                           "Headers not compatible.");
-      }
-      m_Values = (FastVector)m_Values.copy();
-      m_Values.setElementAt(data, index);
-    } else {
-      throw new IllegalArgumentException("Can only set value for"
-                                         + " relation-valued attributes!");
     }
   }
 

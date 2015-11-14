@@ -482,17 +482,6 @@ public class ArffLoader
               errorMessage("unparseable date: " + m_Tokenizer.sval);
             }
             break;
-          case Attribute.RELATIONAL:
-            try {
-              ArffReader arff =
-                new ArffReader(new StringReader(m_Tokenizer.sval), m_Data
-                  .attribute(i).relation(), 0);
-              Instances data = arff.getData();
-              instance[i] = m_Data.attribute(i).addRelation(data);
-            } catch (Exception e) {
-              throw new IOException(e.toString() + " of line " + getLineNo());
-            }
-            break;
           default:
             errorMessage("unknown attribute type in column " + i);
           }
