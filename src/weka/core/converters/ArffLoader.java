@@ -29,14 +29,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.io.StringReader;
 import java.text.ParseException;
 
 import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-//import weka.core.SparseInstance;
 
 /**
  * <!-- globalinfo-start --> Reads a source that is in arff (attribute relation
