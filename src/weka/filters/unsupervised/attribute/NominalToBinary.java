@@ -24,7 +24,6 @@
 package weka.filters.unsupervised.attribute;
 
 import weka.core.Instance;
-import weka.core.Range;
 import weka.filters.Filter;
 
 /** 
@@ -62,9 +61,6 @@ public class NominalToBinary
   
   /** for serialization */
   static final long serialVersionUID = -1130642825710549138L;
-
-  /** Stores which columns to act on */
-  protected Range m_Columns = new Range();
 
   /** Are all values transformed into new attributes? */
   private boolean m_TransformAll = false;
@@ -112,49 +108,5 @@ public class NominalToBinary
       push(instance);
       return;
     }
-    
-    /*
-    double [] vals = new double [m_OutputFormat.numAttributes()];
-    int attSoFar = 0;
-
-    for(int j = 0; j < m_InputFormat.numAttributes(); j++) {
-      Attribute att = m_InputFormat.attribute(j);
-      if (!att.isNominal() || (j == m_InputFormat.classIndex()) ||
-	  !m_Columns.isInRange(j)) {
-	vals[attSoFar] = instance.value(j);
-	attSoFar++;
-      } else {
-	if ( (att.numValues() <= 2) && (!m_TransformAll) ) {
-	  vals[attSoFar] = instance.value(j);
-	  attSoFar++;
-	} else {
-	  if (instance.isMissing(j)) {
-	    for (int k = 0; k < att.numValues(); k++) {
-              vals[attSoFar + k] = instance.value(j);
-	    }
-	  } else {
-	    for (int k = 0; k < att.numValues(); k++) {
-	      if (k == (int)instance.value(j)) {
-                vals[attSoFar + k] = 1;
-	      } else {
-                vals[attSoFar + k] = 0;
-	      }
-	    }
-	  }
-	  attSoFar += att.numValues();
-	}
-      }
-    }
-    Instance inst = null;System.out.println(instance instanceof SparseInstance);
-    if (instance instanceof SparseInstance) {
-      inst = new SparseInstance(instance.weight(), vals);
-    } else {
-      inst = new Instance(instance.weight(), vals);
-    }
-    inst.setDataset(getOutputFormat());
-    copyValues(inst, false, instance.dataset(), getOutputFormat());
-    inst.setDataset(getOutputFormat());
-    push(inst);
-    */
   }
 }
