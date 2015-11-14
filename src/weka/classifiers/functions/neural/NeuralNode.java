@@ -38,29 +38,20 @@ public class NeuralNode
   /** The weights for each of the input connections, and the threshold. */
   private double[] m_weights;
   
-  /** The change in the weights. */
-  //private double[] m_changeInWeights;
-  
   private Random m_random;
-
-  /** Performs the operations for this node. Currently this
-   * defines that the node is either a sigmoid or a linear unit. */
-  private SigmoidUnit m_methods;
 
   /** 
    * @param id The string name for this node (used to id this node).
    * @param r A random number generator used to generate initial weights.
    * @param m The methods this node should use to update.
    */
-  public NeuralNode(String id, Random r, SigmoidUnit m) {
+  public NeuralNode(String id, Random r) {
     super(id);
     m_weights = new double[1];
     
     m_random = r;
     
     m_weights[0] = m_random.nextDouble() * .1 - .05;
-
-    m_methods = m;
   }
   
 
@@ -74,11 +65,36 @@ public class NeuralNode
     
     if (Double.isNaN(m_unitValue) && calculate) {
       //then calculate the output value;
-      m_unitValue = m_methods.outputValue(this);
+      m_unitValue = outputValue();
     }
     
     return m_unitValue;
   }
+  
+  	public double outputValue() {
+
+	    double[] weights = m_weights;
+	    NeuralConnection[] inputs = m_inputList;
+	    double value = weights[0];
+	    for (int noa = 0; noa < m_numInputs; noa++) {
+	      
+	      value += inputs[noa].outputValue(true) 
+		* weights[noa+1];
+	    }
+	     
+	    //this I got from the Neural Network faq to combat overflow
+	    //pretty simple solution really :)
+	    if (value < -45) {
+	      value = 0;
+	    }
+	    else if (value > 45) {
+	      value = 1;
+	    }
+	    else {
+	      value = 1 / (1 + Math.exp(-value));
+	    }  
+	    return value;
+	  }
 
   /**
    * Call this to reset the value and error for this unit, ready for the next
@@ -93,19 +109,8 @@ public class NeuralNode
       m_unitError = Double.NaN;
       m_weightsUpdated = false;
       for (int noa = 0; noa < m_numInputs; noa++) {
-	m_inputList[noa].reset();
+    	  m_inputList[noa].reset();
       }
     }
   }
-
-  /**
-   * call this function to get the weights array.
-   * This will also allow the weights to be updated.
-   * @return The weights array.
-   */
-  public double[] getWeights() {
-    return m_weights;
-  }
-
-
 }

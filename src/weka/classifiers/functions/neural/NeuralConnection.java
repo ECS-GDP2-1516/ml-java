@@ -174,16 +174,6 @@ public abstract class NeuralConnection
   }
 
   /**
-   * Use this to get easy access to the inputs.
-   * It is not advised to change the entries in this list
-   * (use the connecting and disconnecting functions to do that)
-   * @return The inputs list.
-   */
-  public NeuralConnection[] getInputs() {
-    return m_inputList;
-  }
-
-  /**
    * Use this to get easy access to the outputs.
    * It is not advised to change the entries in this list
    * (use the connecting and disconnecting functions to do that)
@@ -201,13 +191,6 @@ public abstract class NeuralConnection
    */
   public int[] getOutputNums() {
     return m_outputNums;
-  }
-  
-  /**
-   * @return The number of input connections.
-   */
-  public int getNumInputs() {
-    return m_numInputs;
   }
 
   /**
