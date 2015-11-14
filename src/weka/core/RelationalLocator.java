@@ -37,38 +37,6 @@ public class RelationalLocator
   private static final long serialVersionUID = 4646872277151854732L;
 
   /**
-   * Initializes the RelationalLocator with the given data.
-   * 
-   * @param data	the data to work on
-   */
-  public RelationalLocator(Instances data) {
-    super(data, Attribute.RELATIONAL);
-  }
-  
-  /**
-   * Initializes the RelationalLocator with the given data. 
-   * Checks only the given range.
-   * 
-   * @param data	the data to work on
-   * @param fromIndex	the first index to inspect (including)
-   * @param toIndex	the last index to check (including)
-   */
-  public RelationalLocator(Instances data, int fromIndex, int toIndex) {
-    super(data, Attribute.RELATIONAL, fromIndex, toIndex);
-  }
-  
-  /**
-   * Initializes the RelationalLocator with the given data.
-   * Checks only the specified attribute indices.
-   * 
-   * @param data	the data to work on
-   * @param indices	the attribute indices to check
-   */
-  public RelationalLocator(Instances data, int[] indices) {
-    super(data, Attribute.RELATIONAL, indices);
-  }
-
-  /**
    * Copies relational values contained in the instance copied to a new
    * dataset. The Instance must already be assigned to a dataset. This
    * dataset and the destination dataset must have the same structure.

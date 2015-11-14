@@ -63,70 +63,6 @@ public class AttributeLocator
   protected int[] m_LocatorIndices = null;
   
   /**
-   * Initializes the AttributeLocator with the given data for the specified
-   * type of attribute. Checks all attributes.
-   * 
-   * @param data	the data to work on
-   * @param type	the type of attribute to locate
-   */
-  public AttributeLocator(Instances data, int type) {
-    this(data, type, 0, data.numAttributes() - 1);
-  }
-  
-  /**
-   * Initializes the AttributeLocator with the given data for the specified
-   * type of attribute. Checks only the given range.
-   * 
-   * @param data	the data to work on
-   * @param type	the type of attribute to locate
-   * @param fromIndex	the first index to inspect (including)
-   * @param toIndex	the last index to check (including)
-   */
-  public AttributeLocator(Instances data, int type, int fromIndex, int toIndex) {
-    super();
-
-    int[] indices = new int[toIndex - fromIndex + 1];
-    for (int i = 0; i < indices.length; i++)
-      indices[i] = fromIndex + i;
-    
-    initialize(data, type, indices);
-  }
-  
-  /**
-   * initializes the AttributeLocator with the given data for the specified
-   * type of attribute. Checks only the given attribute indices.
-   * 
-   * @param data	the data to work on
-   * @param type	the type of attribute to locate
-   * @param indices	the attribute indices to check
-   */
-  public AttributeLocator(Instances data, int type, int[] indices) {
-    super();
-
-    initialize(data, type, indices);
-  }
-  
-  /**
-   * initializes the AttributeLocator
-   * 
-   * @param data	the data to base the search for attributes on
-   * @param type	the type of attribute to look for
-   * @param indices	the indices that are allowed to check
-   */
-  protected void initialize(Instances data, int type, int[] indices) {
-    m_Data = new Instances(data, 0);
-    m_Type = type;
-    
-    m_AllowedIndices = new int[indices.length];
-    System.arraycopy(indices, 0, m_AllowedIndices, 0, indices.length);
-    
-    locate();
-
-    m_Indices        = find(true);
-    m_LocatorIndices = find(false);
-  }
-  
-  /**
    * returns the type of attribute that is located
    * 
    * @return		the type of attribute
@@ -145,26 +81,6 @@ public class AttributeLocator
   }
   
   /**
-   * sets up the structure
-   */
-  protected void locate() {
-    int         i;
-    
-    m_Attributes = null;
-    m_AttributesEfficient = new BitSet(m_AllowedIndices.length);
-    m_Locators   = new Vector<AttributeLocator>();
-    
-    for (i = 0; i < m_AllowedIndices.length; i++) {
-      if (m_Data.attribute(m_AllowedIndices[i]).type() == Attribute.RELATIONAL)
-	m_Locators.add(new AttributeLocator(m_Data.attribute(m_AllowedIndices[i]).relation(), getType()));
-      else
-	m_Locators.add(null);
-      
-      m_AttributesEfficient.set(i, m_Data.attribute(m_AllowedIndices[i]).type() == getType());
-    }
-  }
-  
-  /**
    * returns the underlying data
    * 
    * @return      the underlying Instances object
@@ -173,44 +89,7 @@ public class AttributeLocator
     return m_Data;
   }
   
-  /**
-   * returns the indices of the searched-for attributes (if TRUE) or the indices
-   * of AttributeLocator objects (if FALSE)
-   * 
-   * @param findAtts      if true the indices of attributes are located,
-   *                      otherwise the ones of AttributeLocator objects
-   * @return              the indices of the attributes or the AttributeLocator objects
-   */
-  protected int[] find(boolean findAtts) {
-    int		i;
-    int[]	result;
-    Vector<Integer>	indices;
 
-    if (m_AttributesEfficient == null) 
-      moveFromBooleanVectorToBitSet();
-
-    // determine locations
-    indices = new Vector<Integer>();
-    if (findAtts) {
-      for (i = 0; i < m_AttributesEfficient.size(); i++) {
-	if (((Boolean) m_AttributesEfficient.get(i)).booleanValue())
-	  indices.add(new Integer(i));
-      }
-    }
-    else {
-      for (i = 0; i < m_Locators.size(); i++) {
-	if (m_Locators.get(i) != null)
-	  indices.add(new Integer(i));
-      }
-    }
-    
-    // fill array
-    result = new int[indices.size()];
-    for (i = 0; i < indices.size(); i++)
-      result[i] = ((Integer) indices.get(i)).intValue();
-    
-    return result;
-  }
 
   /**
    * returns actual index in the Instances object.
@@ -306,45 +185,5 @@ public class AttributeLocator
     }
     
     return result;
-  }
-  
-  /**
-   * Indicates whether some other object is "equal to" this one. Only type
-   * and indices are checked.
-   * 
-   * @param o		the AttributeLocator to check for equality
-   * @return		true if the AttributeLocators have the same type and 
-   * 			indices
-   */
-  public boolean equals(Object o) {
-    return (compareTo((AttributeLocator) o) == 0);
-  }
-  
-  /**
-   * returns a string representation of this object
-   * 
-   * @return 		a string representation
-   */
-  public String toString() {
-
-    if (m_AttributesEfficient == null) 
-      moveFromBooleanVectorToBitSet();
-
-    return m_AttributesEfficient.toString();
-  }
-  
-  /**
-   * Moves data from Vector<Boolean> to Bitset. Creates bitset first. Sets vector to null.
-   */
-  private void moveFromBooleanVectorToBitSet() {
-
-    m_AttributesEfficient = new BitSet(m_Attributes.size());
-    
-    for (int i = 0; i < m_Attributes.size(); i++) {
-      if (((Boolean) m_Attributes.get(i)).booleanValue())
-        m_AttributesEfficient.set(i, true);
-    }
-    
-    m_Attributes = null;
   }
 }

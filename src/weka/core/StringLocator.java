@@ -39,38 +39,6 @@ public class StringLocator
   private static final long serialVersionUID = 7805522230268783972L;
 
   /**
-   * initializes the StringLocator with the given data
-   * 
-   * @param data	the data to work on
-   */
-  public StringLocator(Instances data) {
-    super(data, Attribute.STRING);
-  }
-  
-  /**
-   * Initializes the StringLocator with the given data. 
-   * Checks only the given range.
-   * 
-   * @param data	the data to work on
-   * @param fromIndex	the first index to inspect (including)
-   * @param toIndex	the last index to check (including)
-   */
-  public StringLocator(Instances data, int fromIndex, int toIndex) {
-    super(data, Attribute.STRING, fromIndex, toIndex);
-  }
-  
-  /**
-   * Initializes the AttributeLocator with the given data.
-   * Checks only the specified attribute indices.
-   * 
-   * @param data	the data to work on
-   * @param indices	the attribute indices to check
-   */
-  public StringLocator(Instances data, int[] indices) {
-    super(data, Attribute.STRING, indices);
-  }
-
-  /**
    * Copies string values contained in the instance copied to a new
    * dataset. The Instance must already be assigned to a dataset. This
    * dataset and the destination dataset must have the same structure.
