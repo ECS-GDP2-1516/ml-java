@@ -27,7 +27,6 @@ import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Range;
 import weka.core.SparseInstance;
-import weka.core.Utils;
 import weka.filters.Filter;
 
 /** 
@@ -291,7 +290,7 @@ public class NominalToBinary
 	}
       }
     }
-    Instance inst = null;
+    Instance inst = null;System.out.println(instance instanceof SparseInstance);
     if (instance instanceof SparseInstance) {
       inst = new SparseInstance(instance.weight(), vals);
     } else {
