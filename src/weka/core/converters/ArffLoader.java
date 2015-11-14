@@ -724,23 +724,6 @@ public class ArffLoader
               attributes.size()));
           readTillEOL();
         } else if (m_Tokenizer.sval
-          .equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_DATE)) {
-          String format = null;
-          if (m_Tokenizer.nextToken() != StreamTokenizer.TT_EOL) {
-            if ((m_Tokenizer.ttype != StreamTokenizer.TT_WORD) &&
-              (m_Tokenizer.ttype != '\'') &&
-              (m_Tokenizer.ttype != '\"')) {
-              errorMessage("not a valid date format");
-            }
-            format = m_Tokenizer.sval;
-            readTillEOL();
-          } else {
-            m_Tokenizer.pushBack();
-          }
-          attributes.addElement(new Attribute(attributeName, format,
-            attributes.size()));
-
-        } else if (m_Tokenizer.sval
           .equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_RELATIONAL)) {
           readTillEOL();
 

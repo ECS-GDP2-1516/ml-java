@@ -239,52 +239,6 @@ public class Attribute
   }
 
   /**
-   * Constructor for a date attribute.
-   *
-   * @param attributeName the name for the attribute
-   * @param dateFormat a string suitable for use with
-   * SimpleDateFormatter for parsing dates.
-   */
-  //@ requires attributeName != null;
-  //@ requires dateFormat != null;
-  //@ ensures  m_Name == attributeName;
-  public Attribute(String attributeName, String dateFormat) {
-
-    this(attributeName, dateFormat,
-	 new ProtectedProperties(new Properties()));
-  }
-
-  /**
-   * Constructor for a date attribute, where metadata is supplied.
-   *
-   * @param attributeName the name for the attribute
-   * @param dateFormat a string suitable for use with
-   * SimpleDateFormatter for parsing dates.
-   * @param metadata the attribute's properties
-   */
-  //@ requires attributeName != null;
-  //@ requires dateFormat != null;
-  //@ requires metadata != null;
-  //@ ensures  m_Name == attributeName;
-  public Attribute(String attributeName, String dateFormat,
-		   ProtectedProperties metadata) {
-
-    m_Name = attributeName;
-    m_Index = -1;
-    m_Values = null;
-    m_Hashtable = null;
-    m_Header = null;
-    m_Type = DATE;
-    if (dateFormat != null) {
-      m_DateFormat = new SimpleDateFormat(dateFormat);
-    } else {
-      m_DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-    }
-    m_DateFormat.setLenient(false);
-    setMetadata(metadata);
-  }
-
-  /**
    * Constructor for nominal attributes and string attributes.
    * If a null vector of attribute values is passed to the method,
    * the attribute is assumed to be a string.
@@ -743,26 +697,6 @@ public class Attribute
   public Attribute(String attributeName, int index) {
 
     this(attributeName);
-    m_Index = index;
-  }
-
-  /**
-   * Constructor for date attributes with a particular index.
-   *
-   * @param attributeName the name for the attribute
-   * @param dateFormat a string suitable for use with
-   * SimpleDateFormatter for parsing dates.  Null for a default format
-   * string.
-   * @param index the attribute's index
-   */
-  //@ requires attributeName != null;
-  //@ requires index >= 0;
-  //@ ensures  m_Name == attributeName;
-  //@ ensures  m_Index == index;
-  public Attribute(String attributeName, String dateFormat, 
-	    int index) {
-
-    this(attributeName, dateFormat);
     m_Index = index;
   }
 
