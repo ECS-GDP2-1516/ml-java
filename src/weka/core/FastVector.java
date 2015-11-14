@@ -34,7 +34,7 @@ import java.util.Enumeration;
  * @version $Revision: 1.16 $
  */
 public class FastVector
-  implements Copyable, Serializable {
+  implements Serializable {
 
   /** for serialization */
   private static final long serialVersionUID = -2173635135622930169L;

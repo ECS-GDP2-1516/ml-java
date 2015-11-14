@@ -65,7 +65,7 @@ import java.util.Enumeration;
  * @version $Revision: 9140 $ 
  */
 public class Instance
-  implements Copyable, Serializable {
+  implements Serializable {
   
   /** for serialization */
   static final long serialVersionUID = 1482635194499365122L;
