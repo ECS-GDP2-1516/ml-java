@@ -23,12 +23,6 @@
 package weka.core;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.lang.reflect.Array;
-import java.text.BreakIterator;
-import java.util.Properties;
-import java.util.Random;
-
 
 /**
  * Class implementing some simple utility methods.
