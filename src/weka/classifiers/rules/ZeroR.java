@@ -49,9 +49,6 @@ public class ZeroR
 
   /** for serialization */
   static final long serialVersionUID = 48055541465867954L;
-  
-  /** The class value 0R predicts. */
-  private double m_ClassValue;
 
   /** The number of instances in each class (null if class numeric). */
   private double [] m_Counts;
@@ -65,15 +62,6 @@ public class ZeroR
    */
   public double [] distributionForInstance(Instance instance) 
        throws Exception {
-	  
-	  System.out.println(m_Counts);
-	 
-    if (m_Counts == null) {
-      double[] result = new double[1];
-      result[0] = m_ClassValue;
-      return result;
-    } else {
       return (double []) m_Counts.clone();
-    }
   }
 }

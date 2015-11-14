@@ -23,7 +23,6 @@
 package weka.classifiers;
 
 import java.io.Serializable;
-import weka.core.Attribute;
 import weka.core.Instance;
 
 /**
@@ -63,8 +62,6 @@ public abstract class Classifier implements Cloneable, Serializable
       throw new Exception("Null distribution predicted");
     }
         
-    switch (instance.classAttribute().type()) {
-    case Attribute.NOMINAL:
       double max = 0;
       int maxIndex = 0;
 
@@ -79,10 +76,5 @@ public abstract class Classifier implements Cloneable, Serializable
       } else {
         return Instance.missingValue();
       }
-    case Attribute.NUMERIC:
-      return dist[0];
-    default:
-      return Instance.missingValue();
-    }
   }
 }

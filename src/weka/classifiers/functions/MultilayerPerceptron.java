@@ -249,54 +249,59 @@ public class MultilayerPerceptron
    * @return A double array filled with the probabilities of each class type.
    * @throws Exception if can't classify instance.
    */
-  public double[] distributionForInstance(Instance i) throws Exception {
-	  
-    // default model?
-    if (m_useDefaultModel) {
-      return m_ZeroR.distributionForInstance(i);
-    }
-    
-    // Make a copy of the instance so that it isn't modified
-    m_currentInstance = (Instance)i.copy();
-    
-    if (m_normalizeAttributes) {
-      for (int noa = 0; noa < m_instances.numAttributes(); noa++) {
-	if (noa != m_instances.classIndex()) {
-	  if (m_attributeRanges[noa] != 0) {
-	    m_currentInstance.setValue(noa, (m_currentInstance.value(noa) - 
-					     m_attributeBases[noa]) / 
-				       m_attributeRanges[noa]);
-	  }
-	  else {
-	    m_currentInstance.setValue(noa, m_currentInstance.value(noa) -
-				       m_attributeBases[noa]);
-	  }
+	public double[] distributionForInstance(Instance i) throws Exception
+	{
+		// Make a copy of the instance so that it isn't modified
+		m_currentInstance = (Instance)i.copy();
+		
+		if (m_normalizeAttributes)
+		{
+			for (int noa = 0; noa < m_instances.numAttributes(); noa++)
+			{
+				if (noa != m_instances.classIndex())
+				{
+					if (m_attributeRanges[noa] != 0)
+					{
+						m_currentInstance.setValue
+						(
+							noa,
+							(m_currentInstance.value(noa) - m_attributeBases[noa]) / m_attributeRanges[noa]
+						);
+					}
+					else
+					{
+						m_currentInstance.setValue
+						(
+							noa, m_currentInstance.value(noa) - m_attributeBases[noa]
+						);
+					}
+				}
+			}
+		}
+		
+		resetNetwork();
+		
+		//since all the output values are needed.
+		//They are calculated manually here and the values collected.
+		double[] theArray = new double[m_numClasses];
+		
+		for (int noa = 0; noa < m_numClasses; noa++) {
+			theArray[noa] = m_outputs[noa].outputValue(true);
+		}
+		
+		//now normalize the array
+		double count = 0;
+		for (int noa = 0; noa < m_numClasses; noa++)
+		{
+			count += theArray[noa];
+		}
+		if (count <= 0)
+		{
+			return m_ZeroR.distributionForInstance(i);
+		}
+		for (int noa = 0; noa < m_numClasses; noa++) {
+			theArray[noa] /= count;
+		}
+		return theArray;
 	}
-      }
-    }
-    resetNetwork();
-    
-    //since all the output values are needed.
-    //They are calculated manually here and the values collected.
-    double[] theArray = new double[m_numClasses];
-    for (int noa = 0; noa < m_numClasses; noa++) {
-      theArray[noa] = m_outputs[noa].outputValue(true);
-    }
-    if (m_instances.classAttribute().isNumeric()) {
-      return theArray;
-    }
-    
-    //now normalize the array
-    double count = 0;
-    for (int noa = 0; noa < m_numClasses; noa++) {
-      count += theArray[noa];
-    }
-    if (count <= 0) {
-      return m_ZeroR.distributionForInstance(i);
-    }
-    for (int noa = 0; noa < m_numClasses; noa++) {
-      theArray[noa] /= count;
-    }
-    return theArray;
-  }
 }
