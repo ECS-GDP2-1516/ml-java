@@ -108,9 +108,6 @@ public class Attribute
   /** Constant set for modulo-ordered attributes. */
   public static final int ORDERING_MODULO   = 2;
   
-  /** Dummy first value for String attributes (useful for sparse instances) */
-  public final static String DUMMY_STRING_VAL = "*WEKA*DUMMY*STRING*FOR*STRING*ATTRIBUTES*";
-
   /** The attribute's name. */
   private /*@ spec_public non_null @*/ String m_Name;
 
