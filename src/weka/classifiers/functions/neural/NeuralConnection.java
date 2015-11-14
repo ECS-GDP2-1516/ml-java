@@ -57,25 +57,6 @@ public abstract class NeuralConnection
   
   /** True if the weights have already been updated. */
   protected boolean m_weightsUpdated;
-  
-  /**
-   * Constructs The unit with the basic connection information prepared for
-   * use. 
-   * 
-   * @param id the unique id of the unit
-   */
-  public NeuralConnection(String id) {
-    
-    m_inputList = new NeuralConnection[0];
-    m_outputList = new NeuralConnection[0];
-
-    m_numInputs = 0;
-
-    m_unitValue = Double.NaN;
-    m_unitError = Double.NaN;
-
-    m_weightsUpdated = false;
-  }
 
   /**
    * Call this to reset the unit for another run.

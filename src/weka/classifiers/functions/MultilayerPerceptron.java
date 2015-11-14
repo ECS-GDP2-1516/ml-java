@@ -131,18 +131,6 @@ public class MultilayerPerceptron
     
     /** True if node is an input, False if it's an output. */
     private boolean m_input;
-
-    /**
-     * Constructor
-     */
-    public NeuralEnd(String id) {
-      super(id);
-
-      m_link = 0;
-      m_input = true;
-      
-    }
-
     
     /**
      * Call this to get the output value of this unit. 
@@ -245,26 +233,6 @@ public class MultilayerPerceptron
    * is numeric. */
   private boolean m_normalizeClass;
   
-  /**
-   * The constructor.
-   */
-  public MultilayerPerceptron() {
-    m_instances = null;
-    m_currentInstance = null;
-    m_outputs = new NeuralEnd[0];
-    m_numClasses = 0;
-    m_numeric = false;
-    //setting all the options to their defaults. To completely change these
-    //defaults they will also need to be changed down the bottom in the 
-    //setoptions function (the text info in the accompanying functions should 
-    //also be changed to reflect the new defaults
-    m_normalizeClass = true;
-    m_normalizeAttributes = true;
-    m_useNomToBin = true;
-  }
-
-  
-
   /**
    * this will reset all the nodes in the network.
    */

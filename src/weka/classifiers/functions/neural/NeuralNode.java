@@ -21,8 +21,6 @@
 
 package weka.classifiers.functions.neural;
 
-import java.util.Random;
-
 /**
  * This class is used to represent a node in the neuralnet.
  * 
@@ -32,28 +30,11 @@ import java.util.Random;
 public class NeuralNode
   extends NeuralConnection {
 
-  /** for serialization */
+/** for serialization */
   private static final long serialVersionUID = -1085750607680839163L;
     
   /** The weights for each of the input connections, and the threshold. */
   private double[] m_weights;
-  
-  private Random m_random;
-
-  /** 
-   * @param id The string name for this node (used to id this node).
-   * @param r A random number generator used to generate initial weights.
-   * @param m The methods this node should use to update.
-   */
-  public NeuralNode(String id, Random r) {
-    super(id);
-    m_weights = new double[1];
-    
-    m_random = r;
-    
-    m_weights[0] = m_random.nextDouble() * .1 - .05;
-  }
-  
 
   /**
    * Call this to get the output value of this unit. 
