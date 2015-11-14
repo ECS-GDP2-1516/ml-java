@@ -214,25 +214,6 @@ public class FastVector
   }
 
   /**
-   * Clones the vector and shallow copies all its elements.
-   * The elements have to implement the Copyable interface.
-   * 
-   * @return the new vector
-   */
-  public final Object copyElements() {
-
-    FastVector copy = new FastVector(m_Objects.length);
-
-    copy.m_Size = m_Size;
-    copy.m_CapacityIncrement = m_CapacityIncrement;
-    copy.m_CapacityMultiplier = m_CapacityMultiplier;
-    for (int i = 0; i < m_Size; i++) {
-      copy.m_Objects[i] = ((Copyable)m_Objects[i]).copy();
-    }
-    return copy;
-  }
-
-  /**
    * Returns the element at the given position.
    *
    * @param index the element's index

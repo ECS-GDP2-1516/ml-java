@@ -455,71 +455,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Deletes an attribute at the given position (0 to numAttributes() - 1). A
-   * deep copy of the attribute information is performed before the attribute is
-   * deleted.
-   * 
-   * @param position the attribute's position (position starts with 0)
-   * @throws IllegalArgumentException if the given index is out of range or the
-   *           class attribute is being deleted
-   */
-  // @ requires 0 <= position && position < numAttributes();
-  // @ requires position != classIndex();
-  public void deleteAttributeAt(int position) {
-
-    if ((position < 0) || (position >= m_Attributes.size())) {
-      throw new IllegalArgumentException("Index out of range");
-    }
-    if (position == m_ClassIndex) {
-      throw new IllegalArgumentException("Can't delete class attribute");
-    }
-    freshAttributeInfo();
-    if (m_ClassIndex > position) {
-      m_ClassIndex--;
-    }
-    m_Attributes.removeElementAt(position);
-    for (int i = position; i < m_Attributes.size(); i++) {
-      Attribute current = (Attribute) m_Attributes.elementAt(i);
-      current.setIndex(current.index() - 1);
-    }
-    for (int i = 0; i < numInstances(); i++) {
-      instance(i).forceDeleteAttributeAt(position);
-    }
-  }
-
-  /**
-   * Deletes all attributes of the given type in the dataset. A deep copy of the
-   * attribute information is performed before an attribute is deleted.
-   * 
-   * @param attType the attribute type to delete
-   * @throws IllegalArgumentException if attribute couldn't be successfully
-   *           deleted (probably because it is the class attribute).
-   */
-  public void deleteAttributeType(int attType) {
-    int i = 0;
-    while (i < m_Attributes.size()) {
-      if (attribute(i).type() == attType) {
-        deleteAttributeAt(i);
-      } else {
-        i++;
-      }
-    }
-  }
-
-  /**
-   * Deletes all string attributes in the dataset. A deep copy of the attribute
-   * information is performed before an attribute is deleted.
-   * 
-   * @throws IllegalArgumentException if string attribute couldn't be
-   *           successfully deleted (probably because it is the class
-   *           attribute).
-   * @see #deleteAttributeType(int)
-   */
-  public void deleteStringAttributes() {
-    deleteAttributeType(Attribute.STRING);
-  }
-
-  /**
    * Removes all instances with missing values for a particular attribute from
    * the dataset.
    * 
@@ -632,42 +567,6 @@ public class Instances implements Serializable {
     r.setSeed(instance(r.nextInt(numInstances())).toStringNoWeight().hashCode()
       + seed);
     return r;
-  }
-
-  /**
-   * Inserts an attribute at the given position (0 to numAttributes()) and sets
-   * all values to be missing. Shallow copies the attribute before it is
-   * inserted, and performs a deep copy of the existing attribute information.
-   * 
-   * @param att the attribute to be inserted
-   * @param position the attribute's position (position starts with 0)
-   * @throws IllegalArgumentException if the given index is out of range
-   */
-  // @ requires 0 <= position;
-  // @ requires position <= numAttributes();
-  public void insertAttributeAt(/* @non_null@ */Attribute att, int position) {
-
-    if ((position < 0) || (position > m_Attributes.size())) {
-      throw new IllegalArgumentException("Index out of range");
-    }
-    if (attribute(att.name()) != null) {
-      throw new IllegalArgumentException("Attribute name '" + att.name()
-        + "' already in use at position #" + attribute(att.name()).index());
-    }
-    att = (Attribute) att.copy();
-    freshAttributeInfo();
-    att.setIndex(position);
-    m_Attributes.insertElementAt(att, position);
-    for (int i = position + 1; i < m_Attributes.size(); i++) {
-      Attribute current = (Attribute) m_Attributes.elementAt(i);
-      current.setIndex(current.index() + 1);
-    }
-    for (int i = 0; i < numInstances(); i++) {
-      instance(i).forceInsertAttributeAt(position);
-    }
-    if (m_ClassIndex >= position) {
-      m_ClassIndex++;
-    }
   }
 
   /**
@@ -1653,14 +1552,6 @@ public class Instances implements Serializable {
     for (int i = 0; i < num; i++) {
       dest.add(instance(from + i));
     }
-  }
-
-  /**
-   * Replaces the attribute information by a clone of itself.
-   */
-  protected void freshAttributeInfo() {
-
-    m_Attributes = (FastVector) m_Attributes.copyElements();
   }
 
   /**
