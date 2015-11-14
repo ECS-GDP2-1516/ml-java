@@ -502,12 +502,12 @@ public class ArffLoader
       if (m_Tokenizer.ttype == StreamTokenizer.TT_EOF) {
         errorMessage("premature end of file");
       }
-      if (Instances.ARFF_RELATION.equalsIgnoreCase(m_Tokenizer.sval)) {
+      if ("@relation".equalsIgnoreCase(m_Tokenizer.sval)) {
         getNextToken();
         relationName = m_Tokenizer.sval;
         getLastToken(false);
       } else {
-        errorMessage("keyword " + Instances.ARFF_RELATION + " expected");
+        errorMessage("keyword " + "@relation" + " expected");
       }
 
       // Create vectors to hold information temporarily.
@@ -519,13 +519,13 @@ public class ArffLoader
         errorMessage("premature end of file");
       }
 
-      while (Attribute.ARFF_ATTRIBUTE.equalsIgnoreCase(m_Tokenizer.sval)) {
+      while ("@attribute".equalsIgnoreCase(m_Tokenizer.sval)) {
         attributes = parseAttribute(attributes);
       }
 
       // Check if data part follows. We can't easily check for EOL.
-      if (!Instances.ARFF_DATA.equalsIgnoreCase(m_Tokenizer.sval)) {
-        errorMessage("keyword " + Instances.ARFF_DATA + " expected");
+      if (!"@data".equalsIgnoreCase(m_Tokenizer.sval)) {
+        errorMessage("keyword " + "@data" + " expected");
       }
 
       // Check if any attributes have been declared.
@@ -556,7 +556,7 @@ public class ArffLoader
       // Check if attribute is nominal.
       if (m_Tokenizer.ttype == StreamTokenizer.TT_WORD) {
         // Attribute is real, integer, or string.
-        if (m_Tokenizer.sval.equalsIgnoreCase(Attribute.ARFF_ATTRIBUTE_NUMERIC)) {
+        if (m_Tokenizer.sval.equalsIgnoreCase("numeric")) {
           attributes
             .addElement(new Attribute(attributeName, attributes.size()));
           readTillEOL();

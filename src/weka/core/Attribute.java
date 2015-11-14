@@ -107,30 +107,6 @@ public class Attribute
 
   /** Constant set for modulo-ordered attributes. */
   public static final int ORDERING_MODULO   = 2;
-
-  /** The keyword used to denote the start of an arff attribute declaration */
-  public final static String ARFF_ATTRIBUTE = "@attribute";
-
-  /** A keyword used to denote a numeric attribute */
-  public final static String ARFF_ATTRIBUTE_INTEGER = "integer";
-
-  /** A keyword used to denote a numeric attribute */
-  public final static String ARFF_ATTRIBUTE_REAL = "real";
-
-  /** A keyword used to denote a numeric attribute */
-  public final static String ARFF_ATTRIBUTE_NUMERIC = "numeric";
-
-  /** The keyword used to denote a string attribute */
-  public final static String ARFF_ATTRIBUTE_STRING = "string";
-
-  /** The keyword used to denote a date attribute */
-  public final static String ARFF_ATTRIBUTE_DATE = "date";
-
-  /** The keyword used to denote a relation-valued attribute */
-  public final static String ARFF_ATTRIBUTE_RELATIONAL = "relational";
-
-  /** The keyword used to denote the end of the declaration of a subrelation */
-  public final static String ARFF_END_SUBRELATION = "@end";
   
   /** Dummy first value for String attributes (useful for sparse instances) */
   public final static String DUMMY_STRING_VAL = "*WEKA*DUMMY*STRING*FOR*STRING*ATTRIBUTES*";
@@ -144,10 +120,7 @@ public class Attribute
   /** The attribute's type. */
   private /*@ spec_public @*/ int m_Type;
   /*@ invariant m_Type == NUMERIC || 
-                m_Type == DATE || 
-                m_Type == STRING || 
-                m_Type == NOMINAL ||
-                m_Type == RELATIONAL;
+                m_Type == NOMINAL;
   */
 
   /** The attribute's values (if nominal or string). */
@@ -155,12 +128,6 @@ public class Attribute
 
   /** Mapping of values to indices (if nominal or string). */
   private Hashtable m_Hashtable;
-
-  /** The header information for a relation-valued attribute. */
-  private Instances m_Header;
-
-  /** Date format specification for date attributes */
-  private SimpleDateFormat m_DateFormat;
 
   /** The attribute's index. */
   private /*@ spec_public @*/ int m_Index;
@@ -222,7 +189,6 @@ public class Attribute
     m_Index = -1;
     m_Values = null;
     m_Hashtable = null;
-    m_Header = null;
     m_Type = NUMERIC;
     setMetadata(metadata);
   }
@@ -274,7 +240,6 @@ public class Attribute
     if (attributeValues == null) {} else {
       m_Values = new FastVector(attributeValues.size());
       m_Hashtable = new Hashtable(attributeValues.size());
-      m_Header = null;
       for (int i = 0; i < attributeValues.size(); i++) {
 	Object store = attributeValues.elementAt(i);
 	if (((String)store).length() > STRING_COMPRESS_THRESHOLD) {
@@ -312,8 +277,6 @@ public class Attribute
     copy.m_Type = m_Type;
     copy.m_Values = m_Values;
     copy.m_Hashtable = m_Hashtable;
-    copy.m_DateFormat = m_DateFormat;
-    copy.m_Header = m_Header;
     copy.setMetadata(m_Metadata);
  
     return copy;
@@ -534,11 +497,9 @@ public class Attribute
     Attribute copy = new Attribute(newName);
 
     copy.m_Index = m_Index;
-    copy.m_DateFormat = m_DateFormat;
     copy.m_Type = m_Type;
     copy.m_Values = m_Values;
     copy.m_Hashtable = m_Hashtable;
-    copy.m_Header = m_Header;
     copy.setMetadata(m_Metadata);
  
     return copy;
