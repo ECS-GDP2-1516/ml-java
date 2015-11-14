@@ -1126,36 +1126,6 @@ public class Attribute
   }
 
   /**
-   * Determines whether a value lies within the bounds of the attribute.
-   *
-   * @param value the value to check
-   * @return whether the value is in range
-   */
-  public final /*@ pure @*/ boolean isInRange(double value) {
-
-    // dates and missing values are a special case 
-    if (m_Type == DATE || Instance.isMissingValue(value)) return true;
-    if (m_Type != NUMERIC) {
-      // do label range check
-      int intVal = (int) value;
-      if (intVal < 0 || intVal >= m_Hashtable.size()) return false;
-    } else {
-      // do numeric bounds check
-      if (m_LowerBoundIsOpen) {
-	if (value <= m_LowerBound) return false;
-      } else {
-	if (value < m_LowerBound) return false;
-      }
-      if (m_UpperBoundIsOpen) {
-	if (value >= m_UpperBound) return false;
-      } else {
-	if (value > m_UpperBound) return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * Sets the metadata for the attribute. Processes the strings stored in the
    * metadata of the attribute so that the properties can be set up for the
    * easy-access metadata methods. Any strings sought that are omitted will

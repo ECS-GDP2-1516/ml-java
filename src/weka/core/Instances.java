@@ -521,51 +521,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Returns the kth-smallest attribute value of a numeric attribute.
-   * 
-   * @param att the Attribute object
-   * @param k the value of k
-   * @return the kth-smallest value
-   */
-  public double kthSmallestValue(Attribute att, int k) {
-
-    return kthSmallestValue(att.index(), k);
-  }
-
-  /**
-   * Returns the kth-smallest attribute value of a numeric attribute. NOTE
-   * CHANGE: Missing values (NaN values) are now treated as Double.MAX_VALUE.
-   * Also, the order of the instances in the data is no longer affected.
-   * 
-   * @param attIndex the attribute's index
-   * @param k the value of k
-   * @return the kth-smallest value
-   */
-  public double kthSmallestValue(int attIndex, int k) {
-
-    if (!attribute(attIndex).isNumeric()) {
-      throw new IllegalArgumentException(
-        "Instances: attribute must be numeric to compute kth-smallest value.");
-    }
-
-    if ((k < 1) || (k > numInstances())) {
-      throw new IllegalArgumentException(
-        "Instances: value for k for computing kth-smallest value too large.");
-    }
-
-    double[] vals = new double[numInstances()];
-    for (int i = 0; i < vals.length; i++) {
-      double val = instance(i).value(attIndex);
-      if (Instance.isMissingValue(val)) {
-        vals[i] = Double.MAX_VALUE;
-      } else {
-        vals[i] = val;
-      }
-    }
-    return Utils.kthSmallestValue(vals, k);
-  }
-
-  /**
    * Returns the last instance in the set.
    * 
    * @return the last instance in the set
@@ -657,52 +612,6 @@ public class Instances implements Serializable {
     } else {
       return classAttribute().numValues();
     }
-  }
-
-  /**
-   * Returns the number of distinct values of a given attribute. Returns the
-   * number of instances if the attribute is a string attribute. The value
-   * 'missing' is not counted.
-   * 
-   * @param attIndex the attribute (index starts with 0)
-   * @return the number of distinct values of a given attribute
-   */
-  // @ requires 0 <= attIndex;
-  // @ requires attIndex < numAttributes();
-  public/* @pure@ */int numDistinctValues(int attIndex) {
-
-    if (attribute(attIndex).isNumeric()) {
-      double[] attVals = attributeToDoubleArray(attIndex);
-      int[] sorted = Utils.sort(attVals);
-      double prev = 0;
-      int counter = 0;
-      for (int i = 0; i < sorted.length; i++) {
-        Instance current = instance(sorted[i]);
-        if (current.isMissing(attIndex)) {
-          break;
-        }
-        if ((i == 0) || (current.value(attIndex) > prev)) {
-          prev = current.value(attIndex);
-          counter++;
-        }
-      }
-      return counter;
-    } else {
-      return attribute(attIndex).numValues();
-    }
-  }
-
-  /**
-   * Returns the number of distinct values of a given attribute. Returns the
-   * number of instances if the attribute is a string attribute. The value
-   * 'missing' is not counted.
-   * 
-   * @param att the attribute
-   * @return the number of distinct values of a given attribute
-   */
-  public/* @pure@ */int numDistinctValues(/* @non_null@ */Attribute att) {
-
-    return numDistinctValues(att.index());
   }
 
   /**
@@ -1042,51 +951,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Sorts the instances based on an attribute. For numeric attributes,
-   * instances are sorted in ascending order. For nominal attributes, instances
-   * are sorted based on the attribute label ordering specified in the header.
-   * Instances with missing values for the attribute are placed at the end of
-   * the dataset.
-   * 
-   * @param attIndex the attribute's index (index starts with 0)
-   */
-  public void sort(int attIndex) {
-
-    double[] vals = new double[numInstances()];
-    for (int i = 0; i < vals.length; i++) {
-      double val = instance(i).value(attIndex);
-      if (Instance.isMissingValue(val)) {
-        vals[i] = Double.MAX_VALUE;
-      } else {
-        vals[i] = val;
-      }
-    }
-
-    int[] sortOrder = Utils.sortWithNoMissingValues(vals);
-    Instance[] backup = new Instance[vals.length];
-    for (int i = 0; i < vals.length; i++) {
-      backup[i] = instance(i);
-    }
-    for (int i = 0; i < vals.length; i++) {
-      m_Instances.setElementAt(backup[sortOrder[i]], i);
-    }
-  }
-
-  /**
-   * Sorts the instances based on an attribute. For numeric attributes,
-   * instances are sorted into ascending order. For nominal attributes,
-   * instances are sorted based on the attribute label ordering specified in the
-   * header. Instances with missing values for the attribute are placed at the
-   * end of the dataset.
-   * 
-   * @param att the attribute
-   */
-  public void sort(Attribute att) {
-
-    sort(att.index());
-  }
-
-  /**
    * Computes the sum of all the instances' weights.
    * 
    * @return the sum of all the instances' weights as a double
@@ -1292,46 +1156,6 @@ public class Instances implements Serializable {
   }
 
   /**
-   * Calculates summary statistics on the values that appear in this set of
-   * instances for a specified attribute.
-   * 
-   * @param index the index of the attribute to summarize (index starts with 0)
-   * @return an AttributeStats object with it's fields calculated.
-   */
-  // @ requires 0 <= index && index < numAttributes();
-  public AttributeStats attributeStats(int index) {
-
-    AttributeStats result = new AttributeStats();
-    if (attribute(index).isNominal()) {
-      result.nominalCounts = new int[attribute(index).numValues()];
-    }
-
-    result.totalCount = numInstances();
-
-    double[] attVals = attributeToDoubleArray(index);
-    int[] sorted = Utils.sort(attVals);
-    int currentCount = 0;
-    double prev = Instance.missingValue();
-    for (int j = 0; j < numInstances(); j++) {
-      Instance current = instance(sorted[j]);
-      if (current.isMissing(index)) {
-        result.missingCount = numInstances() - j;
-        break;
-      }
-      if (current.value(index) == prev) {
-        currentCount++;
-      } else {
-        result.addDistinct(prev, currentCount);
-        currentCount = 1;
-        prev = current.value(index);
-      }
-    }
-    result.addDistinct(prev, currentCount);
-    result.distinctCount--; // So we don't count "missing" as a value
-    return result;
-  }
-
-  /**
    * Gets the value of all instances in this dataset for a particular attribute.
    * Useful in conjunction with Utils.sort to allow iterating through the
    * dataset in sorted order for some attribute.
@@ -1348,95 +1172,6 @@ public class Instances implements Serializable {
       result[i] = instance(i).value(index);
     }
     return result;
-  }
-
-  /**
-   * Generates a string summarizing the set of instances. Gives a breakdown for
-   * each attribute indicating the number of missing/discrete/unique values and
-   * other information.
-   * 
-   * @return a string summarizing the dataset
-   */
-  public String toSummaryString() {
-
-    StringBuffer result = new StringBuffer();
-    result.append("Relation Name:  ").append(relationName()).append('\n');
-    result.append("Num Instances:  ").append(numInstances()).append('\n');
-    result.append("Num Attributes: ").append(numAttributes()).append('\n');
-    result.append('\n');
-
-    result.append(Utils.padLeft("", 5)).append(Utils.padRight("Name", 25));
-    result.append(Utils.padLeft("Type", 5)).append(Utils.padLeft("Nom", 5));
-    result.append(Utils.padLeft("Int", 5)).append(Utils.padLeft("Real", 5));
-    result.append(Utils.padLeft("Missing", 12));
-    result.append(Utils.padLeft("Unique", 12));
-    result.append(Utils.padLeft("Dist", 6)).append('\n');
-    for (int i = 0; i < numAttributes(); i++) {
-      Attribute a = attribute(i);
-      AttributeStats as = attributeStats(i);
-      result.append(Utils.padLeft("" + (i + 1), 4)).append(' ');
-      result.append(Utils.padRight(a.name(), 25)).append(' ');
-      long percent;
-      switch (a.type()) {
-      case Attribute.NOMINAL:
-        result.append(Utils.padLeft("Nom", 4)).append(' ');
-        percent = Math.round(100.0 * as.intCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        result.append(Utils.padLeft("" + 0, 3)).append("% ");
-        percent = Math.round(100.0 * as.realCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        break;
-      case Attribute.NUMERIC:
-        result.append(Utils.padLeft("Num", 4)).append(' ');
-        result.append(Utils.padLeft("" + 0, 3)).append("% ");
-        percent = Math.round(100.0 * as.intCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        percent = Math.round(100.0 * as.realCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        break;
-      case Attribute.DATE:
-        result.append(Utils.padLeft("Dat", 4)).append(' ');
-        result.append(Utils.padLeft("" + 0, 3)).append("% ");
-        percent = Math.round(100.0 * as.intCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        percent = Math.round(100.0 * as.realCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        break;
-      case Attribute.STRING:
-        result.append(Utils.padLeft("Str", 4)).append(' ');
-        percent = Math.round(100.0 * as.intCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        result.append(Utils.padLeft("" + 0, 3)).append("% ");
-        percent = Math.round(100.0 * as.realCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        break;
-      case Attribute.RELATIONAL:
-        result.append(Utils.padLeft("Rel", 4)).append(' ');
-        percent = Math.round(100.0 * as.intCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        result.append(Utils.padLeft("" + 0, 3)).append("% ");
-        percent = Math.round(100.0 * as.realCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        break;
-      default:
-        result.append(Utils.padLeft("???", 4)).append(' ');
-        result.append(Utils.padLeft("" + 0, 3)).append("% ");
-        percent = Math.round(100.0 * as.intCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        percent = Math.round(100.0 * as.realCount / as.totalCount);
-        result.append(Utils.padLeft("" + percent, 3)).append("% ");
-        break;
-      }
-      result.append(Utils.padLeft("" + as.missingCount, 5)).append(" /");
-      percent = Math.round(100.0 * as.missingCount / as.totalCount);
-      result.append(Utils.padLeft("" + percent, 3)).append("% ");
-      result.append(Utils.padLeft("" + as.uniqueCount, 5)).append(" /");
-      percent = Math.round(100.0 * as.uniqueCount / as.totalCount);
-      result.append(Utils.padLeft("" + percent, 3)).append("% ");
-      result.append(Utils.padLeft("" + as.distinctCount, 5)).append(' ');
-      result.append('\n');
-    }
-    return result.toString();
   }
 
   /**

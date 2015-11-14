@@ -430,42 +430,6 @@ public final class Utils {
       doubles[i] /= sum;
     }
   }
-  
-  /**
-   * Replaces all "missing values" in the given array of double values with
-   * MAX_VALUE.
-   * 
-   * @param array the array to be modified.
-   */
-  public static void replaceMissingWithMAX_VALUE(double[] array) {
-
-    for (int i = 0; i < array.length; i++) {
-      if (Instance.isMissingValue(array[i])) {
-        array[i] = Double.MAX_VALUE;
-      }
-    }
-  }
-
-  /**
-   * Sorts a given array of doubles in ascending order and returns an array of
-   * integers with the positions of the elements of the original array in the
-   * sorted array. NOTE THESE CHANGES: the sort is no longer stable and it
-   * doesn't use safe floating-point comparisons anymore. Occurrences of
-   * Double.NaN are treated as Double.MAX_VALUE.
-   * 
-   * @param array this array is not changed by the method!
-   * @return an array of integers with the positions in the sorted array.
-   */
-  public static/* @pure@ */int[] sort(/* @non_null@ */double[] array) {
-
-    int[] index = initialIndex(array.length);
-    if (array.length > 1) {
-      array = array.clone();
-      replaceMissingWithMAX_VALUE(array);
-      quickSort(array, index, 0, array.length - 1);
-    }
-    return index;
-  }
 
   /**
    * Sorts a given array of doubles in ascending order and returns an array of

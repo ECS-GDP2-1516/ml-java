@@ -217,20 +217,6 @@ public class Instance
     return m_Dataset;
   }
 
-
-
-  /**
-   * Returns the index of the attribute stored at the given position.
-   * Just returns the given value.
-   *
-   * @param position the position 
-   * @return the index of the attribute stored at the given position
-   */
-  public /*@pure@*/ int index(int position) {
-
-    return position;
-  }
-
   /**
    * Tests if a specific value is "missing".
    *
@@ -246,19 +232,6 @@ public class Instance
   }
 
   /**
-   * Tests if the given value codes "missing".
-   *
-   * @param val the value to be tested
-   * @return true if val codes "missing"
-   */
-  public static /*@pure@*/ boolean isMissingValue(double val) {
-
-    return Double.isNaN(val);
-  }
-
-  
-
-  /**
    * Returns the double that codes "missing".
    *
    * @return the double that codes "missing"
@@ -267,6 +240,9 @@ public class Instance
 
     return MISSING_VALUE;
   }
+  
+  
+  
 
   /**
    * Sets the class value of an instance to the given value (internal
