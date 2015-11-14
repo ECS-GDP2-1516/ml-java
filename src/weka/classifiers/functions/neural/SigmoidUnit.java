@@ -42,6 +42,7 @@ public class SigmoidUnit implements Serializable
    * @return The value.
    */
   public double outputValue(NeuralNode node) {
+
     double[] weights = node.getWeights();
     NeuralConnection[] inputs = node.getInputs();
     double value = weights[0];

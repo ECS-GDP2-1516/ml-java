@@ -38,11 +38,8 @@ public class NeuralNode
   /** The weights for each of the input connections, and the threshold. */
   private double[] m_weights;
   
-  /** The best (lowest error) weights. Only used when validation set is used */
-  private double[] m_bestWeights;
-  
   /** The change in the weights. */
-  private double[] m_changeInWeights;
+  //private double[] m_changeInWeights;
   
   private Random m_random;
 
@@ -58,13 +55,10 @@ public class NeuralNode
   public NeuralNode(String id, Random r, SigmoidUnit m) {
     super(id);
     m_weights = new double[1];
-    m_bestWeights = new double[1];
-    m_changeInWeights = new double[1];
     
     m_random = r;
     
     m_weights[0] = m_random.nextDouble() * .1 - .05;
-    m_changeInWeights[0] = 0;
 
     m_methods = m;
   }
