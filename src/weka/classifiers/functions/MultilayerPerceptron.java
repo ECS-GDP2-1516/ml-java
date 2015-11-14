@@ -284,24 +284,19 @@ public class MultilayerPerceptron
 		//since all the output values are needed.
 		//They are calculated manually here and the values collected.
 		double[] theArray = new double[m_numClasses];
-		
-		for (int noa = 0; noa < m_numClasses; noa++) {
-			theArray[noa] = m_outputs[noa].outputValue(true);
-		}
-		
-		//now normalize the array
 		double count = 0;
+		
 		for (int noa = 0; noa < m_numClasses; noa++)
 		{
-			count += theArray[noa];
+			theArray[noa] = m_outputs[noa].outputValue(true);
+			count        += theArray[noa];
 		}
+		
 		if (count <= 0)
 		{
 			return m_ZeroR.distributionForInstance(i);
 		}
-		for (int noa = 0; noa < m_numClasses; noa++) {
-			theArray[noa] /= count;
-		}
+		
 		return theArray;
 	}
 }
