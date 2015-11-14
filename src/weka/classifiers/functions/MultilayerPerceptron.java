@@ -138,7 +138,6 @@ public class MultilayerPerceptron
      * @return The output value, or NaN, if the value has not been calculated.
      */
     public double outputValue(boolean calculate) {
-     
       if (Double.isNaN(m_unitValue) && calculate) {
 	if (m_input) {
 	  if (m_currentInstance.isMissing(m_link)) {
@@ -156,13 +155,6 @@ public class MultilayerPerceptron
 	    m_unitValue += m_inputList[noa].outputValue(true);
 	   
 	  }
-	  if (m_numeric && m_normalizeClass) {
-	    //then scale the value;
-	    //this scales linearly from between -1 and 1
-	    m_unitValue = m_unitValue * 
-	      m_attributeRanges[m_instances.classIndex()] + 
-	      m_attributeBases[m_instances.classIndex()];
-	  }
 	}
       }
       return m_unitValue;
@@ -174,18 +166,12 @@ public class MultilayerPerceptron
    * or the network predicts all zeros for the classes */
   private Classifier m_ZeroR;
 
-  /** Whether to use the default ZeroR model */
-  private boolean m_useDefaultModel = false;
-    
   /** The training instances. */
   private Instances m_instances;
   
   /** The current instance running through the network. */
   private Instance m_currentInstance;
   
-  /** A flag to say that it's a numeric class. */
-  private boolean m_numeric;
-
   /** The ranges for all the attributes. */
   private double[] m_attributeRanges;
 
@@ -198,18 +184,9 @@ public class MultilayerPerceptron
   /** The number of classes. */
   private int m_numClasses = 0;
 
-  /** A flag to state that a nominal to binary filter should be used. */
-  private boolean m_useNomToBin;
-
   /** This flag states that the user wants the input values normalized. */
   private boolean m_normalizeAttributes;
 
-  /** This flag states that the user wants the class to be normalized while
-   * processing in the network is done. (the final answer will be in the
-   * original range regardless). This option will only be used when the class
-   * is numeric. */
-  private boolean m_normalizeClass;
-  
   /**
    * this will reset all the nodes in the network.
    */
