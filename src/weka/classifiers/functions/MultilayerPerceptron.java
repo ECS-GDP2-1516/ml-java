@@ -185,59 +185,6 @@ public class MultilayerPerceptron
     }
     
     /**
-     * Call this to get the error value of this unit, which in this case is
-     * the difference between the predicted class, and the actual class.
-     * @param calculate True if the value should be calculated if it hasn't 
-     * been already.
-     * @return The error value, or NaN, if the value has not been calculated.
-     */
-    public double errorValue(boolean calculate) {
-      
-      if (!Double.isNaN(m_unitValue) && Double.isNaN(m_unitError) 
-	  && calculate) {
-	
-	if (m_input) {
-	  m_unitError = 0;
-	  for (int noa = 0; noa < m_numOutputs; noa++) {
-	    m_unitError += m_outputList[noa].errorValue(true);
-	  }
-	}
-	else {
-	  if (m_currentInstance.classIsMissing()) {
-	    m_unitError = .1;  
-	  }
-	  else if (m_instances.classAttribute().isNominal()) {
-	    if (m_currentInstance.classValue() == m_link) {
-	      m_unitError = 1 - m_unitValue;
-	    }
-	    else {
-	      m_unitError = 0 - m_unitValue;
-	    }
-	  }
-	  else if (m_numeric) {
-	    
-	    if (m_normalizeClass) {
-	      if (m_attributeRanges[m_instances.classIndex()] == 0) {
-		m_unitError = 0;
-	      }
-	      else {
-		m_unitError = (m_currentInstance.classValue() - m_unitValue ) /
-		  m_attributeRanges[m_instances.classIndex()];
-		//m_numericRange;
-		
-	      }
-	    }
-	    else {
-	      m_unitError = m_currentInstance.classValue() - m_unitValue;
-	    }
-	  }
-	}
-      }
-      return m_unitError;
-    }
-    
-    
-    /**
      * Call this to reset the value and error for this unit, ready for the next
      * run. This will also call the reset function of all units that are 
      * connected as inputs to this one.
@@ -255,40 +202,7 @@ public class MultilayerPerceptron
 	}
       }
     }
-    
-    
-    /** 
-     * Call this function to set What this end unit represents.
-     * @param input True if this unit is used for entering an attribute,
-     * False if it's used for determining a class value.
-     * @param val The attribute number or class type that this unit represents.
-     * (for nominal attributes).
-     */
-    public void setLink(boolean input, int val) throws Exception {
-      m_input = input;
-      
-      if (input) {
-	m_type = PURE_INPUT;
-      }
-      else {
-	m_type = PURE_OUTPUT;
-      }
-      if (val < 0 || (input && val > m_instances.numAttributes()) 
-	  || (!input && m_instances.classAttribute().isNominal() 
-	      && val > m_instances.classAttribute().numValues())) {
-	m_link = 0;
-      }
-      else {
-	m_link = val;
-      }
-    }
-    
-    /**
-     * @return link for this node.
-     */
-    public int getLink() {
-      return m_link;
-    }
+   
   }
   
   

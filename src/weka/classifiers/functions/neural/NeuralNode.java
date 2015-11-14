@@ -86,22 +86,6 @@ public class NeuralNode
     return m_unitValue;
   }
 
-  
-  /**
-   * Call this to get the error value of this unit.
-   * @param calculate True if the value should be calculated if it hasn't been
-   * already.
-   * @return The error value, or NaN, if the value has not been calculated.
-   */
-  public double errorValue(boolean calculate) {
-
-    if (!Double.isNaN(m_unitValue) && Double.isNaN(m_unitError) && calculate) {
-      //then calculate the error.
-      m_unitError = m_methods.errorValue(this);
-    }
-    return m_unitError;
-  }
-
   /**
    * Call this to reset the value and error for this unit, ready for the next
    * run. This will also call the reset function of all units that are 

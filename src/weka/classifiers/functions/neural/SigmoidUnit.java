@@ -64,26 +64,5 @@ public class SigmoidUnit implements Serializable
     }  
     return value;
   }
-  
-  /**
-   * This function calculates what the error value should be.
-   * @param node The node to calculate the error for.
-   * @return The error.
-   */
-  public double errorValue(NeuralNode node) {
-    //then calculate the error.
-    
-    NeuralConnection[] outputs = node.getOutputs();
-    int[] oNums = node.getOutputNums();
-    double error = 0;
-    
-    for (int noa = 0; noa < node.getNumOutputs(); noa++) {
-      error += outputs[noa].errorValue(true) 
-	* outputs[noa].weightValue(oNums[noa]);
-    }
-    double value = node.outputValue(false);
-    error *= value * (1 - value);
-    
-    return error;
-  }
+
 }

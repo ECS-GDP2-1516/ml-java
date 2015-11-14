@@ -161,14 +161,6 @@ public abstract class NeuralConnection
   public abstract double outputValue(boolean calculate);
 
   /**
-   * Call this to get the error value of this unit.
-   * @param calculate True if the value should be calculated if it hasn't been
-   * already.
-   * @return The error value, or NaN, if the value has not been calculated.
-   */
-  public abstract double errorValue(boolean calculate);
-
-  /**
    * Call this to get the weight value on a particular connection.
    * @param n The connection number to get the weight for, -1 if The threshold
    * weight should be returned.
