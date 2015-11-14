@@ -25,8 +25,6 @@ package weka.filters;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Queue;
-import weka.core.RelationalLocator;
-import weka.core.StringLocator;
 import java.io.Serializable;
 
 /** 
@@ -71,18 +69,6 @@ public abstract class Filter
   /** The output instance queue */
   private Queue m_OutputQueue = null;
 
-  /** Indices of string attributes in the output format */
-  protected StringLocator m_OutputStringAtts = null;
-
-  /** Indices of string attributes in the input format */
-  protected StringLocator m_InputStringAtts = null;
-
-  /** Indices of relational attributes in the output format */
-  protected RelationalLocator m_OutputRelAtts = null;
-
-  /** Indices of relational attributes in the input format */
-  protected RelationalLocator m_InputRelAtts = null;
-
   /** The input format for instances */
   protected Instances m_InputFormat = null;
 
@@ -102,7 +88,6 @@ public abstract class Filter
 
     if (instance != null) {
       if (instance.dataset() != null)
-	copyValues(instance, false);
       instance.setDataset(m_OutputFormat);
       m_OutputQueue.push(instance);
     }
@@ -127,76 +112,11 @@ public abstract class Filter
   protected void bufferInput(Instance instance) {
 
     if (instance != null) {
-      copyValues(instance, true);
       m_InputFormat.add(instance);
     }
   }
 
   
-  /**
-   * Copies string/relational values contained in the instance copied to a new
-   * dataset. The Instance must already be assigned to a dataset. This
-   * dataset and the destination dataset must have the same structure.
-   *
-   * @param instance		the Instance containing the string/relational 
-   * 				values to copy.
-   * @param isInput		if true the input format and input attribute 
-   * 				locators are used otherwise the output format 
-   * 				and output locators
-   */
-  protected void copyValues(Instance instance, boolean isInput) {
-
-    RelationalLocator.copyRelationalValues(
-	instance, 
-	(isInput) ? m_InputFormat : m_OutputFormat, 
-	(isInput) ? m_InputRelAtts : m_OutputRelAtts);
-
-    StringLocator.copyStringValues(
-	instance, 
-	(isInput) ? m_InputFormat : m_OutputFormat, 
-	(isInput) ? m_InputStringAtts : m_OutputStringAtts);
-  }
-
-  /**
-   * Takes string/relational values referenced by an Instance and copies them 
-   * from a source dataset to a destination dataset. The instance references are
-   * updated to be valid for the destination dataset. The instance may have the 
-   * structure (i.e. number and attribute position) of either dataset (this
-   * affects where references are obtained from). Only works if the number
-   * of string/relational attributes is the same in both indices (implicitly 
-   * these string/relational attributes should be semantically same but just 
-   * with shifted positions).
-   *
-   * @param instance 		the instance containing references to strings/
-   * 				relational values in the source dataset that 
-   * 				will have references updated to be valid for 
-   * 				the destination dataset.
-   * @param instSrcCompat 	true if the instance structure is the same as 
-   * 				the source, or false if it is the same as the 
-   * 				destination (i.e. which of the string/relational 
-   * 				attribute indices contains the correct locations 
-   * 				for this instance).
-   * @param srcDataset 		the dataset for which the current instance 
-   * 				string/relational value references are valid 
-   * 				(after any position mapping if needed)
-   * @param destDataset 	the dataset for which the current instance 
-   * 				string/relational value references need to be 
-   * 				inserted (after any position mapping if needed)
-   */
-  protected void copyValues(Instance instance, boolean instSrcCompat,
-                         Instances srcDataset, Instances destDataset) {
-
-    RelationalLocator.copyRelationalValues(
-	instance, instSrcCompat, 
-	srcDataset, m_InputRelAtts,
-	destDataset, m_OutputRelAtts);
-
-    StringLocator.copyStringValues(
-	instance, instSrcCompat, 
-	srcDataset, m_InputStringAtts,
-	getOutputFormat(), m_OutputStringAtts);
-  }
-
   /**
    * Gets the format of the output instances. This should only be called
    * after input() or batchFinished() has returned true. The relation
