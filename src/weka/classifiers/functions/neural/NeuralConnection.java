@@ -53,12 +53,20 @@ public abstract class NeuralConnection
   protected double m_unitValue;
 
   /**
-   * Call this to reset the unit for another run.
-   * It is expected by that this unit will call the reset functions of all 
-   * input units to it. It is also expected that this will not be done
-   * if the unit has already been reset (or atleast appears to be).
+   * Call this to reset the value and error for this unit, ready for the next
+   * run. This will also call the reset function of all units that are 
+   * connected as inputs to this one.
+   * This is also the time that the update for the listeners will be performed.
    */
-  public abstract void reset();
+  public void reset() {
+    
+    if (!Double.isNaN(m_unitValue)) {
+      m_unitValue = Double.NaN;
+      for (int noa = 0; noa < m_numInputs; noa++) {
+    	  m_inputList[noa].reset();
+      }
+    }
+  }
 
   /**
    * Call this to get the output value of this unit. 
