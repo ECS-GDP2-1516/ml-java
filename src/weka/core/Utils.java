@@ -40,50 +40,7 @@ public final class Utils {
 
   /** The small deviation allowed in double comparisons. */
   public static double SMALL = 1e-6;
-
-
-  /**
-   * Removes all occurrences of a string from another string.
-   * 
-   * @param inString the string to remove substrings from.
-   * @param substring the substring to remove.
-   * @return the input string with occurrences of substring removed.
-   */
-  public static String removeSubstring(String inString, String substring) {
-
-    StringBuffer result = new StringBuffer();
-    int oldLoc = 0, loc = 0;
-    while ((loc = inString.indexOf(substring, oldLoc)) != -1) {
-      result.append(inString.substring(oldLoc, loc));
-      oldLoc = loc + substring.length();
-    }
-    result.append(inString.substring(oldLoc));
-    return result.toString();
-  }
-
-  /**
-   * Replaces with a new string, all occurrences of a string from another
-   * string.
-   * 
-   * @param inString the string to replace substrings in.
-   * @param subString the substring to replace.
-   * @param replaceString the replacement substring
-   * @return the input string with occurrences of substring replaced.
-   */
-  public static String replaceSubstring(String inString, String subString,
-    String replaceString) {
-
-    StringBuffer result = new StringBuffer();
-    int oldLoc = 0, loc = 0;
-    while ((loc = inString.indexOf(subString, oldLoc)) != -1) {
-      result.append(inString.substring(oldLoc, loc));
-      result.append(replaceString);
-      oldLoc = loc + subString.length();
-    }
-    result.append(inString.substring(oldLoc));
-    return result.toString();
-  }
-
+  
   /**
    * Pads a string to a specified length, inserting spaces on the left as
    * required. If the string is too long, characters are removed (from the
@@ -189,69 +146,6 @@ public final class Utils {
       return stringBuffer.toString().trim();
     }
     return new String("" + value);
-  }
-
-  /**
-   * Rounds a double and converts it into a formatted decimal-justified String.
-   * Trailing 0's are replaced with spaces.
-   * 
-   * @param value the double value
-   * @param width the width of the string
-   * @param afterDecimalPoint the number of digits after the decimal point
-   * @return the double as a formatted string
-   */
-  public static/* @pure@ */String doubleToString(double value, int width,
-    int afterDecimalPoint) {
-
-    String tempString = doubleToString(value, afterDecimalPoint);
-    char[] result;
-    int dotPosition;
-
-    if ((afterDecimalPoint >= width) || (tempString.indexOf('E') != -1)) { // Protects
-                                                                           // sci
-                                                                           // notation
-      return tempString;
-    }
-
-    // Initialize result
-    result = new char[width];
-    for (int i = 0; i < result.length; i++) {
-      result[i] = ' ';
-    }
-
-    if (afterDecimalPoint > 0) {
-      // Get position of decimal point and insert decimal point
-      dotPosition = tempString.indexOf('.');
-      if (dotPosition == -1) {
-        dotPosition = tempString.length();
-      } else {
-        result[width - afterDecimalPoint - 1] = '.';
-      }
-    } else {
-      dotPosition = tempString.length();
-    }
-
-    int offset = width - afterDecimalPoint - dotPosition;
-    if (afterDecimalPoint > 0) {
-      offset--;
-    }
-
-    // Not enough room to decimal align within the supplied width
-    if (offset < 0) {
-      return tempString;
-    }
-
-    // Copy characters before decimal point
-    for (int i = 0; i < dotPosition; i++) {
-      result[offset + i] = tempString.charAt(i);
-    }
-
-    // Copy characters after decimal point
-    for (int i = dotPosition + 1; i < tempString.length(); i++) {
-      result[offset + i] = tempString.charAt(i);
-    }
-
-    return new String(result);
   }
 
   /**
