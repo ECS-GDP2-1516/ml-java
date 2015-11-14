@@ -25,7 +25,6 @@ import weka.classifiers.Classifier;
 import weka.classifiers.functions.neural.NeuralConnection;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.filters.unsupervised.attribute.NominalToBinary;
 
 /** 
  <!-- globalinfo-start -->
@@ -236,9 +235,6 @@ public class MultilayerPerceptron
 
   /** A flag to state that a nominal to binary filter should be used. */
   private boolean m_useNomToBin;
-  
-  /** The actual filter. */
-  private NominalToBinary m_nominalToBinaryFilter;
 
   /** This flag states that the user wants the input values normalized. */
   private boolean m_normalizeAttributes;
@@ -258,7 +254,6 @@ public class MultilayerPerceptron
     m_outputs = new NeuralEnd[0];
     m_numClasses = 0;
     m_numeric = false;
-    m_nominalToBinaryFilter = new NominalToBinary();
     //setting all the options to their defaults. To completely change these
     //defaults they will also need to be changed down the bottom in the 
     //setoptions function (the text info in the accompanying functions should 
@@ -293,16 +288,8 @@ public class MultilayerPerceptron
       return m_ZeroR.distributionForInstance(i);
     }
     
-    if (m_useNomToBin) {
-      m_nominalToBinaryFilter.input(i);
-      m_currentInstance = m_nominalToBinaryFilter.output();
-    }
-    else {
-      m_currentInstance = i;
-    }
-    
     // Make a copy of the instance so that it isn't modified
-    m_currentInstance = (Instance)m_currentInstance.copy();
+    m_currentInstance = (Instance)i.copy();
     
     if (m_normalizeAttributes) {
       for (int noa = 0; noa < m_instances.numAttributes(); noa++) {
