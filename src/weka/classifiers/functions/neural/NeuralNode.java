@@ -48,14 +48,14 @@ public class NeuralNode
 
   /** Performs the operations for this node. Currently this
    * defines that the node is either a sigmoid or a linear unit. */
-  private NeuralMethod m_methods;
+  private SigmoidUnit m_methods;
 
   /** 
    * @param id The string name for this node (used to id this node).
    * @param r A random number generator used to generate initial weights.
    * @param m The methods this node should use to update.
    */
-  public NeuralNode(String id, Random r, NeuralMethod m) {
+  public NeuralNode(String id, Random r, SigmoidUnit m) {
     super(id);
     m_weights = new double[1];
     m_bestWeights = new double[1];
@@ -74,11 +74,11 @@ public class NeuralNode
    * internal state, so the same object can be used by any number of nodes.
    * @param m The new method.
    */
-  public void setMethod(NeuralMethod m) {
+  public void setMethod(SigmoidUnit m) {
     m_methods = m;
   } 
 
-  public NeuralMethod getMethod() {
+  public SigmoidUnit getMethod() {
     return m_methods;
   }
 

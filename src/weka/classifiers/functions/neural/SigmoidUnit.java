@@ -21,6 +21,8 @@
 
 package weka.classifiers.functions.neural;
 
+import java.io.Serializable;
+
 /**
  * This can be used by the 
  * neuralnode to perform all it's computations (as a sigmoid unit).
@@ -28,8 +30,8 @@ package weka.classifiers.functions.neural;
  * @author Malcolm Ware (mfw4@cs.waikato.ac.nz)
  * @version $Revision: 1.7 $
  */
-public class SigmoidUnit
-  implements NeuralMethod {
+public class SigmoidUnit implements Serializable
+   {
 
   /** for serialization */
   private static final long serialVersionUID = -5162958458177475652L;
