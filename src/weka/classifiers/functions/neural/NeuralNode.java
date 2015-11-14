@@ -85,10 +85,8 @@ public class NeuralNode
    */
   public void reset() {
     
-    if (!Double.isNaN(m_unitValue) || !Double.isNaN(m_unitError)) {
+    if (!Double.isNaN(m_unitValue)) {
       m_unitValue = Double.NaN;
-      m_unitError = Double.NaN;
-      m_weightsUpdated = false;
       for (int noa = 0; noa < m_numInputs; noa++) {
     	  m_inputList[noa].reset();
       }

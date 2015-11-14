@@ -52,12 +52,6 @@ public abstract class NeuralConnection
   /** The output value for this unit, NaN if not calculated. */
   protected double m_unitValue;
 
-  /** The error value for this unit, NaN if not calculated. */
-  protected double m_unitError;
-  
-  /** True if the weights have already been updated. */
-  protected boolean m_weightsUpdated;
-
   /**
    * Call this to reset the unit for another run.
    * It is expected by that this unit will call the reset functions of all 
