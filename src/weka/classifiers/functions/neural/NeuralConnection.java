@@ -104,9 +104,6 @@ public abstract class NeuralConnection
   /** The y coord of this unit purely for displaying purposes. */
   protected double m_y;
   
-
-  
-  
   /**
    * Constructs The unit with the basic connection information prepared for
    * use. 
@@ -131,14 +128,6 @@ public abstract class NeuralConnection
     m_x = 0;
     m_y = 0;
     m_type = UNCONNECTED;
-  }
-  
-  
-  /**
-   * @return The identity string of this unit.
-   */
-  public String getId() {
-    return m_id;
   }
 
   /**
@@ -178,18 +167,6 @@ public abstract class NeuralConnection
    * @return The error value, or NaN, if the value has not been calculated.
    */
   public abstract double errorValue(boolean calculate);
-  
-  /**
-   * Call this to have the connection save the current
-   * weights.
-   */
-  public abstract void saveWeights();
-  
-  /**
-   * Call this to have the connection restore from the saved
-   * weights.
-   */
-  public abstract void restoreWeights();
 
   /**
    * Call this to get the weight value on a particular connection.
@@ -202,29 +179,6 @@ public abstract class NeuralConnection
    */
   public double weightValue(int n) {
     return 1;
-  }
-
-  /**
-   * Call this function to update the weight values at this unit.
-   * After the weights have been updated at this unit, All the
-   * input connections will then be called from this to have their
-   * weights updated.
-   * @param l The learning Rate to use.
-   * @param m The momentum to use.
-   */
-  public void updateWeights(double l, double m) {
-    
-    //the action the subclasses should perform is upto them 
-    //but if they coverride they should make a call to this to
-    //call the method for all their inputs.
-    
-    if (!m_weightsUpdated) {
-      for (int noa = 0; noa < m_numInputs; noa++) {
-	m_inputList[noa].updateWeights(l, m);
-      }
-      m_weightsUpdated = true;
-    }
-    
   }
 
   /**
@@ -248,16 +202,6 @@ public abstract class NeuralConnection
   }
 
   /**
-   * Use this to get easy access to the input numbers.
-   * It is not advised to change the entries in this list
-   * (use the connecting and disconnecting functions to do that)
-   * @return The input nums list.
-   */
-  public int[] getInputNums() {
-    return m_inputNums;
-  }
-
-  /**
    * Use this to get easy access to the output numbers.
    * It is not advised to change the entries in this list
    * (use the connecting and disconnecting functions to do that)
@@ -265,267 +209,6 @@ public abstract class NeuralConnection
    */
   public int[] getOutputNums() {
     return m_outputNums;
-  }
-
-  /**
-   * @return the x coord.
-   */
-  public double getX() {
-    return m_x;
-  }
-  
-  /**
-   * @return the y coord.
-   */
-  public double getY() {
-    return m_y;
-  }
-  
-  /**
-   * @param x The new value for it's x pos.
-   */
-  public void setX(double x) {
-    m_x = x;
-  }
-  
-  /**
-   * @param y The new value for it's y pos.
-   */
-  public void setY(double y) {
-    m_y = y;
-  }
-
-  /**
-   * This will connect the specified unit to be an input to this unit.
-   * @param i The unit.
-   * @param n It's connection number for this connection.
-   * @return True if the connection was made, false otherwise.
-   */
-  protected boolean connectInput(NeuralConnection i, int n) {
-    
-    for (int noa = 0; noa < m_numInputs; noa++) {
-      if (i == m_inputList[noa]) {
-	return false;
-      }
-    }
-    if (m_numInputs >= m_inputList.length) {
-      //then allocate more space to it.
-      allocateInputs();
-    }
-    m_inputList[m_numInputs] = i;
-    m_inputNums[m_numInputs] = n;
-    m_numInputs++;
-    return true;
-  }
-  
-  /**
-   * This will allocate more space for input connection information
-   * if the arrays for this have been filled up.
-   */
-  protected void allocateInputs() {
-    
-    NeuralConnection[] temp1 = new NeuralConnection[m_inputList.length + 15];
-    int[] temp2 = new int[m_inputNums.length + 15];
-
-    for (int noa = 0; noa < m_numInputs; noa++) {
-      temp1[noa] = m_inputList[noa];
-      temp2[noa] = m_inputNums[noa];
-    }
-    m_inputList = temp1;
-    m_inputNums = temp2;
-  }
-
-  /** 
-   * This will connect the specified unit to be an output to this unit.
-   * @param o The unit.
-   * @param n It's connection number for this connection.
-   * @return True if the connection was made, false otherwise.
-   */
-  protected boolean connectOutput(NeuralConnection o, int n) {
-    
-    for (int noa = 0; noa < m_numOutputs; noa++) {
-      if (o == m_outputList[noa]) {
-	return false;
-      }
-    }
-    if (m_numOutputs >= m_outputList.length) {
-      //then allocate more space to it.
-      allocateOutputs();
-    }
-    m_outputList[m_numOutputs] = o;
-    m_outputNums[m_numOutputs] = n;
-    m_numOutputs++;
-    return true;
-  }
-  
-  /**
-   * Allocates more space for output connection information
-   * if the arrays have been filled up.
-   */
-  protected void allocateOutputs() {
-    
-    NeuralConnection[] temp1 
-      = new NeuralConnection[m_outputList.length + 15];
-    
-    int[] temp2 = new int[m_outputNums.length + 15];
-    
-    for (int noa = 0; noa < m_numOutputs; noa++) {
-      temp1[noa] = m_outputList[noa];
-      temp2[noa] = m_outputNums[noa];
-    }
-    m_outputList = temp1;
-    m_outputNums = temp2;
-  }
-  
-  /**
-   * This will disconnect the input with the specific connection number
-   * From this node (only on this end however).
-   * @param i The unit to disconnect.
-   * @param n The connection number at the other end, -1 if all the connections
-   * to this unit should be severed.
-   * @return True if the connection was removed, false if the connection was 
-   * not found.
-   */
-  protected boolean disconnectInput(NeuralConnection i, int n) {
-    
-    int loc = -1;
-    boolean removed = false;
-    do {
-      loc = -1;
-      for (int noa = 0; noa < m_numInputs; noa++) {
-	if (i == m_inputList[noa] && (n == -1 || n == m_inputNums[noa])) {
-	  loc = noa;
-	  break;
-	}
-      }
-      
-      if (loc >= 0) {
-	for (int noa = loc+1; noa < m_numInputs; noa++) {
-	  m_inputList[noa-1] = m_inputList[noa];
-	  m_inputNums[noa-1] = m_inputNums[noa];
-	  //set the other end to have the right connection number.
-	  m_inputList[noa-1].changeOutputNum(m_inputNums[noa-1], noa-1);
-	}
-	m_numInputs--;
-	removed = true;
-      }
-    } while (n == -1 && loc != -1);
-
-    return removed;
-  }
-
-  /**
-   * This function will remove all the inputs to this unit.
-   * In doing so it will also terminate the connections at the other end.
-   */
-  public void removeAllInputs() {
-    
-    for (int noa = 0; noa < m_numInputs; noa++) {
-      //this command will simply remove any connections this node has
-      //with the other in 1 go, rather than seperately.
-      m_inputList[noa].disconnectOutput(this, -1);
-    }
-    
-    //now reset the inputs.
-    m_inputList = new NeuralConnection[0];
-    setType(getType() & (~INPUT));
-    if (getNumOutputs() == 0) {
-      setType(getType() & (~CONNECTED));
-    }
-    m_inputNums = new int[0];
-    m_numInputs = 0;
-    
-  }
-
- 
-
-  /**
-   * Changes the connection value information for one of the connections.
-   * @param n The connection number to change.
-   * @param v The value to change it to.
-   */
-  protected void changeInputNum(int n, int v) {
-    
-    if (n >= m_numInputs || n < 0) {
-      return;
-    }
-
-    m_inputNums[n] = v;
-  }
-  
-  /**
-   * This will disconnect the output with the specific connection number
-   * From this node (only on this end however).
-   * @param o The unit to disconnect.
-   * @param n The connection number at the other end, -1 if all the connections
-   * to this unit should be severed.
-   * @return True if the connection was removed, false if the connection was
-   * not found.
-   */  
-  protected boolean disconnectOutput(NeuralConnection o, int n) {
-    
-    int loc = -1;
-    boolean removed = false;
-    do {
-      loc = -1;
-      for (int noa = 0; noa < m_numOutputs; noa++) {
-	if (o == m_outputList[noa] && (n == -1 || n == m_outputNums[noa])) {
-	  loc =noa;
-	  break;
-	}
-      }
-      
-      if (loc >= 0) {
-	for (int noa = loc+1; noa < m_numOutputs; noa++) {
-	  m_outputList[noa-1] = m_outputList[noa];
-	  m_outputNums[noa-1] = m_outputNums[noa];
-
-	  //set the other end to have the right connection number
-	  m_outputList[noa-1].changeInputNum(m_outputNums[noa-1], noa-1);
-	}
-	m_numOutputs--;
-	removed = true;
-      }
-    } while (n == -1 && loc != -1);
-    
-    return removed;
-  }
-
-  /**
-   * This function will remove all outputs to this unit.
-   * In doing so it will also terminate the connections at the other end.
-   */
-  public void removeAllOutputs() {
-    
-    for (int noa = 0; noa < m_numOutputs; noa++) {
-      //this command will simply remove any connections this node has
-      //with the other in 1 go, rather than seperately.
-      m_outputList[noa].disconnectInput(this, -1);
-    }
-    
-    //now reset the inputs.
-    m_outputList = new NeuralConnection[0];
-    m_outputNums = new int[0];
-    setType(getType() & (~OUTPUT));
-    if (getNumInputs() == 0) {
-      setType(getType() & (~CONNECTED));
-    }
-    m_numOutputs = 0;
-    
-  }
-
-  /**
-   * Changes the connection value information for one of the connections.
-   * @param n The connection number to change.
-   * @param v The value to change it to.
-   */
-  protected void changeOutputNum(int n, int v) {
-    
-    if (n >= m_numOutputs || n < 0) {
-      return;
-    }
-
-    m_outputNums[n] = v;
   }
   
   /**
@@ -541,109 +224,4 @@ public abstract class NeuralConnection
   public int getNumOutputs() {
     return m_numOutputs;
   }
-
-
-  /**
-   * Connects two units together.
-   * @param s The source unit.
-   * @param t The target unit.
-   * @return True if the units were connected, false otherwise.
-   */
-  public static boolean connect(NeuralConnection s, NeuralConnection t) {
-    
-    if (s == null || t == null) {
-      return false;
-    }
-    //this ensures that there is no existing connection between these 
-    //two units already. This will also cause the current weight there to be 
-    //lost
- 
-    disconnect(s, t);
-    if (s == t) {
-      return false;
-    }
-    if ((t.getType() & PURE_INPUT) == PURE_INPUT) {
-      return false;   //target is an input node.
-    }
-    if ((s.getType() & PURE_OUTPUT) == PURE_OUTPUT) {
-      return false;   //source is an output node
-    }
-    if ((s.getType() & PURE_INPUT) == PURE_INPUT 
-	&& (t.getType() & PURE_OUTPUT) == PURE_OUTPUT) {      
-      return false;   //there is no actual working node in use
-    }
-    if ((t.getType() & PURE_OUTPUT) == PURE_OUTPUT && t.getNumInputs() > 0) {
-      return false; //more than 1 node is trying to feed a particular output
-    }
-
-    if ((t.getType() & PURE_OUTPUT) == PURE_OUTPUT &&
-	(s.getType() & OUTPUT) == OUTPUT) {
-      return false; //an output node already feeding out a final answer
-    }
-
-    if (!s.connectOutput(t, t.getNumInputs())) {
-      return false;
-    }
-    if (!t.connectInput(s, s.getNumOutputs() - 1)) {
-      
-      s.disconnectOutput(t, t.getNumInputs());
-      return false;
-
-    }
-
-    //now ammend the type.
-    if ((s.getType() & PURE_INPUT) == PURE_INPUT) {
-      t.setType(t.getType() | INPUT);
-    }
-    else if ((t.getType() & PURE_OUTPUT) == PURE_OUTPUT) {
-      s.setType(s.getType() | OUTPUT);
-    }
-    t.setType(t.getType() | CONNECTED);
-    s.setType(s.getType() | CONNECTED);
-    return true;
-  }
-
-  /**
-   * Disconnects two units.
-   * @param s The source unit.
-   * @param t The target unit.
-   * @return True if the units were disconnected, false if they weren't
-   * (probably due to there being no connection).
-   */
-  public static boolean disconnect(NeuralConnection s, NeuralConnection t) {
-    
-    if (s == null || t == null) {
-      return false;
-    }
-
-    boolean stat1 = s.disconnectOutput(t, -1);
-    boolean stat2 = t.disconnectInput(s, -1);
-    if (stat1 && stat2) {
-      if ((s.getType() & PURE_INPUT) == PURE_INPUT) {
-	t.setType(t.getType() & (~INPUT));
-      }
-      else if ((t.getType() & (PURE_OUTPUT)) == PURE_OUTPUT) {
-	s.setType(s.getType() & (~OUTPUT));
-      }
-      if (s.getNumInputs() == 0 && s.getNumOutputs() == 0) {
-	s.setType(s.getType() & (~CONNECTED));
-      }
-      if (t.getNumInputs() == 0 && t.getNumOutputs() == 0) {
-	t.setType(t.getType() & (~CONNECTED));
-      }
-    }
-    return stat1 && stat2;
-  }
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -256,26 +256,6 @@ public class MultilayerPerceptron
       }
     }
     
-    /**
-     * Call this to have the connection save the current
-     * weights.
-     */
-    public void saveWeights() {
-      for (int i = 0; i < m_numInputs; i++) {
-        m_inputList[i].saveWeights();
-      }
-    }
-    
-    /**
-     * Call this to have the connection restore from the saved
-     * weights.
-     */
-    public void restoreWeights() {
-      for (int i = 0; i < m_numInputs; i++) {
-        m_inputList[i].restoreWeights();
-      }
-    }
-    
     
     /** 
      * Call this function to set What this end unit represents.

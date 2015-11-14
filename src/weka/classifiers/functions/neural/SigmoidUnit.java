@@ -86,33 +86,4 @@ public class SigmoidUnit implements Serializable
     
     return error;
   }
-
-  /**
-   * This function will calculate what the change in weights should be
-   * and also update them.
-   * @param node The node to update the weights for.
-   * @param learn The learning rate to use.
-   * @param momentum The momentum to use.
-   */
-  public void updateWeights(NeuralNode node, double learn, double momentum) {
-
-    NeuralConnection[] inputs = node.getInputs();
-    double[] cWeights = node.getChangeInWeights();
-    double[] weights = node.getWeights();
-    double learnTimesError = 0;
-    learnTimesError = learn * node.errorValue(false);
-    double c = learnTimesError + momentum * cWeights[0];
-    weights[0] += c;
-    cWeights[0] = c;
- 
-    int stopValue = node.getNumInputs() + 1;
-    for (int noa = 1; noa < stopValue; noa++) {
-      
-      c = learnTimesError * inputs[noa-1].outputValue(false);
-      c += momentum * cWeights[noa];
-      
-      weights[noa] += c;
-      cWeights[noa] = c; 
-    }
-  }
 }
