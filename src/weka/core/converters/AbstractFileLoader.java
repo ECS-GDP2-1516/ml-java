@@ -21,8 +21,6 @@
 
 package weka.core.converters;
 
-import weka.core.Environment;
-import weka.core.EnvironmentHandler;
 import weka.core.Instances;
 import weka.core.Utils;
 
@@ -40,7 +38,7 @@ import java.util.zip.GZIPInputStream;
  */
 public abstract class AbstractFileLoader
   extends AbstractLoader
-  implements EnvironmentHandler {
+   {
 
   /** the file */
   protected String m_File = (new File(System.getProperty("user.dir"))).getAbsolutePath();
@@ -56,9 +54,6 @@ public abstract class AbstractFileLoader
 
   /** use relative file paths */
   protected boolean m_useRelativePath = false;
-  
-  /** Environment variables */
-  protected transient Environment m_env;
   
   /**
    * get the File specified as the source
@@ -82,24 +77,7 @@ public abstract class AbstractFileLoader
     //m_File = file.getAbsolutePath();
     setSource(file);
   }
-  
-  /**
-   * Set the environment variables to use.
-   * 
-   * @param env the environment variables to use
-   */
-  public void setEnvironment(Environment env) {
-    m_env = env;
-    try {
-      // causes setSource(File) to be called and 
-      // forces the input stream to be reset with a new file
-      // that has environment variables resolved with those
-      // in the new Environment object
-      reset();
-    } catch (IOException ex) {
-      // we won't complain about it here...
-    }
-  }
+
   
   /**
    * Resets the loader ready to read a new data set
@@ -131,18 +109,7 @@ public abstract class AbstractFileLoader
 
   //  try {
       String fName = file.getPath();
-      try {
-        if (m_env == null) {
-          m_env = Environment.getSystemWide();
-        }
-        fName = m_env.substitute(fName);
-      } catch (Exception e) {
-        // ignore any missing environment variables at this time
-        // as it is possible that these may be set by the time
-        // the actual file is processed
-        
-        //throw new IOException(e.getMessage());
-      }
+
       file = new File(fName);
       // set the source only if the file exists
       if (file.exists()) {
