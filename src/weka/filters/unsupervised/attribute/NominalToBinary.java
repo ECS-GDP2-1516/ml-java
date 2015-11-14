@@ -23,10 +23,8 @@
 
 package weka.filters.unsupervised.attribute;
 
-import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Range;
-//import weka.core.SparseInstance;
 import weka.filters.Filter;
 
 /** 

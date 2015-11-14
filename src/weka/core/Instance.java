@@ -23,7 +23,6 @@
 package weka.core;
 
 import java.io.Serializable;
-import java.util.Enumeration;
 
 /**
  * Class for handling an instance. All values (numeric, date, nominal, string
