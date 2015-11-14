@@ -111,9 +111,6 @@ public class Attribute
   /** Dummy first value for String attributes (useful for sparse instances) */
   public final static String DUMMY_STRING_VAL = "*WEKA*DUMMY*STRING*FOR*STRING*ATTRIBUTES*";
 
-  /** Strings longer than this will be stored compressed. */
-  private static final int STRING_COMPRESS_THRESHOLD = 200;
-
   /** The attribute's name. */
   private /*@ spec_public non_null @*/ String m_Name;
 
@@ -242,14 +239,7 @@ public class Attribute
       m_Hashtable = new Hashtable(attributeValues.size());
       for (int i = 0; i < attributeValues.size(); i++) {
 	Object store = attributeValues.elementAt(i);
-	if (((String)store).length() > STRING_COMPRESS_THRESHOLD) {
-	  try {
-	    store = new SerializedObject(attributeValues.elementAt(i), true);
-	  } catch (Exception ex) {
-	    System.err.println("Couldn't compress nominal attribute value -"
-			       + " storing uncompressed.");
-	  }
-	}
+
 	if (m_Hashtable.containsKey(store)) {
 	  throw new IllegalArgumentException("A nominal attribute (" +
 					     attributeName + ") cannot"
@@ -297,12 +287,7 @@ public class Attribute
             return ee.hasMoreElements();
           }
           public Object nextElement() {
-            Object oo = ee.nextElement();
-            if (oo instanceof SerializedObject) {
-              return ((SerializedObject)oo).getObject();
-            } else {
-              return oo;
-            }
+            return ee.nextElement();
           }
         };
     }
@@ -333,16 +318,8 @@ public class Attribute
 
     if (!isNominal())
       return -1;
-    Object store = value;
-    if (value.length() > STRING_COMPRESS_THRESHOLD) {
-      try {
-        store = new SerializedObject(value, true);
-      } catch (Exception ex) {
-        System.err.println("Couldn't compress string attribute value -"
-                           + " searching uncompressed.");
-      }
-    }
-    Integer val = (Integer)m_Hashtable.get(store);
+
+    Integer val = (Integer)m_Hashtable.get(value);
     if (val == null) return -1;
     else return val.intValue();
   }
@@ -423,10 +400,6 @@ public class Attribute
     } else {
       Object val = m_Values.elementAt(valIndex);
       
-      // If we're storing strings compressed, uncompress it.
-      if (val instanceof SerializedObject) {
-        val = ((SerializedObject)val).getObject();
-      }
       return (String) val;
     }
   }
@@ -514,17 +487,8 @@ public class Attribute
   //@ ensures  m_Values.size() == \old(m_Values.size()) + 1;
   final void forceAddValue(String value) {
 
-    Object store = value;
-    if (value.length() > STRING_COMPRESS_THRESHOLD) {
-      try {
-        store = new SerializedObject(value, true);
-      } catch (Exception ex) {
-        System.err.println("Couldn't compress string attribute value -"
-                           + " storing uncompressed.");
-      }
-    }
-    m_Values.addElement(store);
-    m_Hashtable.put(store, new Integer(m_Values.size() - 1));
+    m_Values.addElement(value);
+    m_Hashtable.put(value, new Integer(m_Values.size() - 1));
   }
 
   /**
@@ -558,18 +522,9 @@ public class Attribute
     case NOMINAL:
       m_Values = (FastVector)m_Values.copy();
       m_Hashtable = (Hashtable)m_Hashtable.clone();
-      Object store = string;
-      if (string.length() > STRING_COMPRESS_THRESHOLD) {
-        try {
-          store = new SerializedObject(string, true);
-        } catch (Exception ex) {
-          System.err.println("Couldn't compress string attribute value -"
-                             + " storing uncompressed.");
-        }
-      }
       m_Hashtable.remove(m_Values.elementAt(index));
-      m_Values.setElementAt(store, index);
-      m_Hashtable.put(store, new Integer(index));
+      m_Values.setElementAt(string, index);
+      m_Hashtable.put(string, new Integer(index));
       break;
     default:
       throw new IllegalArgumentException("Can only set values for nominal"
