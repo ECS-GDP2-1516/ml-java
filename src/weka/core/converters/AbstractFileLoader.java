@@ -23,7 +23,6 @@ package weka.core.converters;
 
 import weka.core.Environment;
 import weka.core.EnvironmentHandler;
-import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
 import weka.core.OptionHandler;
@@ -31,7 +30,6 @@ import weka.core.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.zip.GZIPInputStream;

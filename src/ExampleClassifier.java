@@ -4,7 +4,7 @@ import weka.core.SerializationHelper;
 import weka.core.converters.ArffLoader;
 import java.io.File;
 
-import weka.classifiers.Classifier;
+import weka.classifiers.functions.MultilayerPerceptron;
 
 
 public class ExampleClassifier {
@@ -18,8 +18,8 @@ public class ExampleClassifier {
         if (data.classIndex() == -1)
             data.setClassIndex(data.numAttributes() - 1);
 
-        Classifier rbf; 
-        rbf = (Classifier)SerializationHelper.read("models/2p1-gyro-mlp.model");
+        MultilayerPerceptron rbf; 
+        rbf = (MultilayerPerceptron)SerializationHelper.read("models/2p1-gyro-mlp.model");
 
         for(int i = 0; i < data.numInstances(); i++) {
             System.out.println(rbf.classifyInstance(data.instance(i)));
