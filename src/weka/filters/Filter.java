@@ -198,23 +198,6 @@ public abstract class Filter
   }
 
   /**
-   * This will remove all buffered instances from the inputformat dataset.
-   * Use this method rather than getInputFormat().delete();
-   */
-  protected void flushInput() {
-
-    if (    (m_InputStringAtts.getAttributeIndices().length > 0) 
-	 || (m_InputRelAtts.getAttributeIndices().length > 0) ) {
-      m_InputFormat = m_InputFormat.stringFreeStructure();
-      m_InputStringAtts = new StringLocator(m_InputFormat, m_InputStringAtts.getAllowedIndices());
-      m_InputRelAtts = new RelationalLocator(m_InputFormat, m_InputRelAtts.getAllowedIndices());
-    } else {
-      // This more efficient than new Instances(m_InputFormat, 0);
-      m_InputFormat.delete();
-    }
-  }
-
-  /**
    * Gets the format of the output instances. This should only be called
    * after input() or batchFinished() has returned true. The relation
    * name of the output instances should be changed to reflect the
@@ -231,36 +214,6 @@ public abstract class Filter
       throw new NullPointerException("No output format defined.");
     }
     return new Instances(m_OutputFormat, 0);
-  }
-
-  /**
-   * Input an instance for filtering. Ordinarily the instance is
-   * processed and made available for output immediately. Some filters
-   * require all instances be read before producing output, in which
-   * case output instances should be collected after calling
-   * batchFinished(). If the input marks the start of a new batch, the
-   * output queue is cleared. This default implementation assumes all
-   * instance conversion will occur when batchFinished() is called.
-   *
-   * @param instance the input instance
-   * @return true if the filtered instance may now be
-   * collected with output().
-   * @throws NullPointerException if the input format has not been
-   * defined.
-   * @throws Exception if the input instance was not of the correct 
-   * format or if there was a problem with the filtering.  
-   */
-  public boolean input(Instance instance) throws Exception {
-
-    if (m_InputFormat == null) {
-      throw new NullPointerException("No input instance format defined");
-    }
-    if (m_NewBatch) {
-      m_OutputQueue = new Queue();
-      m_NewBatch = false;
-    }
-    bufferInput(instance);
-    return false;
   }
 
   /**
