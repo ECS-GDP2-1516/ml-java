@@ -20,10 +20,18 @@ public class ExampleClassifier {
 
         MultilayerPerceptron rbf; 
         rbf = (MultilayerPerceptron)SerializationHelper.read("models/2p1-gyro-mlp.model");
-
-        for(int i = 0; i < data.numInstances(); i++) {
-            System.out.println(rbf.classifyInstance(data.instance(i)));
+        
+        float success = 0;
+        
+        for(int i = 0; i < data.numInstances(); i++)
+        {
+        	if (rbf.classifyInstance(data.instance(i)) == data.instance(i).value(data.classIndex()))
+        	{
+        		success += 1;
+        	}
         }
+        
+        System.out.println(success / (float)data.numInstances() * 100.0 + "% success rate");
     }
 }
 
