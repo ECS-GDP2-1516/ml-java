@@ -28,7 +28,6 @@ import weka.core.Capabilities;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.Option;
 import weka.core.Range;
 import weka.core.SparseInstance;
 import weka.core.Utils;
@@ -152,38 +151,6 @@ public class NominalToBinary
     convertInstance(instance);
     return true;
   }
-
-  /**
-   * Returns an enumeration describing the available options.
-   *
-   * @return an enumeration of all the available options.
-   */
-  public Enumeration listOptions() {
-
-    Vector newVector = new Vector(3);
-
-    newVector.addElement(new Option(
-	"\tSets if binary attributes are to be coded as nominal ones.",
-	"N", 0, "-N"));
-
-    newVector.addElement(new Option(
-	"\tFor each nominal value a new attribute is created, \n"
-	+ "\tnot only if there are more than 2 values.",
-	"A", 0, "-A"));
-
-    newVector.addElement(new Option(
-	"\tSpecifies list of columns to act on. First and last are \n"
-	+ "\tvalid indexes.\n"
-	+ "\t(default: first-last)",
-	"R", 1, "-R <col1,col2-col4,...>"));
-
-    newVector.addElement(new Option(
-	"\tInvert matching sense of column indexes.",
-	"V", 0, "-V"));
-
-    return newVector.elements();
-  }
-
 
   /**
    * Parses a given list of options. <p/>
