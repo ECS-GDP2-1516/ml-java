@@ -21,12 +21,10 @@
  */
 
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
@@ -35,7 +33,6 @@ import weka.core.Attribute;
 import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
-import weka.core.Utils;
 
 /**
  * <!-- globalinfo-start --> Reads a source that is in arff (attribute relation
@@ -50,54 +47,14 @@ import weka.core.Utils;
  */
 public class ArffLoader
 {
-  /** the file extension */
-  public static String FILE_EXTENSION = Instances.FILE_EXTENSION;
-
   /** The reader for the source file. */
   protected transient Reader m_sourceReader = null;
 
   /** The parser for the ARFF file */
   protected transient ArffReader m_ArffReader = null;
-  
-  /** The retrieval modes */
-  public static final int NONE = 0;
-  public static final int BATCH = 1;
-  public static final int INCREMENTAL = 2;
-  
-  /** the file */
-  protected String m_File = (new File(System.getProperty("user.dir"))).getAbsolutePath();
 
   /** Holds the determined structure (header) of the data set. */
-  protected transient Instances m_structure = null;
-
-  /** Holds the source of the data set. */
-  protected File m_sourceFile = null;
-
-  /** use relative file paths */
-  protected boolean m_useRelativePath = false;
-  
-/** The current retrieval mode */
-protected int m_retrieval;
-
-/**
-* Sets the retrieval mode.
-*
-* @param mode the retrieval mode
-*/
-public void setRetrieval(int mode) {
-
-m_retrieval = mode;
-}
-
-/**
-* Gets the retrieval mode.
-*
-* @return the retrieval mode
-*/
-protected int getRetrieval() {
-
-return m_retrieval;
-}
+  private Instances m_structure = null;
 
   /**
    * Reads data from an ARFF file, either in incremental or batch mode.
@@ -677,54 +634,16 @@ return m_retrieval;
    * @throws IOException 	if an error occurs
    */
   public void setSource(File file) throws IOException {
-    File original = file;
     m_structure = null;
     
-    setRetrieval(NONE);
-
-    if (file == null)
-      throw new IOException("Source file object is null!");
-
-  //  try {
-      String fName = file.getPath();
-
-      file = new File(fName);
       // set the source only if the file exists
       if (file.exists()) {
-          setSource(new FileInputStream(file));
+    	  m_sourceReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
       }
-   // }
-  /*  catch (FileNotFoundException ex) {
-      throw new IOException("File not found");
-    } */
-
-    if (m_useRelativePath) {
-      try {
-        m_sourceFile = Utils.convertToRelativePath(original);
-        m_File = m_sourceFile.getPath();
-      } catch (Exception ex) {
-        //        System.err.println("[AbstractFileLoader] can't convert path to relative path.");
-        m_sourceFile = original;
-        m_File       = m_sourceFile.getPath();
+      else
+      {
+    	  throw new IOException("No File");
       }
-    } else {
-      m_sourceFile = original;
-      m_File       = m_sourceFile.getPath();
-    }
-  }
-
-  /**
-   * Resets the Loader object and sets the source of the data set to be the
-   * supplied InputStream.
-   * 
-   * @param in the source InputStream.
-   * @throws IOException always thrown.
-   */
-  
-  public void setSource(InputStream in) throws IOException {
-    m_File = (new File(System.getProperty("user.dir"))).getAbsolutePath();
-
-    m_sourceReader = new BufferedReader(new InputStreamReader(in));
   }
 
   /**
@@ -768,11 +687,7 @@ return m_retrieval;
       if (m_sourceReader == null) {
         throw new IOException("No source has been specified");
       }
-      if (getRetrieval() == INCREMENTAL) {
-        throw new IOException(
-          "Cannot mix getting Instances in both incremental and batch modes");
-      }
-      setRetrieval(BATCH);
+
       if (m_structure == null) {
         getStructure();
       }
