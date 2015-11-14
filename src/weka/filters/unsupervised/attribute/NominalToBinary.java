@@ -90,7 +90,7 @@ public class NominalToBinary
    */
   public boolean input(Instance instance) {
 
-    if (getInputFormat() == null) {
+    if (m_InputFormat == null) {
       throw new IllegalStateException("No input instance format defined");
     }
     if (m_NewBatch) {
@@ -115,12 +115,12 @@ public class NominalToBinary
       return;
     }
 
-    double [] vals = new double [outputFormatPeek().numAttributes()];
+    double [] vals = new double [m_OutputFormat.numAttributes()];
     int attSoFar = 0;
 
-    for(int j = 0; j < getInputFormat().numAttributes(); j++) {
-      Attribute att = getInputFormat().attribute(j);
-      if (!att.isNominal() || (j == getInputFormat().classIndex()) ||
+    for(int j = 0; j < m_InputFormat.numAttributes(); j++) {
+      Attribute att = m_InputFormat.attribute(j);
+      if (!att.isNominal() || (j == m_InputFormat.classIndex()) ||
 	  !m_Columns.isInRange(j)) {
 	vals[attSoFar] = instance.value(j);
 	attSoFar++;

@@ -26,7 +26,6 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Queue;
 import weka.core.RelationalLocator;
-import weka.core.SerializedObject;
 import weka.core.StringLocator;
 import java.io.Serializable;
 
@@ -67,7 +66,7 @@ public abstract class Filter
   private static final long serialVersionUID = -8835063755891851218L;
 
   /** The output format for instances */
-  private Instances m_OutputFormat = null;
+  protected Instances m_OutputFormat = null;
 
   /** The output instance queue */
   private Queue m_OutputQueue = null;
@@ -85,71 +84,13 @@ public abstract class Filter
   protected RelationalLocator m_InputRelAtts = null;
 
   /** The input format for instances */
-  private Instances m_InputFormat = null;
+  protected Instances m_InputFormat = null;
 
   /** Record whether the filter is at the start of a batch */
   protected boolean m_NewBatch = true;
 
   /** True if the first batch has been done */
   protected boolean m_FirstBatchDone = false;
-
-  /**
-   * Returns true if the a new batch was started, either a new instance of the 
-   * filter was created or the batchFinished() method got called.
-   * 
-   * @return true if a new batch has been initiated
-   * @see #m_NewBatch
-   * @see #batchFinished()
-   */
-  public boolean isNewBatch() {
-    return m_NewBatch;
-  }
-  
-  /**
-   * Returns true if the first batch of instances got processed. Necessary for
-   * supervised filters, which "learn" from the first batch and then shouldn't
-   * get updated with subsequent calls of batchFinished().
-   * 
-   * @return true if the first batch has been processed
-   * @see #m_FirstBatchDone
-   * @see #batchFinished()
-   */
-  public boolean isFirstBatchDone() {
-    return m_FirstBatchDone;
-  }
-
-  /**
-   * Gets the currently set inputformat instances. This dataset may contain
-   * buffered instances.
-   *
-   * @return the input Instances.
-   */
-  protected Instances getInputFormat() {
-
-    return m_InputFormat;
-  }
-
-  /**
-   * Returns a reference to the current input format without
-   * copying it.
-   *
-   * @return a reference to the current input format
-   */
-  protected Instances inputFormatPeek() {
-
-    return m_InputFormat;
-  }
-
-  /**
-   * Returns a reference to the current output format without
-   * copying it.
-   *
-   * @return a reference to the current output format
-   */
-  protected Instances outputFormatPeek() {
-
-    return m_OutputFormat;
-  }
 
   /**
    * Adds an output instance to the queue. The derived class should use this
@@ -191,45 +132,6 @@ public abstract class Filter
     }
   }
 
-  /**
-   * Initializes the input attribute locators. If indices is null then all 
-   * attributes of the data will be considered, otherwise only the ones
-   * that were provided.
-   * 
-   * @param data		the data to initialize the locators with
-   * @param indices		if not null, the indices to which to restrict
-   * 				the locating
-   */
-  protected void initInputLocators(Instances data, int[] indices) {
-    if (indices == null) {
-      m_InputStringAtts = new StringLocator(data);
-      m_InputRelAtts    = new RelationalLocator(data);
-    }
-    else {
-      m_InputStringAtts = new StringLocator(data, indices);
-      m_InputRelAtts    = new RelationalLocator(data, indices);
-    }
-  }
-
-  /**
-   * Initializes the output attribute locators. If indices is null then all 
-   * attributes of the data will be considered, otherwise only the ones
-   * that were provided.
-   * 
-   * @param data		the data to initialize the locators with
-   * @param indices		if not null, the indices to which to restrict
-   * 				the locating
-   */
-  protected void initOutputLocators(Instances data, int[] indices) {
-    if (indices == null) {
-      m_OutputStringAtts = new StringLocator(data);
-      m_OutputRelAtts    = new RelationalLocator(data);
-    }
-    else {
-      m_OutputStringAtts = new StringLocator(data, indices);
-      m_OutputRelAtts    = new RelationalLocator(data, indices);
-    }
-  }
   
   /**
    * Copies string/relational values contained in the instance copied to a new
@@ -362,42 +264,6 @@ public abstract class Filter
   }
 
   /**
-   * Signify that this batch of input to the filter is finished. If
-   * the filter requires all instances prior to filtering, output()
-   * may now be called to retrieve the filtered instances. Any
-   * subsequent instances filtered should be filtered based on setting
-   * obtained from the first batch (unless the inputFormat has been
-   * re-assigned or new options have been set). This default
-   * implementation assumes all instance processing occurs during
-   * inputFormat() and input().
-   *
-   * @return true if there are instances pending output
-   * @throws NullPointerException if no input structure has been defined,
-   * @throws Exception if there was a problem finishing the batch.
-   */
-  public boolean batchFinished() throws Exception {
-
-    if (m_InputFormat == null) {
-      throw new NullPointerException("No input instance format defined");
-    }
-    flushInput();
-    m_NewBatch = true;
-    m_FirstBatchDone = true;
-    
-    if (m_OutputQueue.empty()) {
-      // Clear out references to old strings/relationals occasionally
-      if (    (m_OutputStringAtts.getAttributeIndices().length > 0)
-          || (m_OutputRelAtts.getAttributeIndices().length > 0) ) {
-        m_OutputFormat = m_OutputFormat.stringFreeStructure();
-        m_OutputStringAtts = new StringLocator(m_OutputFormat, m_OutputStringAtts.getAllowedIndices());
-      }
-    }
-    
-    return (numPendingOutput() != 0);
-  }
-
-
-  /**
    * Output an instance after filtering and remove from the output queue.
    *
    * @return the instance that has most recently been filtered (or null if
@@ -415,123 +281,5 @@ public abstract class Filter
     Instance result = (Instance)m_OutputQueue.pop();
 
     return result;
-  }
-  
-  /**
-   * Output an instance after filtering but do not remove from the
-   * output queue.
-   *
-   * @return the instance that has most recently been filtered (or null if
-   * the queue is empty).
-   * @throws NullPointerException if no input structure has been defined 
-   */
-  public Instance outputPeek() {
-
-    if (m_OutputFormat == null) {
-      throw new NullPointerException("No output instance format defined");
-    }
-    if (m_OutputQueue.empty()) {
-      return null;
-    }
-    Instance result = (Instance)m_OutputQueue.peek();
-    return result;
-  }
-
-  /**
-   * Returns the number of instances pending output
-   *
-   * @return the number of instances  pending output
-   * @throws NullPointerException if no input structure has been defined
-   */
-  public int numPendingOutput() {
-
-    if (m_OutputFormat == null) {
-      throw new NullPointerException("No output instance format defined");
-    }
-    return m_OutputQueue.size();
-  }
-
-  /**
-   * Returns whether the output format is ready to be collected
-   *
-   * @return true if the output format is set
-   */
-  public boolean isOutputFormatDefined() {
-
-    return (m_OutputFormat != null);
-  }
-
-  /**
-   * Creates a deep copy of the given filter using serialization.
-   *
-   * @param model 	the filter to copy
-   * @return 		a deep copy of the filter
-   * @throws Exception 	if an error occurs
-   */
-  public static Filter makeCopy(Filter model) throws Exception {
-    return (Filter)new SerializedObject(model).getObject();
-  }
-
-  /**
-   * Creates a given number of deep copies of the given filter using 
-   * serialization.
-   * 
-   * @param model 	the filter to copy
-   * @param num 	the number of filter copies to create.
-   * @return 		an array of filters.
-   * @throws Exception 	if an error occurs
-   */
-  public static Filter[] makeCopies(Filter model, int num) throws Exception {
-
-    if (model == null) {
-      throw new Exception("No model filter set");
-    }
-    Filter[] filters = new Filter[num];
-    SerializedObject so = new SerializedObject(model);
-    for (int i = 0; i < filters.length; i++) {
-      filters[i] = (Filter) so.getObject();
-    }
-    return filters;
-  }
-  
-  /**
-   * Filters an entire set of instances through a filter and returns
-   * the new set. 
-   *
-   * @param data the data to be filtered
-   * @param filter the filter to be used
-   * @return the filtered set of data
-   * @throws Exception if the filter can't be used successfully
-   */
-  public static Instances useFilter(Instances data,
-				    Filter filter) throws Exception {
-    /*
-    System.err.println(filter.getClass().getName() 
-                       + " in:" + data.numInstances());
-    */
-    for (int i = 0; i < data.numInstances(); i++) {
-      filter.input(data.instance(i));
-    }
-    filter.batchFinished();
-    Instances newData = filter.getOutputFormat();
-    Instance processed;
-    while ((processed = filter.output()) != null) {
-      newData.add(processed);
-    }
-
-    /*
-    System.err.println(filter.getClass().getName() 
-                       + " out:" + newData.numInstances());
-    */
-    return newData;
-  }
-
-  /**
-   * Returns a description of the filter, by default only the classname.
-   * 
-   * @return a string describing the filter
-   */
-  public String toString() {
-    return this.getClass().getName();
   }
 }
