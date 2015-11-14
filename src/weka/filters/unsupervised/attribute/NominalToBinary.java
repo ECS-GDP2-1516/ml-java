@@ -29,7 +29,6 @@ import weka.core.FastVector;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.Option;
-import weka.core.OptionHandler;
 import weka.core.Range;
 import weka.core.SparseInstance;
 import weka.core.Utils;
@@ -70,7 +69,7 @@ import java.util.Vector;
  */
 public class NominalToBinary 
   extends Filter 
-  implements OptionHandler {
+   {
   
   /** for serialization */
   static final long serialVersionUID = -1130642825710549138L;
@@ -129,27 +128,6 @@ public class NominalToBinary
     result.enable(Capability.NO_CLASS);
     
     return result;
-  }
-
-  /**
-   * Sets the format of the input instances.
-   *
-   * @param instanceInfo an Instances object containing the input 
-   * instance structure (any instances contained in the object are 
-   * ignored - only the structure is required).
-   * @return true if the outputFormat may be collected immediately
-   * @throws Exception if the input format can't be set 
-   * successfully
-   */
-  public boolean setInputFormat(Instances instanceInfo) 
-       throws Exception {
-
-    super.setInputFormat(instanceInfo);
-
-    m_Columns.setUpper(instanceInfo.numAttributes() - 1);
-
-    setOutputFormat();
-    return true;
   }
 
   /**
@@ -414,78 +392,6 @@ public class NominalToBinary
   public void setAttributeIndices(String rangeList) {
 
     m_Columns.setRanges(rangeList);
-  }
-
-  /**
-   * Set the output format if the class is nominal.
-   */
-  private void setOutputFormat() {
-
-    FastVector newAtts;
-    int newClassIndex;
-    StringBuffer attributeName;
-    Instances outputFormat;
-    FastVector vals;
-
-    // Compute new attributes
-    
-    m_needToTransform = false;
-    for (int i = 0; i < getInputFormat().numAttributes(); i++) {
-      Attribute att = getInputFormat().attribute(i);
-      if (att.isNominal() && i != getInputFormat().classIndex() && 
-          (att.numValues() > 2 || m_TransformAll || m_Numeric)) {
-        m_needToTransform = true;
-        break;
-      }
-    }
-    
-    if (!m_needToTransform) {
-      setOutputFormat(getInputFormat());
-      return;
-    }
-
-    newClassIndex = getInputFormat().classIndex();
-    newAtts = new FastVector();
-    for (int j = 0; j < getInputFormat().numAttributes(); j++) {
-      Attribute att = getInputFormat().attribute(j);
-      if (!att.isNominal() || (j == getInputFormat().classIndex()) ||
-	  !m_Columns.isInRange(j)) {
-	newAtts.addElement(att.copy());
-      } else {
-	if ( (att.numValues() <= 2) && (!m_TransformAll) ) {
-	  if (m_Numeric) {
-	    newAtts.addElement(new Attribute(att.name()));
-	  } else {
-	    newAtts.addElement(att.copy());
-	  }
-	} else {
-
-	  if (newClassIndex >= 0 && j < getInputFormat().classIndex()) {
-	    newClassIndex += att.numValues() - 1;
-	  }
-
-	  // Compute values for new attributes
-	  for (int k = 0; k < att.numValues(); k++) {
-	    attributeName = 
-	      new StringBuffer(att.name() + "=");
-	    attributeName.append(att.value(k));
-	    if (m_Numeric) {
-	      newAtts.
-		addElement(new Attribute(attributeName.toString()));
-	    } else {
-	      vals = new FastVector(2);
-	      vals.addElement("f"); vals.addElement("t");
-	      newAtts.
-		addElement(new Attribute(attributeName.toString(), vals));
-	    }
-	  }
-	}
-      }
-    }
-    outputFormat = new Instances(getInputFormat().relationName(),
-				 newAtts, 0);
-    outputFormat.setClassIndex(newClassIndex);
-    setOutputFormat(outputFormat);
   }
 
   /**

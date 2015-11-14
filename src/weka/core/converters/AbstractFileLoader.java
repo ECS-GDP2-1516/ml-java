@@ -24,14 +24,11 @@ package weka.core.converters;
 import weka.core.Environment;
 import weka.core.EnvironmentHandler;
 import weka.core.Instances;
-import weka.core.Option;
-import weka.core.OptionHandler;
 import weka.core.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.zip.GZIPInputStream;
 
 
@@ -229,95 +226,5 @@ public abstract class AbstractFileLoader
   }
   
   abstract public String[] getFileExtensions();
-
-  /**
-   * generates a string suitable for output on the command line displaying
-   * all available options (currently only a simple usage).
-   * 
-   * @param loader	the loader to create the option string for
-   * @return		the option string
-   */
-  protected static String makeOptionStr(AbstractFileLoader loader) {
-    StringBuffer 	result;
-    Option 		option;
-    
-    result = new StringBuffer("\nUsage:\n");
-    result.append("\t" + loader.getClass().getName().replaceAll(".*\\.", ""));
-    if (loader instanceof OptionHandler)
-      result.append(" [options]");
-    result.append(" <");
-    String[] ext = loader.getFileExtensions();
-    for (int i = 0; i < ext.length; i++) {
-	if (i > 0)
-	  result.append(" | ");
-	result.append("file" + ext[i]);
-    }
-    result.append(">\n");
-
-    if (loader instanceof OptionHandler) {
-      result.append("\nOptions:\n\n");
-      Enumeration enm = ((OptionHandler) loader).listOptions();
-      while (enm.hasMoreElements()) {
-	option = (Option) enm.nextElement();
-	result.append(option.synopsis() + "\n");
-	result.append(option.description() + "\n");
-      }
-    }
-    
-    return result.toString();
-  }
   
-  /**
-   * runs the given loader with the provided options
-   * 
-   * @param loader	the loader to run
-   * @param options	the commandline options, first argument must be the
-   * 			file to load
-   */
-  public static void runFileLoader(AbstractFileLoader loader, String[] options) {
-    // help request?
-    try {
-      String[] tmpOptions = (String[]) options.clone();
-      if (Utils.getFlag('h', tmpOptions)) {
-	System.err.println("\nHelp requested\n" + makeOptionStr(loader));
-	return;
-      }
-    }
-    catch (Exception e) {
-      // ignore it
-    }
-    
-    if (options.length > 0) {
-      if (loader instanceof OptionHandler) {
-	// set options
-	try {
-	  ((OptionHandler) loader).setOptions(options);
-	  // find file
-	  for (int i = 0; i < options.length; i++) {
-	    if (options[i].length() > 0) {
-	      options = new String[]{options[i]};
-	      break;
-	    }
-	  }
-	}
-	catch (Exception ex) {
-	  System.err.println(makeOptionStr(loader));
-	  System.exit(1);
-	}
-      }
-      
-      try {
-	loader.setFile(new File(options[0]));
-	// incremental
-
-	  System.out.println(loader.getDataSet());
-      }
-      catch (Exception ex) {
-	ex.printStackTrace();
-      }
-    }
-    else {
-      System.err.println(makeOptionStr(loader));
-    }
-  }
 }

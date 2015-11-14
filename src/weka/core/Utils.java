@@ -991,53 +991,6 @@ public final class Utils {
   }
 
   /**
-   * Creates a new instance of an object given it's class name and (optional)
-   * arguments to pass to it's setOptions method. If the object implements
-   * OptionHandler and the options parameter is non-null, the object will have
-   * it's options set. Example use:
-   * <p>
-   * 
-   * <code> <pre>
-   * String classifierName = Utils.getOption('W', options);
-   * Classifier c = (Classifier)Utils.forName(Classifier.class,
-   *                                          classifierName,
-   *                                          options);
-   * setClassifier(c);
-   * </pre></code>
-   * 
-   * @param classType the class that the instantiated object should be
-   *          assignable to -- an exception is thrown if this is not the case
-   * @param className the fully qualified class name of the object
-   * @param options an array of options suitable for passing to setOptions. May
-   *          be null. Any options accepted by the object will be removed from
-   *          the array.
-   * @return the newly created object, ready for use.
-   * @exception Exception if the class name is invalid, or if the class is not
-   *              assignable to the desired class type, or the options supplied
-   *              are not acceptable to the object
-   */
-  public static Object forName(Class classType, String className,
-    String[] options) throws Exception {
-
-    Class c = null;
-    try {
-      c = Class.forName(className);
-    } catch (Exception ex) {
-      throw new Exception("Can't find class called: " + className);
-    }
-    if (!classType.isAssignableFrom(c)) {
-      throw new Exception(classType.getName() + " is not assignable from "
-        + className);
-    }
-    Object o = c.newInstance();
-    if ((o instanceof OptionHandler) && (options != null)) {
-      ((OptionHandler) o).setOptions(options);
-      Utils.checkForRemainingOptions(options);
-    }
-    return o;
-  }
-
-  /**
    * Computes entropy for an array of integers.
    * 
    * @param counts array of counts
