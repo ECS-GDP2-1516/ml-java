@@ -22,9 +22,7 @@
 
 package weka.core;
 
-import java.io.IOException;
 import java.util.Vector;
-import java.io.Reader;
 import java.io.Serializable;
 import java.util.HashSet;
 

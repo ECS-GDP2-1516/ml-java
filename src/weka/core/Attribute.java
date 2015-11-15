@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
