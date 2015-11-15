@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
+import java.util.Vector;
 
 /** 
  * Class for handling an attribute. Once an attribute has been created,
@@ -73,7 +74,7 @@ import java.util.Properties;
  * Attribute weight = new Attribute("weight"); <br><br>
  * 
  * // Create vector to hold nominal values "first", "second", "third" <br>
- * FastVector my_nominal_values = new FastVector(3); <br>
+ * Vector my_nominal_values = new Vector(3); <br>
  * my_nominal_values.addElement("first"); <br>
  * my_nominal_values.addElement("second"); <br>
  * my_nominal_values.addElement("third"); <br><br>
@@ -118,7 +119,7 @@ public class Attribute
   */
 
   /** The attribute's values (if nominal or string). */
-  private /*@ spec_public @*/ FastVector m_Values;
+  private /*@ spec_public @*/ Vector m_Values;
 
   /** Mapping of values to indices (if nominal or string). */
   private Hashtable m_Hashtable;
@@ -199,7 +200,7 @@ public class Attribute
   //@ requires attributeName != null;
   //@ ensures  m_Name == attributeName;
   public Attribute(String attributeName, 
-		   FastVector attributeValues) {
+		   Vector attributeValues) {
 
     this(attributeName, attributeValues,
 	 new ProtectedProperties(new Properties()));
@@ -226,13 +227,13 @@ public class Attribute
                  (* if duplicate strings in attributeValues *);
   */
   public Attribute(String attributeName, 
-		   FastVector attributeValues,
+		   Vector attributeValues,
 		   ProtectedProperties metadata) {
 
     m_Name = attributeName;
     m_Index = -1;
     if (attributeValues == null) {} else {
-      m_Values = new FastVector(attributeValues.size());
+      m_Values = new Vector(attributeValues.size());
       m_Hashtable = new Hashtable(attributeValues.size());
       for (int i = 0; i < attributeValues.size(); i++) {
 	Object store = attributeValues.elementAt(i);
@@ -432,7 +433,7 @@ public class Attribute
   //@ requires index >= 0;
   //@ ensures  m_Name == attributeName;
   //@ ensures  m_Index == index;
-  public Attribute(String attributeName, FastVector attributeValues, 
+  public Attribute(String attributeName, Vector attributeValues, 
 	    int index) {
 
     this(attributeName, attributeValues);
@@ -447,7 +448,7 @@ public class Attribute
    */
   final void addValue(String value) {
 
-    m_Values = (FastVector)m_Values.copy();
+    m_Values = (Vector)m_Values.clone();
     m_Hashtable = (Hashtable)m_Hashtable.clone();
     forceAddValue(value);
   }
@@ -517,7 +518,7 @@ public class Attribute
     
     switch (m_Type) {
     case NOMINAL:
-      m_Values = (FastVector)m_Values.copy();
+      m_Values = (Vector)m_Values.clone();
       m_Hashtable = (Hashtable)m_Hashtable.clone();
       m_Hashtable.remove(m_Values.elementAt(index));
       m_Values.setElementAt(string, index);

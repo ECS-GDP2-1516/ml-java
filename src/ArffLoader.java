@@ -30,7 +30,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 
 import weka.core.Attribute;
-import weka.core.FastVector;
+import java.util.Vector;
 import weka.core.Instance;
 import weka.core.Instances;
 
@@ -511,7 +511,7 @@ public class ArffLoader
       }
 
       // Create vectors to hold information temporarily.
-      FastVector attributes = new FastVector();
+      Vector attributes = new Vector();
 
       // Get attribute declarations.
       getFirstToken();
@@ -543,10 +543,10 @@ public class ArffLoader
      * @return the new attributes vector
      * @throws IOException if the information is not read successfully
      */
-    protected FastVector parseAttribute(FastVector attributes)
+    protected Vector parseAttribute(Vector attributes)
       throws IOException {
       String attributeName;
-      FastVector attributeValues;
+      Vector attributeValues;
 
       // Get attribute name.
       getNextToken();
@@ -567,7 +567,7 @@ public class ArffLoader
       } else {
 
         // Attribute is nominal.
-        attributeValues = new FastVector();
+        attributeValues = new Vector();
         m_Tokenizer.pushBack();
 
         // Get values for nominal attribute.

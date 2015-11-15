@@ -133,9 +133,9 @@ public class MultilayerPerceptron implements Serializable
 		
 		if (m_normalizeAttributes)
 		{
-			for (int noa = 0; noa < m_instances.numAttributes(); noa++)
+			for (int noa = 0; noa < m_currentInstance.dataset().numAttributes(); noa++)
 			{
-				if (noa != m_instances.classIndex())
+				if (noa != m_currentInstance.classIndex())
 				{
 					if (m_attributeRanges[noa] != 0)
 					{

@@ -23,6 +23,7 @@
 package weka.core;
 
 import java.io.IOException;
+import java.util.Vector;
 import java.io.Reader;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -72,14 +73,14 @@ public class Instances implements Serializable {
   protected/* @spec_public non_null@ */String m_RelationName;
 
   /** The attribute information. */
-  protected/* @spec_public non_null@ */FastVector m_Attributes;
+  protected/* @spec_public non_null@ */Vector m_Attributes;
   /*
    * public invariant (\forall int i; 0 <= i && i < m_Attributes.size();
    * m_Attributes.elementAt(i) != null);
    */
 
   /** The instances. */
-  protected/* @spec_public non_null@ */FastVector m_Instances;
+  protected/* @spec_public non_null@ */Vector m_Instances;
 
   /** The class attribute's index */
   protected int m_ClassIndex;
@@ -115,7 +116,7 @@ public class Instances implements Serializable {
     m_ClassIndex = dataset.m_ClassIndex;
     m_RelationName = dataset.m_RelationName;
     m_Attributes = dataset.m_Attributes;
-    m_Instances = new FastVector(capacity);
+    m_Instances = new Vector(capacity);
   }
 
   /**
@@ -129,7 +130,7 @@ public class Instances implements Serializable {
    * @param capacity the capacity of the set
    */
   public Instances(/* @non_null@ */String name,
-  /* @non_null@ */FastVector attInfo, int capacity) {
+  /* @non_null@ */Vector attInfo, int capacity) {
 
     // check whether the attribute names are unique
     HashSet<String> names = new HashSet<String>();
@@ -153,7 +154,7 @@ public class Instances implements Serializable {
     for (int i = 0; i < numAttributes(); i++) {
       attribute(i).setIndex(i);
     }
-    m_Instances = new FastVector(capacity);
+    m_Instances = new Vector(capacity);
   }
 
   /**
