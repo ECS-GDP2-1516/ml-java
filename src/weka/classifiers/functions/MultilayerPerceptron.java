@@ -21,94 +21,17 @@
 
 package weka.classifiers.functions;
 
-import weka.classifiers.Classifier;
+import java.io.Serializable;
+
 import weka.classifiers.functions.neural.NeuralConnection;
+import weka.classifiers.rules.ZeroR;
 import weka.core.Instance;
 import weka.core.Instances;
 
-/** 
- <!-- globalinfo-start -->
- * A Classifier that uses backpropagation to classify instances.<br/>
- * This network can be built by hand, created by an algorithm or both. The network can also be monitored and modified during training time. The nodes in this network are all sigmoid (except for when the class is numeric in which case the the output nodes become unthresholded linear units).
- * <p/>
- <!-- globalinfo-end -->
- *
- <!-- options-start -->
- * Valid options are: <p/>
- * 
- * <pre> -L &lt;learning rate&gt;
- *  Learning Rate for the backpropagation algorithm.
- *  (Value should be between 0 - 1, Default = 0.3).</pre>
- * 
- * <pre> -M &lt;momentum&gt;
- *  Momentum Rate for the backpropagation algorithm.
- *  (Value should be between 0 - 1, Default = 0.2).</pre>
- * 
- * <pre> -N &lt;number of epochs&gt;
- *  Number of epochs to train through.
- *  (Default = 500).</pre>
- * 
- * <pre> -V &lt;percentage size of validation set&gt;
- *  Percentage size of validation set to use to terminate
- *  training (if this is non zero it can pre-empt num of epochs.
- *  (Value should be between 0 - 100, Default = 0).</pre>
- * 
- * <pre> -S &lt;seed&gt;
- *  The value used to seed the random number generator
- *  (Value should be &gt;= 0 and and a long, Default = 0).</pre>
- * 
- * <pre> -E &lt;threshold for number of consequetive errors&gt;
- *  The consequetive number of errors allowed for validation
- *  testing before the netwrok terminates.
- *  (Value should be &gt; 0, Default = 20).</pre>
- * 
- * <pre> -G
- *  GUI will be opened.
- *  (Use this to bring up a GUI).</pre>
- * 
- * <pre> -A
- *  Autocreation of the network connections will NOT be done.
- *  (This will be ignored if -G is NOT set)</pre>
- * 
- * <pre> -B
- *  A NominalToBinary filter will NOT automatically be used.
- *  (Set this to not use a NominalToBinary filter).</pre>
- * 
- * <pre> -H &lt;comma seperated numbers for nodes on each layer&gt;
- *  The hidden layers to be created for the network.
- *  (Value should be a list of comma separated Natural 
- *  numbers or the letters 'a' = (attribs + classes) / 2, 
- *  'i' = attribs, 'o' = classes, 't' = attribs .+ classes)
- *  for wildcard values, Default = a).</pre>
- * 
- * <pre> -C
- *  Normalizing a numeric class will NOT be done.
- *  (Set this to not normalize the class if it's numeric).</pre>
- * 
- * <pre> -I
- *  Normalizing the attributes will NOT be done.
- *  (Set this to not normalize the attributes).</pre>
- * 
- * <pre> -R
- *  Reseting the network will NOT be allowed.
- *  (Set this to not allow the network to reset).</pre>
- * 
- * <pre> -D
- *  Learning rate decay will occur.
- *  (Set this to cause the learning rate to decay).</pre>
- * 
- <!-- options-end -->
- *
- * @author Malcolm Ware (mfw4@cs.waikato.ac.nz)
- * @version $Revision: 10073 $
- */
-public class MultilayerPerceptron 
-  extends Classifier 
+public class MultilayerPerceptron implements Serializable
   {
-	
   /** for serialization */
   private static final long serialVersionUID = -5990607817048210779L;
-  
 
   /** 
    * This inner class is used to connect the nodes in the network up to
@@ -164,7 +87,7 @@ public class MultilayerPerceptron
   
   /** a ZeroR model in case no model can be built from the data 
    * or the network predicts all zeros for the classes */
-  private Classifier m_ZeroR;
+  private ZeroR m_ZeroR;
 
   /** The training instances. */
   private Instances m_instances;
@@ -248,9 +171,42 @@ public class MultilayerPerceptron
 		
 		if (count <= 0)
 		{
-			return m_ZeroR.distributionForInstance(i);
+			return m_ZeroR.m_Counts;
 		}
 		
 		return theArray;
 	}
+	
+  /**
+   * Classifies the given test instance. The instance has to belong to a dataset
+   * when it's being classified. Note that a classifier MUST implement either
+   * this or distributionForInstance().
+   * 
+   * @param instance the instance to be classified
+   * @return the predicted most likely class for the instance or
+   *         Instance.missingValue() if no prediction is made
+   * @exception Exception if an error occurred during the prediction
+   */
+  public double classifyInstance(Instance instance) throws Exception {
+
+    double[] dist = distributionForInstance(instance);
+    if (dist == null) {
+      throw new Exception("Null distribution predicted");
+    }
+        
+      double max = 0;
+      int maxIndex = 0;
+
+      for (int i = 0; i < dist.length; i++) {
+        if (dist[i] > max) {
+          maxIndex = i;
+          max = dist[i];
+        }
+      }
+      if (max > 0) {
+        return maxIndex;
+      } else {
+        return Instance.missingValue();
+      }
+  }
 }

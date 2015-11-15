@@ -22,46 +22,13 @@
 
 package weka.classifiers.rules;
 
-import weka.classifiers.Classifier;
-import weka.core.Instance;
+import java.io.Serializable;
 
-/**
- <!-- globalinfo-start -->
- * Class for building and using a 0-R classifier. Predicts the mean (for a numeric class) or the mode (for a nominal class).
- * <p/>
- <!-- globalinfo-end -->
- *
- <!-- options-start -->
- * Valid options are: <p/>
- * 
- * <pre> -D
- *  If set, classifier is run in debug mode and
- *  may output additional info to the console</pre>
- * 
- <!-- options-end -->
- *
- * @author Eibe Frank (eibe@cs.waikato.ac.nz)
- * @version $Revision: 5529 $
- */
-public class ZeroR 
-  extends Classifier 
-   {
-
+public class ZeroR implements Serializable
+{
   /** for serialization */
   static final long serialVersionUID = 48055541465867954L;
 
   /** The number of instances in each class (null if class numeric). */
-  private double [] m_Counts;
-
-  /**
-   * Calculates the class membership probabilities for the given test instance.
-   *
-   * @param instance the instance to be classified
-   * @return predicted class probability distribution
-   * @throws Exception if class is numeric
-   */
-  public double [] distributionForInstance(Instance instance) 
-       throws Exception {
-      return (double []) m_Counts.clone();
-  }
+  public double [] m_Counts;
 }
