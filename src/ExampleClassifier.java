@@ -1,8 +1,10 @@
 
 import weka.core.Instances;
-import weka.core.SerializationHelper;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 
 import weka.classifiers.functions.MultilayerPerceptron;
 
@@ -19,7 +21,7 @@ public class ExampleClassifier {
             data.setClassIndex(data.numAttributes() - 1);
 
         MultilayerPerceptron rbf; 
-        rbf = (MultilayerPerceptron)SerializationHelper.read("models/2p1-gyro-mlp.model");
+        rbf = (MultilayerPerceptron)read("models/2p1-gyro-mlp.model");
         
         float success = 0;
         
@@ -32,6 +34,29 @@ public class ExampleClassifier {
         }
         
         System.out.println(success / (float)data.numInstances() * 100.0 + "% success rate");
+    }
+    
+    /**
+     * deserializes from the given stream and returns the object from it.
+     * 
+     * @param stream the stream to deserialize from
+     * @return       the deserialized object
+     * @throws Exception if deserialization fails
+     */
+    public static Object read(String filename) throws Exception
+    {
+    	ObjectInputStream ois = new ObjectInputStream
+        (
+            new BufferedInputStream
+            (
+                new FileInputStream(filename)
+            )
+        );
+  	    Object result = ois.readObject();
+
+	    ois.close();
+      
+	    return result;
     }
 }
 
