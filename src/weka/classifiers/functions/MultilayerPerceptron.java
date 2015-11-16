@@ -22,8 +22,10 @@
 package weka.classifiers.functions;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import weka.classifiers.functions.neural.NeuralConnection;
+import weka.classifiers.functions.neural.NeuralNode;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -49,10 +51,10 @@ public class MultilayerPerceptron implements Serializable
      * For an input it is the attribute number, for an output, if nominal
      * it is the class value. 
      */
-    private int m_link;
+    public int m_link;
     
     /** True if node is an input, False if it's an output. */
-    private boolean m_input;
+    public boolean m_input;
     
     /**
      * Call this to get the output value of this unit. 
@@ -87,7 +89,7 @@ public class MultilayerPerceptron implements Serializable
   
   /** a ZeroR model in case no model can be built from the data 
    * or the network predicts all zeros for the classes */
-  private ZeroR m_ZeroR;
+  public ZeroR m_ZeroR;
 
   /** The training instances. */
   private Instances m_instances;
@@ -96,19 +98,19 @@ public class MultilayerPerceptron implements Serializable
   private Instance m_currentInstance;
   
   /** The ranges for all the attributes. */
-  private double[] m_attributeRanges;
+  public double[] m_attributeRanges;
 
   /** The base values for all the attributes. */
-  private double[] m_attributeBases;
+  public double[] m_attributeBases;
 
   /** The output units.(only feeds the errors, does no calcs) */
-  private NeuralEnd[] m_outputs;
+  public NeuralEnd[] m_outputs;
 
   /** The number of classes. */
-  private int m_numClasses = 0;
+  public int m_numClasses = 0;
 
   /** This flag states that the user wants the input values normalized. */
-  private boolean m_normalizeAttributes;
+  public boolean m_normalizeAttributes;
 
   /**
    * this will reset all the nodes in the network.
@@ -209,4 +211,87 @@ public class MultilayerPerceptron implements Serializable
         return Instance.missingValue();
       }
   }
+  
+  private ArrayList<NeuralConnection> visited;
+  
+  public void export()
+  {
+	  
+	  
+  	System.out.println("Classes: " + m_numClasses);
+  	System.out.println("m_normalizeAttributes: " + m_normalizeAttributes);
+  	
+  	System.out.println("ZeroR");
+  	for (int i = 0; i < m_numClasses; i++)
+  	{
+  		System.out.println("  " + m_ZeroR.m_Counts[i]);
+  	}
+  	
+  	System.out.println();
+  	System.out.println("NETWORK");
+  	System.out.println();
+  	
+  	visited = new ArrayList<NeuralConnection>();
+  	loop(this.m_outputs, this.m_numClasses);
+  	
+  	for (int i = 0; i < visited.size(); i++)
+  	{
+  		NeuralConnection item = visited.get(i);
+  		
+  		if (item.m_numInputs != 0)
+  		{
+  			System.out.print("LINK " + i + "{");
+  			
+  			for (int j = 0; j < item.m_numInputs; j++)
+			{
+  				System.out.print(visited.indexOf(item.m_inputList[j]) + ",");
+  			}
+  			
+  			System.out.println("}");
+  		}
+  	}
+  	
+  }
+  
+  	private void loop(NeuralConnection[] items, int size)
+	{
+  		for (int i = 0; i < size; i++)
+	  	{
+	  		if (visited.contains(items[i])) continue;
+	  		
+  			System.out.print("ID " + visited.size() + " ");
+  			visited.add(items[i]);
+  			
+  			if (items[i] instanceof NeuralNode)
+  			{
+  				double[] weights = ((NeuralNode)items[i]).m_weights;
+  				
+  				System.out.println("Node");
+  				System.out.println("  Threshold: " + weights[0]);
+  				System.out.print("  Weights {");
+  				
+  				for (int j = 1; j <= items[i].m_numInputs; j++)
+  				{
+  					System.out.print(weights[j] + ",");
+  				}
+  				
+  				System.out.println("}");
+  				loop(items[i].m_inputList, items[i].m_numInputs);
+  			}
+  			else
+  			{
+  				NeuralEnd end = (NeuralEnd)items[i];
+  				
+  				if (end.m_input)
+  				{
+  					System.out.println("Input(" + end.m_link + ")");
+  				}
+  				else
+  				{
+  					System.out.println("Output");
+  					loop(items[i].m_inputList, items[i].m_numInputs);
+  				}
+  			}
+	  	}
+	}
 }

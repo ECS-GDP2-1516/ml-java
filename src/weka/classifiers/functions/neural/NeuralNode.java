@@ -34,7 +34,7 @@ public class NeuralNode
   private static final long serialVersionUID = -1085750607680839163L;
     
   /** The weights for each of the input connections, and the threshold. */
-  private double[] m_weights;
+  public double[] m_weights;
 
   /**
    * Call this to get the output value of this unit. 

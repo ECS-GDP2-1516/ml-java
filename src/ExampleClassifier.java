@@ -23,6 +23,8 @@ public class ExampleClassifier {
         MultilayerPerceptron rbf; 
         rbf = (MultilayerPerceptron)read("models/2p1-gyro-mlp.model");
         
+        rbf.export();
+        
         float success = 0;
         
         for(int i = 0; i < data.numInstances(); i++)

@@ -41,13 +41,13 @@ public abstract class NeuralConnection
   /////on the connections they can make.
 
   /** The list of inputs to this unit. */
-  protected NeuralConnection[] m_inputList;
+  public NeuralConnection[] m_inputList;
 
   /** The list of outputs from this unit. */
   protected NeuralConnection[] m_outputList;
 
   /** The number of inputs. */
-  protected int m_numInputs;
+  public int m_numInputs;
 
   /** The output value for this unit, NaN if not calculated. */
   protected double m_unitValue;
