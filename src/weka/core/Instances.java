@@ -23,6 +23,11 @@
 package weka.core;
 
 import java.util.Vector;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashSet;
 
@@ -307,4 +312,23 @@ public class Instances implements Serializable {
     }
     m_ClassIndex = classIndex;
   }
+
+	public void store(String name) throws IOException
+	{
+		FileWriter fos = new FileWriter(name);
+		
+		for (int i = 0; i < m_Instances.size(); i++)
+		{
+			Instance inst = (Instance)m_Instances.get(i);
+			
+			for (double a : inst.m_AttValues)
+			{
+				fos.write(Integer.toString((int)(a * Math.pow(2, 8))));
+				fos.write(",");
+			}
+			fos.write("\n");
+		}
+		
+		fos.close();
+	}
 }
