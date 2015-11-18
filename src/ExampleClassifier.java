@@ -14,14 +14,16 @@ public class ExampleClassifier {
     public static void main(String[] args) throws Exception {
     	
     	ArffLoader m_Loader = new ArffLoader();
-    	m_Loader.setSource(new File("examples/200hz-3class-gyro.arff"));
+    	m_Loader.setSource(new File("examples/2015-11-18-collection.arff"));
         Instances data = m_Loader.getDataSet();
 
         if (data.classIndex() == -1)
             data.setClassIndex(data.numAttributes() - 1);
 
         MultilayerPerceptron rbf; 
-        rbf = (MultilayerPerceptron)read("models/2p1-gyro-mlp.model");
+        rbf = (MultilayerPerceptron)read("models/example-4-layer-mlp.model");
+        
+        data.store("data.txt");
         
         rbf.export();
                 
