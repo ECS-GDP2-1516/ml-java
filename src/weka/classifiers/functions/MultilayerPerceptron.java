@@ -223,9 +223,7 @@ public class MultilayerPerceptron implements Serializable
         return Instance.missingValue();
       }
   }
-  
-  private ArrayList<NeuralConnection> visited;
-  
+    
   public void export()
   {
 	  ArrayList<ArrayList<NeuralConnection>> layers;
@@ -241,6 +239,11 @@ public class MultilayerPerceptron implements Serializable
 	  int varOffset = 0;
 	  int varStart  = prev_0.size();
 	  int min       = 1;
+	  StringBuffer arrs = new StringBuffer();
+	  StringBuffer code = new StringBuffer();
+	  int dataCount = 0;
+	  int r1        = 1;
+	  int r2        = 2;
 	  
 	  for (NeuralConnection n : layers.get(0))
 	  {
@@ -251,15 +254,77 @@ public class MultilayerPerceptron implements Serializable
 		  }
 	  }
 	  
+	  code.append("double* offset=(double*)data;\n");
+	  code.append("double* s1;\n");
+	  code.append("double* e1;\n");
+	  code.append("double* s2=v;\n");
+	  code.append("double* e2=s2 + ");
+	  code.append(prev_0.size());
+	  code.append(";\n\n");
+	  
 	  for (int l = layers.size() - 2; l >= min; l--)
 	  {
 		  ArrayList<NeuralConnection> layer = layers.get(l);
+		  int firstVar;
+
+		  if (prev_1 == null)
+		  {
+			  firstVar = varStart;
+		  }
+		  else
+		  {
+			  firstVar = prev_1.get(varOffset).getVariable();
+		  }
+		  
+		  code.append("// Layer ");
+		  code.append(l);
+		  code.append("\n");
+		  code.append("s");
+		  code.append(r1);
+		  code.append("=v + ");
+		  code.append(firstVar);
+		  code.append(";\n");
+		  code.append("e");
+		  code.append(r1);
+		  code.append("=s");
+		  code.append(r1);
+		  code.append(" + ");
+		  code.append(layer.size());
+		  code.append(";\n");
+		  code.append("for (double* i = s");
+		  code.append(r1);
+		  code.append("; i < e");
+		  code.append(r1);
+		  code.append("; i++){\n");
+		  code.append("    *i=*offset;\n");
+		  code.append("    offset++;\n");
+		  code.append("    for (double* j=s");
+		  code.append(r2);
+		  code.append("; j < e");
+		  code.append(r2);
+		  code.append("; j++) {\n");
+		  code.append("        *i+=*offset**j;\n");
+		  code.append("        offset++;\n");
+		  code.append("    }\n");
+		  code.append("    sigmoid(i);\n");
+		  code.append("}\n\n");
+		  
+		  if (r1 == 1)
+		  {
+			  r1 = 2;
+			  r2 = 1;
+		  }
+		  else
+		  {
+			  r1 = 1;
+			  r2 = 2;
+		  }
 		  
 		  for (int i = 0; i < layer.size(); i++)
 		  {
 			  NeuralConnection n = layer.get(i);
 			  int var;
-			  
+
 			  if (prev_1 == null)
 			  {
 				  var = varStart++;
@@ -270,17 +335,15 @@ public class MultilayerPerceptron implements Serializable
 			  }
 			  
 			  n.setVariable(var);
-			  System.out.print("v[" + var + "]=");
 			  
 			  if (n instanceof NeuralNode)
 			  {
-				  System.out.print(((NeuralNode)n).m_weights[0] + "+");
+				  arrs.append((float)((NeuralNode)n).m_weights[0]);
+				  arrs.append(",");
 			  }
 			  			  
 			  for (int j = 0; j < n.m_numInputs; j++)
-			  {
-				  NeuralConnection in = n.m_inputList[j];
-				  
+			  {				  
 				  if (j != 0)
 				  {
 					  System.out.print("+");
@@ -288,17 +351,16 @@ public class MultilayerPerceptron implements Serializable
 				  
 				  if (n instanceof NeuralNode)
 				  {
-					  System.out.print(((NeuralNode)n).m_weights[j + 1] + "*");
+					  arrs.append((float)((NeuralNode)n).m_weights[j + 1]);
+					  arrs.append(",");
 				  }
-				  
-				  System.out.print("v[" + in.getVariable() + "]");
 			  }
 			  
-			  System.out.println(";");
+			  arrs.append("\n");  
 			  
 			  if (n instanceof NeuralNode)
 			  {
-				  System.out.println("sigmoid(&v[" + var + "]);");
+				  dataCount += n.m_numInputs + 1;
 			  }
 		  }
 		  
@@ -306,100 +368,15 @@ public class MultilayerPerceptron implements Serializable
 		  prev_0    = layer;
 		  varOffset = 0;
 	  }
-  }
-  
-  public void _export()
-  {
 	  
+	  arrs.substring(0, arrs.length() - 1);
 	  
-  	System.out.println("Classes: " + m_numClasses);
-  	System.out.println("m_normalizeAttributes: " + m_normalizeAttributes);
-  	
-  	System.out.println("ZeroR");
-  	for (int i = 0; i < m_numClasses; i++)
-  	{
-  		System.out.println("  " + m_ZeroR.m_Counts[i]);
-  	}
-  	
-  	System.out.print("attributeBases {");
-  	for (int i = 0; i < m_attributeBases.length; i++)
-  	{
-  		System.out.print(m_attributeBases[i] + ",");
-  	}
-  	System.out.println("}");
-  	
-  	System.out.print("attributeRanges {");
-  	for (int i = 0; i < m_attributeRanges.length; i++)
-  	{
-  		System.out.print(m_attributeRanges[i] + ",");
-  	}
-  	System.out.println("}");
-  	  	
-  	System.out.println();
-  	System.out.println("NETWORK");
-  	System.out.println();
-  	
-  	visited = new ArrayList<NeuralConnection>();
-  	loop(this.m_outputs, this.m_numClasses);
-  	
-  	for (int i = 0; i < visited.size(); i++)
-  	{
-  		NeuralConnection item = visited.get(i);
-  		
-  		if (item.m_numInputs != 0)
-  		{
-  			System.out.print("n" + i + "->link(new NeuralConnection*[" + item.m_numInputs + "] {");
-  			
-  			for (int j = 0; j < item.m_numInputs - 1; j++)
-			{
-  				System.out.print("n" + visited.indexOf(item.m_inputList[j]) + ",");
-  			}
-  			
-  			System.out.print("n" + visited.indexOf(item.m_inputList[item.m_numInputs - 1]));
-  			
-  			System.out.println("});");
-  		}
-  	}
-  	
+	  System.out.print("const double* data=new double[");
+	  System.out.print(dataCount);
+	  System.out.print("]{");
+	  System.out.print(arrs.toString());
+	  System.out.println("};");
+	  
+	  System.out.println(code.toString());
   }
-  
-  	private void loop(NeuralConnection[] items, int size)
-	{
-  		for (int i = 0; i < size; i++)
-	  	{
-	  		if (visited.contains(items[i])) continue;
-	  		
-  			System.out.print("NeuralConnection* n" + visited.size() + "=new ");
-  			visited.add(items[i]);
-  			
-  			if (items[i] instanceof NeuralNode)
-  			{
-  				double[] weights = ((NeuralNode)items[i]).m_weights;
-  				
-  				System.out.print("NeuralNode(" + weights[0] + "," + items[i].m_numInputs + "," + "new double[" + items[i].m_numInputs + "]{");
-  				
-  				for (int j = 1; j < items[i].m_numInputs; j++)
-  				{
-  					System.out.print(weights[j] + ",");
-  				}
-  				
-  				System.out.println(weights[items[i].m_numInputs] + "});");
-  				loop(items[i].m_inputList, items[i].m_numInputs);
-  			}
-  			else
-  			{
-  				NeuralEnd end = (NeuralEnd)items[i];
-  				
-  				if (end.m_input)
-  				{
-  					System.out.println("NeuralInput(" + end.m_link + ");");
-  				}
-  				else
-  				{
-  					System.out.println("NeuralOutput(" + items[i].m_numInputs + ");");
-  					loop(items[i].m_inputList, items[i].m_numInputs);
-  				}
-  			}
-	  	}
-	}
 }
