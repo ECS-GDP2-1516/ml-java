@@ -22,6 +22,7 @@
 package weka.classifiers.functions.neural;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /** 
  * Abstract unit in a NeuralNetwork.
@@ -31,7 +32,7 @@ import java.io.Serializable;
  */
 public abstract class NeuralConnection
   implements Serializable {
-
+	
   /** for serialization */
   private static final long serialVersionUID = -286208828571059163L;
 
@@ -41,13 +42,13 @@ public abstract class NeuralConnection
   /////on the connections they can make.
 
   /** The list of inputs to this unit. */
-  protected NeuralConnection[] m_inputList;
+  public NeuralConnection[] m_inputList;
 
   /** The list of outputs from this unit. */
-  protected NeuralConnection[] m_outputList;
+  public NeuralConnection[] m_outputList;
 
   /** The number of inputs. */
-  protected int m_numInputs;
+  public int m_numInputs;
 
   /** The output value for this unit, NaN if not calculated. */
   protected double m_unitValue;
@@ -75,4 +76,42 @@ public abstract class NeuralConnection
    * @return The output value, or NaN, if the value has not been calculated.
    */
   public abstract double outputValue(boolean calculate);
+  
+  public void generateLayers(int layerID, ArrayList<ArrayList<NeuralConnection>> layers)
+  {
+	  ArrayList<NeuralConnection> layer;
+	  
+	  if (layers.size() != layerID)
+	  {
+		  layer = layers.get(layerID);
+		  
+		  if (!layer.contains(this))
+		  {
+			  layer.add(this);
+		  }
+	  }
+	  else
+	  {
+		  layer = new ArrayList<NeuralConnection>();
+		  layers.add(layer);
+		  layer.add(this);
+	  }
+	  
+	  for (int i = 0; i < m_numInputs; i++)
+	  {
+		  m_inputList[i].generateLayers(layerID + 1, layers);
+	  }
+  }
+  
+  public int getVariable()
+  {
+	  return var;
+  }
+  
+  private int var;
+  
+  public void setVariable(int _var)
+  {
+	  this.var = _var;
+  }
 }

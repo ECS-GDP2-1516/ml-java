@@ -22,8 +22,10 @@
 package weka.classifiers.functions;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import weka.classifiers.functions.neural.NeuralConnection;
+import weka.classifiers.functions.neural.NeuralNode;
 import weka.classifiers.rules.ZeroR;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -49,10 +51,10 @@ public class MultilayerPerceptron implements Serializable
      * For an input it is the attribute number, for an output, if nominal
      * it is the class value. 
      */
-    private int m_link;
+    public int m_link;
     
     /** True if node is an input, False if it's an output. */
-    private boolean m_input;
+    public boolean m_input;
     
     /**
      * Call this to get the output value of this unit. 
@@ -82,12 +84,24 @@ public class MultilayerPerceptron implements Serializable
       }
       return m_unitValue;
     }
+    
+    public int getVariable()
+    {
+    	if (m_input)
+    	{
+    		return m_link;
+    	}
+    	else
+    	{
+    		return super.getVariable();
+    	}
+    }
   }
   
   
   /** a ZeroR model in case no model can be built from the data 
    * or the network predicts all zeros for the classes */
-  private ZeroR m_ZeroR;
+  public ZeroR m_ZeroR;
 
   /** The training instances. */
   private Instances m_instances;
@@ -96,19 +110,19 @@ public class MultilayerPerceptron implements Serializable
   private Instance m_currentInstance;
   
   /** The ranges for all the attributes. */
-  private double[] m_attributeRanges;
+  public double[] m_attributeRanges;
 
   /** The base values for all the attributes. */
-  private double[] m_attributeBases;
+  public double[] m_attributeBases;
 
   /** The output units.(only feeds the errors, does no calcs) */
-  private NeuralEnd[] m_outputs;
+  public NeuralEnd[] m_outputs;
 
   /** The number of classes. */
-  private int m_numClasses = 0;
+  public int m_numClasses = 0;
 
   /** This flag states that the user wants the input values normalized. */
-  private boolean m_normalizeAttributes;
+  public boolean m_normalizeAttributes;
 
   /**
    * this will reset all the nodes in the network.
@@ -208,5 +222,161 @@ public class MultilayerPerceptron implements Serializable
       } else {
         return Instance.missingValue();
       }
+  }
+    
+  public void export()
+  {
+	  ArrayList<ArrayList<NeuralConnection>> layers;
+	  layers = new ArrayList<ArrayList<NeuralConnection>>();
+	  
+	  for (NeuralConnection n : m_outputs)
+	  {
+		  n.generateLayers(0, layers);
+	  }
+	  
+	  ArrayList<NeuralConnection> prev_0, prev_1 = null;
+	  prev_0 = layers.get(layers.size() - 1);
+	  int varOffset = 0;
+	  int varStart  = prev_0.size();
+	  int min       = 1;
+	  StringBuffer arrs = new StringBuffer();
+	  StringBuffer code = new StringBuffer();
+	  int dataCount = 0;
+	  int r1        = 1;
+	  int r2        = 2;
+	  
+	  for (NeuralConnection n : layers.get(0))
+	  {
+		  if (n.m_numInputs > 1)
+		  {
+			  min = 0;
+			  break;
+		  }
+	  }
+	  
+	  code.append("double* offset=(double*)data;\n");
+	  code.append("double* s1;\n");
+	  code.append("double* e1;\n");
+	  code.append("double* s2=v;\n");
+	  code.append("double* e2=s2 + ");
+	  code.append(prev_0.size());
+	  code.append(";\n\n");
+	  
+	  for (int l = layers.size() - 2; l >= min; l--)
+	  {
+		  ArrayList<NeuralConnection> layer = layers.get(l);
+		  int firstVar;
+
+		  if (prev_1 == null)
+		  {
+			  firstVar = varStart;
+		  }
+		  else
+		  {
+			  firstVar = prev_1.get(varOffset).getVariable();
+		  }
+		  
+		  code.append("// Layer ");
+		  code.append(l);
+		  code.append("\n");
+		  code.append("s");
+		  code.append(r1);
+		  code.append("=v + ");
+		  code.append(firstVar);
+		  code.append(";\n");
+		  code.append("e");
+		  code.append(r1);
+		  code.append("=s");
+		  code.append(r1);
+		  code.append(" + ");
+		  code.append(layer.size());
+		  code.append(";\n");
+		  code.append("for (double* i = s");
+		  code.append(r1);
+		  code.append("; i < e");
+		  code.append(r1);
+		  code.append("; i++){\n");
+		  code.append("    *i=*offset;\n");
+		  code.append("    offset++;\n");
+		  code.append("    for (double* j=s");
+		  code.append(r2);
+		  code.append("; j < e");
+		  code.append(r2);
+		  code.append("; j++) {\n");
+		  code.append("        *i+=*offset**j;\n");
+		  code.append("        offset++;\n");
+		  code.append("    }\n");
+		  code.append("    sigmoid(i);\n");
+		  code.append("}\n\n");
+		  
+		  if (r1 == 1)
+		  {
+			  r1 = 2;
+			  r2 = 1;
+		  }
+		  else
+		  {
+			  r1 = 1;
+			  r2 = 2;
+		  }
+		  
+		  for (int i = 0; i < layer.size(); i++)
+		  {
+			  NeuralConnection n = layer.get(i);
+			  int var;
+
+			  if (prev_1 == null)
+			  {
+				  var = varStart++;
+			  }
+			  else
+			  {
+				  var = prev_1.get(varOffset++).getVariable();
+			  }
+			  
+			  n.setVariable(var);
+			  
+			  if (n instanceof NeuralNode)
+			  {
+				  arrs.append((float)((NeuralNode)n).m_weights[0]);
+				  arrs.append(",");
+			  }
+			  			  
+			  for (int j = 0; j < n.m_numInputs; j++)
+			  {				  
+				  if (j != 0)
+				  {
+					  System.out.print("+");
+				  }
+				  
+				  if (n instanceof NeuralNode)
+				  {
+					  arrs.append((float)((NeuralNode)n).m_weights[j + 1]);
+					  arrs.append(",");
+				  }
+			  }
+			  
+			  arrs.append("\n");  
+			  
+			  if (n instanceof NeuralNode)
+			  {
+				  dataCount += n.m_numInputs + 1;
+			  }
+		  }
+		  
+		  prev_1    = prev_0;
+		  prev_0    = layer;
+		  varOffset = 0;
+	  }
+	  
+	  arrs.substring(0, arrs.length() - 1);
+	  
+	  System.out.print("const double* data=new double[");
+	  System.out.print(dataCount);
+	  System.out.print("]{");
+	  System.out.print(arrs.toString());
+	  System.out.println("};");
+	  
+	  System.out.println(code.toString());
   }
 }
