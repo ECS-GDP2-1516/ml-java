@@ -76,4 +76,16 @@ public class NeuralNode
 	    }  
 	    return value;
 	  }
+  	
+  	public void export()
+  	{
+  		if (m_inputList[0] instanceof NeuralNode)
+  		{
+  			
+  		}
+  		else
+  		{
+
+  		}
+  	}
 }

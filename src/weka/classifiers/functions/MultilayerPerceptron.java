@@ -84,6 +84,18 @@ public class MultilayerPerceptron implements Serializable
       }
       return m_unitValue;
     }
+    
+    public int getVariable()
+    {
+    	if (m_input)
+    	{
+    		return m_link;
+    	}
+    	else
+    	{
+    		return super.getVariable();
+    	}
+    }
   }
   
   
@@ -216,6 +228,88 @@ public class MultilayerPerceptron implements Serializable
   
   public void export()
   {
+	  ArrayList<ArrayList<NeuralConnection>> layers;
+	  layers = new ArrayList<ArrayList<NeuralConnection>>();
+	  
+	  for (NeuralConnection n : m_outputs)
+	  {
+		  n.generateLayers(0, layers);
+	  }
+	  
+	  ArrayList<NeuralConnection> prev_0, prev_1 = null;
+	  prev_0 = layers.get(layers.size() - 1);
+	  int varOffset = 0;
+	  int varStart  = prev_0.size();
+	  int min       = 1;
+	  
+	  for (NeuralConnection n : layers.get(0))
+	  {
+		  if (n.m_numInputs > 1)
+		  {
+			  min = 0;
+			  break;
+		  }
+	  }
+	  
+	  for (int l = layers.size() - 2; l >= min; l--)
+	  {
+		  ArrayList<NeuralConnection> layer = layers.get(l);
+		  
+		  for (int i = 0; i < layer.size(); i++)
+		  {
+			  NeuralConnection n = layer.get(i);
+			  int var;
+			  
+			  if (prev_1 == null)
+			  {
+				  var = varStart++;
+			  }
+			  else
+			  {
+				  var = prev_1.get(varOffset++).getVariable();
+			  }
+			  
+			  n.setVariable(var);
+			  System.out.print("v[" + var + "]=");
+			  
+			  if (n instanceof NeuralNode)
+			  {
+				  System.out.print(((NeuralNode)n).m_weights[0] + "+");
+			  }
+			  			  
+			  for (int j = 0; j < n.m_numInputs; j++)
+			  {
+				  NeuralConnection in = n.m_inputList[j];
+				  
+				  if (j != 0)
+				  {
+					  System.out.print("+");
+				  }
+				  
+				  if (n instanceof NeuralNode)
+				  {
+					  System.out.print(((NeuralNode)n).m_weights[j + 1] + "*");
+				  }
+				  
+				  System.out.print("v[" + in.getVariable() + "]");
+			  }
+			  
+			  System.out.println(";");
+			  
+			  if (n instanceof NeuralNode)
+			  {
+				  System.out.println("sigmoid(&v[" + var + "]);");
+			  }
+		  }
+		  
+		  prev_1    = prev_0;
+		  prev_0    = layer;
+		  varOffset = 0;
+	  }
+  }
+  
+  public void _export()
+  {
 	  
 	  
   	System.out.println("Classes: " + m_numClasses);
@@ -227,6 +321,20 @@ public class MultilayerPerceptron implements Serializable
   		System.out.println("  " + m_ZeroR.m_Counts[i]);
   	}
   	
+  	System.out.print("attributeBases {");
+  	for (int i = 0; i < m_attributeBases.length; i++)
+  	{
+  		System.out.print(m_attributeBases[i] + ",");
+  	}
+  	System.out.println("}");
+  	
+  	System.out.print("attributeRanges {");
+  	for (int i = 0; i < m_attributeRanges.length; i++)
+  	{
+  		System.out.print(m_attributeRanges[i] + ",");
+  	}
+  	System.out.println("}");
+  	  	
   	System.out.println();
   	System.out.println("NETWORK");
   	System.out.println();
@@ -240,14 +348,16 @@ public class MultilayerPerceptron implements Serializable
   		
   		if (item.m_numInputs != 0)
   		{
-  			System.out.print("LINK " + i + "{");
+  			System.out.print("n" + i + "->link(new NeuralConnection*[" + item.m_numInputs + "] {");
   			
-  			for (int j = 0; j < item.m_numInputs; j++)
+  			for (int j = 0; j < item.m_numInputs - 1; j++)
 			{
-  				System.out.print(visited.indexOf(item.m_inputList[j]) + ",");
+  				System.out.print("n" + visited.indexOf(item.m_inputList[j]) + ",");
   			}
   			
-  			System.out.println("}");
+  			System.out.print("n" + visited.indexOf(item.m_inputList[item.m_numInputs - 1]));
+  			
+  			System.out.println("});");
   		}
   	}
   	
@@ -259,23 +369,21 @@ public class MultilayerPerceptron implements Serializable
 	  	{
 	  		if (visited.contains(items[i])) continue;
 	  		
-  			System.out.print("ID " + visited.size() + " ");
+  			System.out.print("NeuralConnection* n" + visited.size() + "=new ");
   			visited.add(items[i]);
   			
   			if (items[i] instanceof NeuralNode)
   			{
   				double[] weights = ((NeuralNode)items[i]).m_weights;
   				
-  				System.out.println("Node");
-  				System.out.println("  Threshold: " + weights[0]);
-  				System.out.print("  Weights {");
+  				System.out.print("NeuralNode(" + weights[0] + "," + items[i].m_numInputs + "," + "new double[" + items[i].m_numInputs + "]{");
   				
-  				for (int j = 1; j <= items[i].m_numInputs; j++)
+  				for (int j = 1; j < items[i].m_numInputs; j++)
   				{
   					System.out.print(weights[j] + ",");
   				}
   				
-  				System.out.println("}");
+  				System.out.println(weights[items[i].m_numInputs] + "});");
   				loop(items[i].m_inputList, items[i].m_numInputs);
   			}
   			else
@@ -284,11 +392,11 @@ public class MultilayerPerceptron implements Serializable
   				
   				if (end.m_input)
   				{
-  					System.out.println("Input(" + end.m_link + ")");
+  					System.out.println("NeuralInput(" + end.m_link + ");");
   				}
   				else
   				{
-  					System.out.println("Output");
+  					System.out.println("NeuralOutput(" + items[i].m_numInputs + ");");
   					loop(items[i].m_inputList, items[i].m_numInputs);
   				}
   			}

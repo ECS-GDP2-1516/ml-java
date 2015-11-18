@@ -24,7 +24,8 @@ public class ExampleClassifier {
         rbf = (MultilayerPerceptron)read("models/2p1-gyro-mlp.model");
         
         rbf.export();
-        
+                
+        /*      
         float success = 0;
         
         for(int i = 0; i < data.numInstances(); i++)
@@ -35,7 +36,8 @@ public class ExampleClassifier {
         	}
         }
         
-        System.out.println(success / (float)data.numInstances() * 100.0 + "% success rate");
+        System.out.println(success / data.numInstances());
+        */
     }
     
     /**
