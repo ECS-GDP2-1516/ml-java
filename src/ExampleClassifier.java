@@ -14,20 +14,20 @@ public class ExampleClassifier {
     public static void main(String[] args) throws Exception {
     	
     	ArffLoader m_Loader = new ArffLoader();
-    	m_Loader.setSource(new File("examples/2015-11-18-collection.arff"));
+    	m_Loader.setSource(new File("models/best-so-far-10hz-10samples-mlp.arff"));
         Instances data = m_Loader.getDataSet();
 
         if (data.classIndex() == -1)
             data.setClassIndex(data.numAttributes() - 1);
 
         MultilayerPerceptron rbf; 
-        rbf = (MultilayerPerceptron)read("models/example-4-layer-mlp.model");
+        rbf = (MultilayerPerceptron)read("models/best-so-far-10hz-10samples-mlp.model");
         
         data.store("data.txt");
         
         rbf.export();
                 
-        /*      
+             
         float success = 0;
         
         for(int i = 0; i < data.numInstances(); i++)
@@ -39,7 +39,7 @@ public class ExampleClassifier {
         }
         
         System.out.println(success / data.numInstances());
-        */
+        
     }
     
     /**

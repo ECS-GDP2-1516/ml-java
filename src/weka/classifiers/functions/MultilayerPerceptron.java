@@ -302,7 +302,7 @@ public class MultilayerPerceptron implements Serializable
 		  code.append("; j < e");
 		  code.append(r2);
 		  code.append("; j++) {\n");
-		  code.append("        *i+=(*offset++**j) >> 8;\n");
+		  code.append("        *i+=(*offset++**j) >> 12;\n");
 		  code.append("    }\n");
 		  code.append("    sigmoid(i);\n");
 		  code.append("}\n\n");
@@ -336,7 +336,7 @@ public class MultilayerPerceptron implements Serializable
 			  
 			  if (n instanceof NeuralNode)
 			  {
-				  arrs.append((int)(((NeuralNode)n).m_weights[0] * Math.pow(2, 8)));
+				  arrs.append((int)(((NeuralNode)n).m_weights[0] * Math.pow(2, 12)));
 				  arrs.append(",");
 			  }
 			  			  
@@ -349,7 +349,7 @@ public class MultilayerPerceptron implements Serializable
 				  
 				  if (n instanceof NeuralNode)
 				  {
-					  arrs.append((int)(((NeuralNode)n).m_weights[j + 1] * Math.pow(2, 8)));
+					  arrs.append((int)(((NeuralNode)n).m_weights[j + 1] * Math.pow(2, 12)));
 					  arrs.append(",");
 				  }
 			  }
