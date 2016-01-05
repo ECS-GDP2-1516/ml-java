@@ -323,7 +323,7 @@ public class Instances implements Serializable {
 			
 			for (double a : inst.m_AttValues)
 			{
-				fos.write(Integer.toString((int)(a * Math.pow(2, 8))));
+				fos.write(Integer.toString((int)(a * Math.pow(2, 12))));
 				fos.write(",");
 			}
 			fos.write("\n");
